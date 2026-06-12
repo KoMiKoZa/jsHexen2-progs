@@ -511,15 +511,16 @@ TorchBurn
 */
 void UseTorch()
 {
-	if((self.effects!=EF_DIMLIGHT) && (self.effects!=EF_TORCHLIGHT))
-	{
-		sound (self, CHAN_WEAPON, "raven/littorch.wav", 1, ATTN_NORM);
+// [2026-06-12] jsH2+ removed the equality test ((self.effects!=EF_DIMLIGHT)&&(self.effects!=EF_TORCHLIGHT)):
+// during the dim phase effects==EF_DIMLIGHT exactly, so using a fresh torch consumed the
+// artifact (FL_ARTIFACTUSED set by the callers) without re-lighting. Both callers already
+// gate on torchtime < time+5, so a use must always (re)light.
+	sound (self, CHAN_WEAPON, "raven/littorch.wav", 1, ATTN_NORM);
 
-		self.effects(+)EF_DIMLIGHT;   // set player to emit light
-		self.torchtime		= time + 1;
-		self.torchthink		= FullTorch;
-		self.artifact_flags (+) AFL_TORCH;   // Show the torch is in use
-	}
+	self.effects(+)EF_DIMLIGHT;   // set player to emit light
+	self.torchtime		= time + 1;
+	self.torchthink		= FullTorch;
+	self.artifact_flags (+) AFL_TORCH;   // Show the torch is in use
 }
 
 

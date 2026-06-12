@@ -256,7 +256,8 @@ void() worldspawn =
 	lightstyle(5,"jklmnopqrstuvwxyzyxwvutsrqponmlkj");
 
 	// 6 TORCHLIGHT (second variety)
-	lightstyle(EF_TORCHLIGHT, "knmonqnmolm");
+	lightstyle(6, "knmonqnmolm");	// [2026-06-12] jsH2+ literal 6: EF_TORCHLIGHT was abused as a style INDEX here
+									// (unrelated to the effects bit, which moved to 1024); style 6 must stay 6.
 	
 	// 7 CANDLE (second variety)
 	lightstyle(7, "mmmaaaabcdefgmmmmaaaammmaamm");

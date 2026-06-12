@@ -367,7 +367,10 @@ void lightning_fire_normal (void)
 		}
 		else if(self.weaponframe==$normal16)
 		{
-			if(!self.lefty)
+			// [2026-06-12] jsH2+ never strip the light while a torch owns it (AFL_TORCH): at $normal16 the
+			// in-loop branch consumes lefty and the exit branches below re-test it in the SAME call,
+			// double-stripping the torch's DIMLIGHT (torch visibly died when firing the staff).
+			if(!self.lefty && !(self.artifact_flags&AFL_TORCH))
 				self.effects(-)EF_DIMLIGHT;
 			else
 				self.lefty=FALSE;
@@ -381,7 +384,7 @@ void lightning_fire_normal (void)
 	{
 		if(self.effects&EF_DIMLIGHT)
 		{
-			if(!self.lefty)
+			if(!self.lefty && !(self.artifact_flags&AFL_TORCH))	// [2026-06-12] jsH2+ torch owns the light
 				self.effects(-)EF_DIMLIGHT;
 			else
 				self.lefty=FALSE;
@@ -395,7 +398,7 @@ void lightning_fire_normal (void)
 	{
 		if(self.effects&EF_DIMLIGHT)
 		{
-			if(!self.lefty)
+			if(!self.lefty && !(self.artifact_flags&AFL_TORCH))	// [2026-06-12] jsH2+ torch owns the light
 				self.effects(-)EF_DIMLIGHT;
 			else
 				self.lefty=FALSE;

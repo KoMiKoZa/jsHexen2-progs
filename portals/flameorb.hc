@@ -82,7 +82,8 @@ void burner_think ()
 		stopSound(self.enemy,CHAN_BODY);
 		//sound(self.enemy,CHAN_BODY,"misc/null.wav",1,ATTN_NORM);
 		self.enemy.flags2 (-) FL2_ONFIRE;
-		self.enemy.effects (-) EF_DIMLIGHT;
+		if(!(self.enemy.artifact_flags&AFL_TORCH))	// [2026-06-12] jsH2+ burn ending must not douse an active torch
+			self.enemy.effects (-) EF_DIMLIGHT;
 		remove(self);
 		return;
 	}
@@ -91,7 +92,8 @@ void burner_think ()
 		sound (self.enemy, CHAN_BODY, "misc/fout.wav", 1, ATTN_NORM);
 		smolder((self.enemy.absmin+self.enemy.absmax)*0.5);
 		self.enemy.flags2 (-) FL2_ONFIRE;
-		self.enemy.effects (-) EF_DIMLIGHT;
+		if(!(self.enemy.artifact_flags&AFL_TORCH))	// [2026-06-12] jsH2+ water dousing the burn must not douse an active torch
+			self.enemy.effects (-) EF_DIMLIGHT;
 		remove(self);
 		return;
 	}

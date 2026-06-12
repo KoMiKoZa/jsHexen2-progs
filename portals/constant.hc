@@ -525,7 +525,10 @@ float	ATTN_LOOP					= 4;
 float	EF_BRIGHTFIELD				= 1;
 float	EF_MUZZLEFLASH 				= 2;
 float	EF_BRIGHTLIGHT 				= 4;
-float	EF_TORCHLIGHT				= 6;
+float	EF_TORCHLIGHT				= 1024;	// [2026-06-12] jsH2+ was 6 = MUZZLEFLASH|BRIGHTLIGHT smuggled onto the player
+											// (full torch + anything stripping DIMLIGHT = wide white light). Now its own
+											// server-only bit: effects reach the client as a byte, engine bits end at 128,
+											// hcode already claims 256/512 (EF_TEX_STOPF/STOPL).
 float	EF_DIMLIGHT 				= 8;
 float	EF_DARKLIGHT				= 16;
 float	EF_DARKFIELD				= 32;
