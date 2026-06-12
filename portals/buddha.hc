@@ -958,7 +958,9 @@ void buddha_run (void) [++ $ready1 .. $ready20]
 	{
 		self.dmgtime+=1;
 		SUB_UseTargets();
-		self.target = self.netname;
+		// [2026-06-12] jsH2+ (fix from HoT/uhexen2): removed "self.target = self.netname;" -
+		// the death chain is fired by buddha_die itself now (see there); pre-assigning it
+		// here was dead bookkeeping that desynced when stages were skipped by a fast kill.
 		self.think = buddha_recharge;
 		thinktime self : 0.1;
 		return;
@@ -1050,7 +1052,15 @@ void buddha_die (void)[++ $death1 .. $death14]
 	entity found;
 	vector new_origin;
 
-	self.target = self.netname;
+	if (self.count >= 3.5 && self.target != self.netname)
+	{	// [2026-06-12] jsH2+ (fix from HoT/uhexen2): the death sequence never fired
+		// SUB_UseTargets at all - the finale chain only ran from the mid-fight health
+		// stages, so killing Praevus fast enough skipped them and the ending never
+		// triggered. Fire the death chain once, mid-death-spectacle, exactly once
+		// (after firing, target==netname keeps this from repeating).
+		self.target = self.netname;
+		SUB_UseTargets();
+	}
 
 	if (self.think != buddha_die)
 	{
