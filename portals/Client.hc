@@ -2332,6 +2332,7 @@ called when a player connects to a server
 */
 void() ClientConnect =
 {
+	sprint (self, "jsHexen2+ Progs 1.0.0 (based on Raven v1.21)\n");	// [2026-06-12] jsH2+ version identity
 	bprint (self.netname);
 	bprint (STR_JOINEDTHEGAME);
 	
