@@ -57,7 +57,7 @@ Each fix is one commit. The commit hash is the unique ID — `git show <hash>`
 shows exactly what changed.
 
 <details>
-<summary><b>1.0.0 (in development)</b> — 9 entries, newest first</summary>
+<summary><h3>📜 1.0.0 (in development) — 9 fixes &nbsp;<sub><i>(click to expand)</i></sub></h3></summary>
 
 <br>
 
