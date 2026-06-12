@@ -339,8 +339,9 @@ entity found;
 	if (other.classname != "player")//||(!infront_of_ent(self,other)))
 		return;
 
-	if ((cvar("noexit") == 1) || ((cvar("noexit") == 2) && (mapname != "start")))
-	{
+	if (deathmatch && ((cvar("noexit") == 1) || ((cvar("noexit") == 2) && (mapname != "start"))))
+	{	// [2026-06-12] jsH2+ (HoT/uhexen2): noexit is a deathmatch rule - ungated, a leftover
+		// noexit cvar in single player/coop KILLED anyone touching a level exit.
 // rjr quake2 change		T_Damage (other, self, self, 50000, 1000, TRUE);
 		T_Damage (other, self, self, 50000);
 		return;
@@ -1206,7 +1207,12 @@ float		fraglimit;
 	
 	if (gameover)	// someone else quit the game already
 		return;
-		
+
+	if (!deathmatch)
+		return;	// [2026-06-12] jsH2+ (HoT/uhexen2): time/frag limits are deathmatch rules -
+			// ungated, leftover timelimit/fraglimit cvars ended single-player and coop
+			// maps out of nowhere.
+
 	timelimit = cvar("timelimit") * 60;
 	fraglimit = cvar("fraglimit");
 	

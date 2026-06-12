@@ -733,9 +733,11 @@ void() ImpulseCommands =
 		if (wp_deselect == 0)
 			CycleWeaponCommand ();
 	break;
-	case 11:
-		ServerflagsCommand ();
-	break;
+//	case 11:	[2026-06-12] jsH2+ disabled (HoT/uhexen2 does the same): ServerflagsCommand
+//			lets ANY player set the server's cross-level progression flags with one
+//			impulse - an open progression cheat/grief in every game mode.
+//		ServerflagsCommand ();
+//	break;
 	case 12:
 		CycleWeaponReverseCommand ();
 	break;
