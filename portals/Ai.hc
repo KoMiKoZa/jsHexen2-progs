@@ -1004,6 +1004,10 @@ float have_monsters;
 		precache_model4 ("models/snowleopard.mdl");
 		precache_model2 ("models/mezzoref.spr");
 		precache_model2 ("models/h_mez.mdl");
+		precache_model4 ("models/h_mez2.mdl");	// [2026-06-12] jsH2+ (HoT/uhexen2): the weretiger
+						// class uses the h_mez2 head gib, whose own precache is
+						// skipped for summoned spawns - head-gibbing a summoned
+						// weretiger hit an unprecached model.
 		precache_sound2 ("mezzo/skid.wav");
 		precache_sound2 ("mezzo/roar.wav");
 		precache_sound2 ("mezzo/reflect.wav");
@@ -1173,7 +1177,7 @@ vector org;
 			spawn_tdeath(trace_ent.origin,newmis);
 
 	newmis.angles = self.angles;
-	newmis.flags2+=FL_SUMMONED;
+	newmis.flags2(+)FL_SUMMONED;	// [2026-06-12] jsH2+ was "+=" (see newai.hc note) (HoT)
 //	newmis.spawnflags=NO_DROP;
 
 	float foundthink,rnd;

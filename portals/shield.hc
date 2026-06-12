@@ -51,7 +51,8 @@ void() MakeForceField=
 	self.shield.health=200;
 	self.shield.th_die=ForceFieldDie;
 	self.shield.th_pain=ForceFieldPain;
-	self.flags2+=FL_SHIELDED;
+	self.flags2(+)FL_SHIELDED;	// [2026-06-12] jsH2+ was "+=": recasting the force shield while
+					// already shielded corrupted the flag set. (HoT)
 
 	setmodel(self.shield,"models/blast.mdl");
 	self.shield.scale=0.3;

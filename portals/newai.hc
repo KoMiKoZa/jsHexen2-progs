@@ -829,7 +829,8 @@ void AI_Land_Init ()
 {
 
 	self.takedamage = DAMAGE_YES;
-	self.flags2+=FL_ALIVE;
+	self.flags2(+)FL_ALIVE;	// [2026-06-12] jsH2+ was "+=": arithmetic add corrupts the flag set
+				// if the bit is already on (re-init paths). Bitwise everywhere. (HoT)
 	self.ideal_yaw = self.angles * '0 1 0';
 	if (!self.yaw_speed)
 		self.yaw_speed = 20;

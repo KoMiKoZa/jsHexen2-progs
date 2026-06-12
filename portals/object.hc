@@ -1424,7 +1424,7 @@ void webs_touch ()
 		return;
 
 	if(!other.flags&FL_ONGROUND)
-		other.flags+=FL_ONGROUND;
+		other.flags(+)FL_ONGROUND;	// [2026-06-12] jsH2+ was "+=" (see newai.hc note) (HoT)
 }
 
 void webs_death (void)

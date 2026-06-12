@@ -1111,7 +1111,7 @@ void func_rotating_movechain (void)
 
 	self.owner.movechain=self;
 	if(!self.spawnflags&NOANGLECHAIN)
-		self.flags+=FL_MOVECHAIN_ANGLE;
+		self.flags(+)FL_MOVECHAIN_ANGLE;	// [2026-06-12] jsH2+ was "+=" (see newai.hc note) (HoT)
 	
 	if(self.targetname)
 	{
