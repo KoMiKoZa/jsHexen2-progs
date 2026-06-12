@@ -1,5 +1,9 @@
 # jsHexen2+ Progs
 
+![License: GPL v2](https://img.shields.io/badge/License-GPL_v2-blue.svg)
+![Progs](https://img.shields.io/badge/progs-1.0.0--dev-orange.svg)
+![Base](https://img.shields.io/badge/base-Raven_v1.21-8B0000.svg)
+
 Game-logic source (`progs.dat`) for **Hexen II: Portal of Praevus**, maintained
 for the [jsHexen2+ engine](https://github.com/KoMiKoZa) project.
 
@@ -9,8 +13,9 @@ if it crashed, blocked progress, or plainly misbehaved, it gets fixed.
 If it would change how the game *feels*, it doesn't go in (or ships as an
 opt-in toggle, off by default).
 
-**Your saves are safe.** The save-format fields are never touched, so any
-existing save loads with any version of these progs.
+> [!IMPORTANT]
+> **Your saves are safe.** The save-format fields are never touched, so any
+> existing save loads with any version of these progs.
 
 ## One brain for the whole game
 
@@ -22,6 +27,15 @@ too. The base game's own `progs.dat` (in `data1/`, final official version
 1.11) is a different, older program that mission-pack engines never load:
 it sits inert and is out of scope here. Fixing this one file fixes all of
 Hexen II as you actually play it.
+
+> [!NOTE]
+> **Works in other engines too.** This is a standard mission-pack `progs.dat`
+> on the official v1.12 data layout — any engine that runs Portal of Praevus
+> loads it: [Hammer of Thyrion / uhexen2](https://sourceforge.net/projects/uhexen2/),
+> FTE's Hexen II support, forks, even the original 1998 expansion exe.
+> One cosmetic feature (the two-state torch light) is paired with a jsHexen2+
+> render upgrade and simply looks vanilla elsewhere; everything else is pure
+> game logic and behaves identically on any engine.
 
 ## Version
 
@@ -42,7 +56,10 @@ separate version line.
 Each fix is one commit. The commit hash is the unique ID — `git show <hash>`
 shows exactly what changed.
 
-### 1.0.0 (in development)
+<details>
+<summary><b>1.0.0 (in development)</b> — 9 entries, newest first</summary>
+
+<br>
 
 | Commit | Fix | What it does |
 |---|---|---|
@@ -55,6 +72,8 @@ shows exactly what changed.
 | `660f17b` | Torch light bug | The torch no longer turns into a wide white light or goes dark when firing the Tempest Staff, and the *burn* system (catching fire, or water putting that fire out) no longer snuffs the torch's light along with it. Root cause: `EF_TORCHLIGHT` was `6` — two other flags glued together — so a burning torch secretly carried a white light that appeared whenever something else touched the player's light. It is now its own flag, and the staff/burn code never strips a light the torch owns. Also made dim-phase use actually relight (vanilla silently did nothing); the relight rule was later refined — see the two-state commit. |
 | `e872eb7` | Version print | The console shows `jsHexen2+ Progs 1.0.0 (based on Raven v1.21)` on every map load, so you can always tell which progs you're running. |
 | `78436a8` | Vanilla import | Raven v1.21-final mission-pack source, untouched baseline. |
+
+</details>
 
 _(more fixes land here as they are committed — crashes & broken levels next,
 then visible misbehaviors, then rules & abuse)_
@@ -74,8 +93,12 @@ nhcc.exe -name Progs.src      (or: hcc -os -oi -on)
 
 Output: `progs.dat` (+ `progs.lno` line-number file for debugging). Place
 `progs.dat` loose in your `Portals/` game directory — a loose file wins over
-the copy inside the paks. Some installs already ship it extracted loose;
-replace it, and keep the original as `progs_vanilla.dat` if you want to A/B.
+the copy inside the paks.
+
+> [!TIP]
+> Some installs already ship `progs.dat` extracted loose; replace it, and
+> keep the original as `progs_vanilla.dat` so you can always A/B against
+> stock behavior.
 
 ## Layout
 
