@@ -17,7 +17,7 @@ opt-in toggle, off by default).
 > **Your saves are safe.** The save-format fields are never touched, so any
 > existing save loads with any version of these progs.
 
-## One brain for the whole game
+## What this covers
 
 `progs.dat` is the game's logic — every monster, weapon, item, and trigger.
 The expansion's progs (this project) contains all of the base game's logic
