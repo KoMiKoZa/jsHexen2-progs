@@ -433,6 +433,10 @@ void wake_effect (void)
 {
 	entity newent;
 
+	if(!(self.flags2&FL_ALIVE))
+		return;	// [2026-06-12] jsH2+ (HoT/uhexen2): the wake/sleep toggle had no alive-gate -
+			// triggering a DEAD snake boss's use re-woke it.
+
 	newent = spawn();
 
 	setorigin(newent,self.origin);

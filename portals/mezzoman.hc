@@ -604,8 +604,10 @@ vector punchdir;
 
 	self.ltime+=1;
 	other.safe_time=time+1.25;//So can't kill them instantly if they're moving against him or pinned on a wall
-	if(self.think!=mezzo_charge_stop)
-	{
+	if(self.think!=mezzo_charge_stop&&self.flags2&FL_ALIVE)
+	{	// [2026-06-12] jsH2+ alive-gate (HoT/uhexen2): a werepanther killed mid-charge kept its
+		// slam touch active - the sliding corpse punched players AND redirected its think away
+		// from the death sequence, acting after death.
 		thinktime self : 0;
 		self.think=mezzo_charge_stop;
 	}

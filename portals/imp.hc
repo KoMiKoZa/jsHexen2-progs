@@ -168,6 +168,11 @@ void summoned_imp_die () [-- $impup23 .. $impup1]
 		self.movetype=MOVETYPE_NOCLIP;
 		self.drawflags=SCALE_ORIGIN_CENTER;
 		self.flags=0;
+		self.flags2(-)FL_ALIVE;	// [2026-06-12] jsH2+ (HoT/uhexen2): the ascending death never
+					// cleared alive status - other systems still treated the dying
+					// imp as a live monster.
+		stopSound(self,CHAN_BODY);	// [2026-06-12] jsH2+ and its wing-flap loop played on
+						// forever (the chunk-death branch already stopped it).
 		self.solid=SOLID_NOT;
 		self.avelocity_y=-200;
 		self.count=0;

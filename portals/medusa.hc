@@ -650,6 +650,12 @@ float throwdist;
 
 void medusa_die (void) [++ $death01..$death20]
 {
+	if(self.frame==$death01)
+	{	// [2026-06-12] jsH2+ (HoT/uhexen2): silence any lingering attack/body sample - loop-marked
+		// sounds otherwise play on the corpse forever (her voice channel carries the death cry).
+		stopSound(self,CHAN_WEAPON);
+		stopSound(self,CHAN_BODY);
+	}
 	medusa_check_use_model("models/medusa2.mdl");
 	if(self.decap)
 		medusa_decap_init();
