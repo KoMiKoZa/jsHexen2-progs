@@ -56,8 +56,8 @@ separate version line.
 Each fix is one commit. The commit hash is the unique ID — `git show <hash>`
 shows exactly what changed.
 
-<details>
-<summary><h3>📜 1.0.0 (in development) — 9 fixes &nbsp;<sub><i>(click to expand)</i></sub></h3></summary>
+<details open>
+<summary><h3>📜 1.0.0 (in development) — 9 fixes &nbsp;<sub><i>(click to collapse)</i></sub></h3></summary>
 
 <br>
 
