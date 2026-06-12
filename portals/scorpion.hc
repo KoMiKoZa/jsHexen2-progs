@@ -449,10 +449,22 @@ void ScorpionPain(void) [++ $scpain1..$scpain10]
 void ScorpionMelee(float damage)
 {
 	vector source;
+	vector dir;
 
 	makevectors (self.angles);
 	source = self.origin;
 	traceline (source, source + v_forward*60, FALSE, self);
+	if (trace_ent != self.enemy)
+	{	// [2026-06-12] jsH2+ aimed fallback: the scorpion's origin sits AT floor level
+		// (mins_z = 0), so the blind-forward swipe skims the ground and clips any slope or
+		// step short of the target - it whiffs on uneven terrain (field-verified: a player
+		// standing uphill is never hit; Shanjaq's raised fallback still ate dirt there).
+		// Retry aimed at the enemy's center, same 60-unit reach, only when the blind swipe
+		// already missed - flat-ground behavior is untouched by construction.
+		source = self.origin + '0 0 10';
+		dir = normalize((self.enemy.absmin + self.enemy.absmax)*0.5 - source);
+		traceline (source, source + dir*60, FALSE, self);
+	}
 
 	if (trace_ent != self.enemy) return;
 
