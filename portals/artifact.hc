@@ -444,8 +444,9 @@ void KillTorch()
 	self.artifact_flags(-)AFL_TORCH;  // Turn off torch flag
 	if(self.netname==STR_TORCH)
 		remove(self);
-	else
-		self.cnt_torch	-= 1;
+// [2026-06-12] jsH2+ no longer charges cnt_torch here - the torch is paid for in UseTorch,
+// like every other artifact. Paying at burn-out let a refresh keep one torch alive forever
+// for free (KillTorch never fires while you keep refreshing). Credit: Math/SoT.
 }
 
 /*
@@ -522,6 +523,8 @@ void UseTorch()
 	self.torchtime		= time + 1;
 	self.torchthink		= FullTorch;
 	self.artifact_flags (+) AFL_TORCH;   // Show the torch is in use
+	self.cnt_torch -= 1;	// [2026-06-12] jsH2+ pay at use (was paid at burn-out in KillTorch,
+							// which a refresh could dodge forever). Callers gate on cnt_torch >= 1.
 }
 
 
