@@ -12,6 +12,17 @@ opt-in toggle, off by default).
 **Your saves are safe.** The save-format fields are never touched, so any
 existing save loads with any version of these progs.
 
+## One brain for the whole game
+
+`progs.dat` is the game's logic — every monster, weapon, item, and trigger.
+The expansion's progs (this project) contains all of the base game's logic
+*plus* everything Portal of Praevus added, and a mission-pack engine
+(jsHexen2+ included) runs **everything** through it — the original campaign
+too. The base game's own `progs.dat` (in `data1/`, final official version
+1.11) is a different, older program that mission-pack engines never load:
+it sits inert and is out of scope here. Fixing this one file fixes all of
+Hexen II as you actually play it.
+
 ## Version
 
 Current: **jsHexen2+ Progs 1.0.0 (in development)**
@@ -62,8 +73,9 @@ nhcc.exe -name Progs.src      (or: hcc -os -oi -on)
 ```
 
 Output: `progs.dat` (+ `progs.lno` line-number file for debugging). Place
-`progs.dat` loose in your `Portals/` game directory — it overrides the
-version inside the pak files.
+`progs.dat` loose in your `Portals/` game directory — a loose file wins over
+the copy inside the paks. Some installs already ship it extracted loose;
+replace it, and keep the original as `progs_vanilla.dat` if you want to A/B.
 
 ## Layout
 
