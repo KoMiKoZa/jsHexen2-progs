@@ -226,7 +226,12 @@ void() walkmonster_start_go =
 		if (!walkmove(0,0, FALSE))
 		{
 			if(self.flags2&FL_SUMMONED)
+			{
 				remove(self);
+				return;	// [2026-06-12] jsH2+ kept initializing the rest of the monster
+					// (slope pitch, yaw, think) as a REMOVED entity - use-after-remove
+					// whenever a summoned creature spawned into a wall.
+			}
 			else
 			{
 				dprint ("walkmonster in wall at: ");
