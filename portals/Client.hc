@@ -2308,6 +2308,9 @@ void() PlayerPostThink =
 
 	CheckPowerups ();
 
+	if ((self.artifact_flags & AFL_TORCH) && (self.waterlevel > 2))
+		DouseTorch ();	// [2026-06-12] jsH2+ submerging extinguishes the torch (Raven's cut feature, restored)
+
 	if ((self.artifact_flags & AFL_TORCH) && (self.torchtime < time))
 		self.torchthink ();
 

@@ -441,6 +441,9 @@ void KillTorch()
 {
 	if(!self.artifact_active&ART_INVISIBILITY)
 		self.effects(-)EF_DIMLIGHT;   // Turn off lights
+	if(self.effects&EF_TORCHLIGHT)	// [2026-06-12] jsH2+ douse can arrive mid-full-burn (skipping DimTorch):
+		self.effects(-)EF_BRIGHTLIGHT;	// drop the blaze marker only when the torch owns it (not Sunstaff's)
+	self.effects(-)EF_TORCHLIGHT;	// [2026-06-12] jsH2+ complete extinguish regardless of entry path
 	self.artifact_flags(-)AFL_TORCH;  // Turn off torch flag
 	if(self.netname==STR_TORCH)
 		remove(self);
@@ -449,19 +452,23 @@ void KillTorch()
 // for free (KillTorch never fires while you keep refreshing). Credit: Math/SoT.
 }
 
-/*
-void DouseTorch()//Never called?!
-{//water?
-	sound (self, CHAN_BODY, "raven/douse.wav", 1, ATTN_IDLE);
+// [2026-06-12] jsH2+ restored Raven's cut function (shipped commented out, "//Never called?!").
+// raven/douse.wav never shipped in any pak; misc/fout.wav is the same fizzle the
+// burn-extinguish path uses and is already precached.
+void DouseTorch()
+{
+	sound (self, CHAN_BODY, "misc/fout.wav", 1, ATTN_NORM);
 	self.torchtime = 0;
 	KillTorch();
 }
-*/
 void DimTorch()
 {
 	sound (self, CHAN_BODY, "raven/kiltorch.wav", 1, ATTN_IDLE);
 
 	self.effects(-)EF_TORCHLIGHT;
+	self.effects(-)EF_BRIGHTLIGHT;	// [2026-06-12] jsH2+ drop the full-blaze marker: the guttering
+									// phase renders at vanilla torch size, so the sound cue finally
+									// matches a visible dimming.
 	self.torchtime = time + 7;
 	self.torchthink = KillTorch;
 }
@@ -471,6 +478,9 @@ void FullTorch()
 {
 	sound (self, CHAN_BODY, "raven/fire1.wav", 1, ATTN_NORM);
 	self.effects(+)EF_TORCHLIGHT;
+	self.effects(+)EF_BRIGHTLIGHT;	// [2026-06-12] jsH2+ full-blaze marker: transmits to the client,
+									// which renders DIMLIGHT+BRIGHTLIGHT as a double-radius torch.
+									// Finishes what Raven's EF_TORCHLIGHT=6 (DIM "+" BRIGHT) implied.
 	self.torchtime = time + 23;
 	self.torchthink = DimTorch;
 }
@@ -491,7 +501,10 @@ void throw_torch (entity throwtorch)
 	if(self.effects&EF_DIMLIGHT)
 		throwtorch.effects(+)EF_DIMLIGHT;
 	if(self.effects&EF_TORCHLIGHT)
+	{
 		throwtorch.effects(+)EF_TORCHLIGHT;
+		throwtorch.effects(+)EF_BRIGHTLIGHT;	// [2026-06-12] jsH2+ the full blaze travels with the thrown torch
+	}
 	throwtorch.torchthink=self.torchthink;
 
 	throwtorch.think=thrown_torch_think;
@@ -500,6 +513,8 @@ void throw_torch (entity throwtorch)
 	if(!self.artifact_active&ART_INVISIBILITY)
 		self.effects(-)EF_DIMLIGHT;   // Turn off lights
 	self.artifact_flags(-)AFL_TORCH;  // Turn off torch flag
+	if(self.effects&EF_TORCHLIGHT)	// [2026-06-12] jsH2+ blaze left with the thrown torch (only when torch-owned)
+		self.effects(-)EF_BRIGHTLIGHT;
 	self.effects(-)EF_TORCHLIGHT;
 	self.torchtime = 0;
 }
@@ -512,14 +527,27 @@ TorchBurn
 */
 void UseTorch()
 {
-// [2026-06-12] jsH2+ removed the equality test ((self.effects!=EF_DIMLIGHT)&&(self.effects!=EF_TORCHLIGHT)):
-// during the dim phase effects==EF_DIMLIGHT exactly, so using a torch there was a silent
-// no-op (no relight, no sound; nothing is consumed either way - cnt_torch only drops at
-// burn-out in KillTorch). Both callers already gate on torchtime < time+5, so a use must
-// always (re)light. Note the vanilla economy: a refresh is free (KillTorch never fires).
+// [2026-06-12] jsH2+ rewritten from the vanilla equality test ((self.effects!=EF_DIMLIGHT)&&
+// (self.effects!=EF_TORCHLIGHT)), which made dim-phase use a silent no-op. Rules now:
+// a burning-strong torch can't be relit (a second torch would be wasted - the caller window
+// torchtime<time+5 is also open during the 1s catch phase); refresh works exactly during
+// the gutter phase (torchthink==KillTorch), which is what the gutter sound warns about.
+	if ((self.artifact_flags & AFL_TORCH) && (self.torchthink != KillTorch))
+		return;
+
+	if (self.waterlevel > 2)
+	{	// [2026-06-12] jsH2+ head under water: the torch won't take - fizzle, nothing consumed
+		sound (self, CHAN_BODY, "misc/fout.wav", 1, ATTN_NORM);
+		return;
+	}
+
 	sound (self, CHAN_WEAPON, "raven/littorch.wav", 1, ATTN_NORM);
 
 	self.effects(+)EF_DIMLIGHT;   // set player to emit light
+	self.effects(+)EF_TORCHLIGHT;	// [2026-06-12] jsH2+ full blaze from the first frame (the old 1s
+	self.effects(+)EF_BRIGHTLIGHT;	// "catching" beat kept the light small, reading as a stutter now
+									// that the two states render differently; FullTorch re-sets these
+									// idempotently and brings the roar 1s in)
 	self.torchtime		= time + 1;
 	self.torchthink		= FullTorch;
 	self.artifact_flags (+) AFL_TORCH;   // Show the torch is in use
