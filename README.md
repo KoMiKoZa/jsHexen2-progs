@@ -57,12 +57,26 @@ Each fix is one commit. The commit hash is the unique ID — `git show <hash>`
 shows exactly what changed.
 
 <details open>
-<summary><h3>📜 1.0.0 (in development) — 20 fixes &nbsp;<sub><i>(click to collapse)</i></sub></h3></summary>
+<summary><h3>📜 1.0.0 (in development) — 34 fixes &nbsp;<sub><i>(click to collapse)</i></sub></h3></summary>
 
 <br>
 
 | Commit | Date | Fix | What it does |
 |---|---|---|---|
+| `a97a976` | 2026-06-12 | Flag arithmetic corruption | Five places set entity flags with `+=` (arithmetic add) instead of the bitwise operator — if the flag was already on, the whole flag set got corrupted (re-init, force-shield recast, summon paths). All five converted. (HoT/uhexen2) |
+| `a97a976` | 2026-06-12 | Summoned weretiger head gib | The weretiger's head-gib model is only precached by its own spawn function, which summoned spawns skip — head-gibbing a summoned weretiger hit an unprecached model. Now precached in the summon path too. (HoT/uhexen2) |
+| `df8dc35` | 2026-06-12 | Corpses re-firing map logic | Corpses kept the living monster's target and targetname — gibbing or touching a corpse could re-fire scripted events meant for the live monster. Cleared when the corpse is made. (Shanjaq/uhexen2-progs) |
+| `f4f79a2` | 2026-06-12 | Skullwizard blinks at ghosts | His teleport-out lasts up to 3 seconds; if his target died or despawned meanwhile, he re-placed himself relative to a stale reference (which reads as the map origin). He now drops the dead target and reappears randomly, as designed for the no-enemy case. (HoT/uhexen2) |
+| `f4f79a2` | 2026-06-12 | Fish schools swim to nowhere | Fish follow a school leader; a dead or removed leader read as coordinates 0,0,0 and the whole school migrated to the map origin. Orphaned fish now keep their last heading. (HoT/uhexen2) |
+| `f4f79a2` | 2026-06-12 | Stuck bolts warp away | Crossbow bolts and stickmines stuck to an entity followed it — and if the host was *removed* rather than killed (or its slot recycled), they warped to wherever the slot now points, classically the map origin. They now detach and fall. (Shanjaq/uhexen2-progs) |
+| `1dd0d6e` | 2026-06-12 | Werepanther corpse attacks | A werepanther killed mid-charge kept its body-slam active — the sliding corpse punched players and even redirected its own AI away from dying. Alive-gate added. (HoT/uhexen2) |
+| `1dd0d6e` | 2026-06-12 | Snake boss re-wakes when dead | The snake boss's wake/sleep toggle had no alive check — triggering it after death woke the corpse. (HoT/uhexen2) |
+| `1dd0d6e` | 2026-06-12 | Imp dies "alive" | The imp's ascending death never cleared its alive status and never stopped its wing-flap sound loop. Both fixed. (HoT/uhexen2) |
+| `1dd0d6e` | 2026-06-12 | Medusa's noisy corpse | Her death now silences the attack/body sound channels — loop-marked samples otherwise played on the corpse forever. (HoT/uhexen2) |
+| `ddbc82d` | 2026-06-12 | Tornado always-throw typo | `if (x = -1)` assigned instead of compared — always true, so the tornado always hurled victims at its goal, never did the random scatter, and corrupted its own timer doing it. (HoT/uhexen2) |
+| `ddbc82d` | 2026-06-12 | Lavaballs barely rise | `self.speed == 1000;` compared instead of assigned — a statement that does nothing, so lavaballs kept speed 0. They actually fly now. (HoT/uhexen2) |
+| `ddbc82d` | 2026-06-12 | Raven shot ghost physics | A typo'd second assignment overwrote the raven missile's collision type with a value from the wrong constant family (`DAMAGE_YES` = 1 = `SOLID_TRIGGER`) — the ravens flew as non-blocking ghosts for 27 years. Line deleted, as HoT does; deliberately *not* made damageable (no death wiring — it would crash on the first hit). |
+| `ddbc82d` | 2026-06-12 | Stillness-fade always on | An operator-precedence slip (`&a\|b` parses as `(x&a)\|b`) made the assassin's fade-back-in branch always true. Parenthesized. (HoT/uhexen2) |
 | `24efda5` | 2026-06-12 | Eidolon finale block | Killing Eidolon during his intro howl or mid-transformation killed him in an invalid state and the base campaign's ending never triggered — vanilla only suppressed his pain reactions during those windows, not death itself. He is now truly invulnerable through the intro and the grow, becoming vulnerable the moment each howl completes. (Fix from HoT/uhexen2.) |
 | `c36b473` | 2026-06-12 | Praevus fast-kill finale block | The expansion's ending chain only fired from Praevus's mid-fight health stages — his death sequence never fired targets at all, so killing him fast enough to skip a stage left the finale permanently stuck. His death now fires the chain exactly once whenever the stages missed it. (Fix from HoT/uhexen2.) |
 | `9afccb3` | 2026-06-12 | DM level change on custom maps | Deathmatch on a custom map with no exit *overwrote the live map-name global* mid-game with "demo1". It now uses the next-map variable properly and records where a found exit trigger leads. (Fix from HoT/uhexen2.) |
