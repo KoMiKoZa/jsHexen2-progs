@@ -1768,6 +1768,9 @@ void() trigger_crosslevel =
 		return;
 	}
 	InitTrigger ();
+	self.inactive = FALSE;	// [2026-06-12] jsH2+ (fix from HoT/uhexen2): crosslevel spawnflags are
+				// trigger1-8 bits, but flag 8 doubles as "start inactive" elsewhere -
+				// an inherited inactive value left the Temple of Mars prize trigger dead.
 	self.touch = trigger_crosslevel_touch;
 	self.use = trigger_crosslevel_use;
 };
@@ -2534,7 +2537,9 @@ entity found;
 	else if(self.wait>0)
 		thinktime self : self.wait;
 	else
-		thinktime self : 999999999999;
+		self.nextthink=-1;	// [2026-06-12] jsH2+ was "thinktime self : 999999999999" - a literal
+					// too large for a float to carry cleanly (fix from HoT/uhexen2,
+					// broke tibet5's wheel); -1 = never think, same as the wait==-1 case.
 }
 
 void trigger_stop_touch ()
