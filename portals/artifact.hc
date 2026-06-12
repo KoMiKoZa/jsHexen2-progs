@@ -512,9 +512,10 @@ TorchBurn
 void UseTorch()
 {
 // [2026-06-12] jsH2+ removed the equality test ((self.effects!=EF_DIMLIGHT)&&(self.effects!=EF_TORCHLIGHT)):
-// during the dim phase effects==EF_DIMLIGHT exactly, so using a fresh torch consumed the
-// artifact (FL_ARTIFACTUSED set by the callers) without re-lighting. Both callers already
-// gate on torchtime < time+5, so a use must always (re)light.
+// during the dim phase effects==EF_DIMLIGHT exactly, so using a torch there was a silent
+// no-op (no relight, no sound; nothing is consumed either way - cnt_torch only drops at
+// burn-out in KillTorch). Both callers already gate on torchtime < time+5, so a use must
+// always (re)light. Note the vanilla economy: a refresh is free (KillTorch never fires).
 	sound (self, CHAN_WEAPON, "raven/littorch.wav", 1, ATTN_NORM);
 
 	self.effects(+)EF_DIMLIGHT;   // set player to emit light
