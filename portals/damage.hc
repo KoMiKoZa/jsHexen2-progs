@@ -793,8 +793,9 @@ entity holdent,lastleader,newking;
 	if (!targ.takedamage)
 		return;
 
-	if(targ.camera_time>=time&&!deathmatch)
-		return;
+	if((targ.flags&FL_CLIENT)&&targ.camera_time>=time&&!deathmatch)
+		return;	// [2026-06-12] jsH2+ players only (fix from HoT/uhexen2): camera_time is a player
+			// camera field - a monster with a stray value here was simply unkillable in SP.
 
 	if (targ.classname=="monster_yakman"&&targ.pain_finished>time)
 		return;
@@ -906,8 +907,10 @@ entity holdent,lastleader,newking;
 	if(targ.flags&FL_MONSTER&&inflictor.flags2&FL2_ADJUST_MON_DAM)
 		damage*=2;//Special- more damage against monsters
 
-	if (attacker.super_damage)
-		damage += attacker.super_damage * damage;
+	if ((attacker.flags&FL_CLIENT) && attacker.super_damage)
+		damage += attacker.super_damage * damage;	// [2026-06-12] jsH2+ players only (fix from
+			// HoT/uhexen2): super_damage is a player powerup field - non-player attackers with
+			// stray values corrupted damage (tibet1's pentacle dealt negative damage = unkillable).
 
 	// Calculating Damage to a player
 	if (targ.classname == "player")
