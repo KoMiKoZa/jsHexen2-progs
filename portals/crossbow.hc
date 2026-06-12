@@ -83,7 +83,11 @@ void() CB_BoltStick=
 			self.think=MultiExplode;
 		else
 			self.think=DarkExplosion;
-	else if(self.enemy.health<=0&&self.health)
+	else if((self.enemy.health<=0||self.enemy.solid==SOLID_NOT||self.enemy.modelindex==0)&&self.health)
+		// [2026-06-12] jsH2+ (Shanjaq S5): also detach when the host entity was REMOVED rather
+		// than killed (freed slot: solid/model zero out, or the slot got recycled by something
+		// non-solid) - stuck bolts/mines otherwise warped to wherever the recycled slot lives,
+		// classically the map origin.
 	{
 		self.health=0;
 		if(self.classname=="bolt")

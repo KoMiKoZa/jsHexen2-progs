@@ -99,7 +99,12 @@ void fish_follow(void)
 		self.goalentity.fish_leader_count += 1;
 	}
 
-	self.monster_last_seen = self.goalentity.origin;
+	if (self.goalentity == world || !(self.goalentity.flags2 & FL_ALIVE))
+		self.goalentity = world;	// [2026-06-12] jsH2+ (HoT/uhexen2): a dead or removed school
+						// leader read as the map origin - the whole school swam to
+						// '0 0 0'. An orphaned fish just keeps its last heading.
+	else
+		self.monster_last_seen = self.goalentity.origin;
 
 	self.count = 80 + random(20);
 	self.movedir_x /= self.count;

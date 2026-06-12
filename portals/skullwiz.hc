@@ -705,6 +705,12 @@ void skullwiz_ininit (void)
 vector spot1,spot2,spot3,newangle,enemy_dir;
 float loop_cnt,forward,dot;
 
+	if(self.enemy!=world&&(self.enemy.health<=0||!(self.enemy.flags2&FL_ALIVE)))
+		self.enemy=world;	// [2026-06-12] jsH2+ (HoT/uhexen2): the blink-out lasts up to 3s; if the
+					// enemy died or was removed meanwhile, the reappear placement traced
+					// toward a stale reference (a freed slot reads as the map origin).
+					// Dropping it falls into the existing no-enemy random placement.
+
 	trace_fraction =0;
 	loop_cnt = 0;
 	do
