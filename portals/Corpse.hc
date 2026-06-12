@@ -62,6 +62,9 @@ vector newmaxs;
 //Won't be necc to pass headmdl once everything has it's .headmodel
 //value set in spawn
 	self.netname="corpse";
+	self.target = "";		// [2026-06-12] jsH2+ (Shanjaq S6): corpses kept their living target/
+	self.targetname = "";		// targetname - gibbing or re-touching a corpse could re-fire map
+					// logic meant for the live monster, or collide with named triggers.
     self.th_die = chunk_death;
 	self.touch = obj_push;
     self.health = random(10,25);
