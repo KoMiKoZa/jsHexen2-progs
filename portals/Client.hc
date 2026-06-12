@@ -1167,8 +1167,14 @@ void() NextLevel =
 		if (!o)
 		{
 			o = spawn();
-			mapname = "demo1";
-			o.map = mapname;
+			nextmap = "demo1";	// [2026-06-12] jsH2+ (fix from HoT/uhexen2): vanilla assigned
+			o.map = nextmap;	// MAPNAME here - clobbering the live current-map global mid-game
+						// on any custom DM map with no exit trigger.
+		}
+		else
+		{
+			nextmap = o.map;	// [2026-06-12] jsH2+ (fix from HoT/uhexen2): record where the
+						// found trigger leads, so repeat NextLevel calls stay consistent.
 		}
 	}
 	else
