@@ -1,0 +1,7 @@
+# build outputs
+progs.dat
+progs2.dat
+*.lno
+nhcc.log
+files.dat
+progdefs.h
