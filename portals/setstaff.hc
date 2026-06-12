@@ -349,8 +349,8 @@ void scarab_die ()
 		self.dmg=75;
 		T_Damage(self.lockentity,self,self.owner,self.dmg);
 	}
-	if(self.movechain!=world);
-		remove(self.movechain);
+	if(self.movechain!=world)	// [2026-06-12] jsH2+ stray semicolon made the remove unconditional -
+		remove(self.movechain);	// scarab_die with no movechain removed the WORLD entity.
 	MultiExplode();
 }
 
