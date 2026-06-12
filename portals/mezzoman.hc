@@ -626,6 +626,9 @@ float magnitude;//remainder, reflect_count,
 		if(self.owner.movechain==self)
 			self.owner.movechain=world;
 		remove(self);
+		return;	// [2026-06-12] jsH2+ (fix from HoT/uhexen2): fell through and kept running the
+			// touch logic as a REMOVED entity - the notorious "assignment to world entity"
+			// Host_Error crash when the mezzoman's reflection trigger outlived him.
 	}
 
 	if(other.classname=="funnal"||other.classname=="tornato")
@@ -870,7 +873,13 @@ void mezzo_missile ()
 void mezzo_die () [++ $death1 .. $death16]
 {
 	if(self.shield)
+	{
 		remove(self.shield);
+		self.shield = world;	// [2026-06-12] jsH2+ null after remove: the dangling reference kept
+					// passing the if(self.shield) guards, and once the freed slot was
+					// recycled the next "shield removal" deleted an unrelated entity -
+					// on tibet7 it ate the yakman's spawn entity (boss never appeared).
+	}
 	if (self.health < -40)
 	{
 		chunk_death();
@@ -907,7 +916,10 @@ void mezzo_pain (entity attacker, float damage)
 	self.monster_awake=TRUE;
 
 	if(self.shield)
+	{
 		remove(self.shield);
+		self.shield = world;	// [2026-06-12] jsH2+ null after remove (see mezzo_die)
+	}
 
 	if(self.health<=100)
 	{
@@ -1098,7 +1110,10 @@ void mezzo_block_return () [-- $block6 .. $block1]
 	{
 	float r;
 		if(self.shield)
+		{
 			remove(self.shield);
+			self.shield = world;	// [2026-06-12] jsH2+ null after remove (see mezzo_die)
+		}
 		r=vlen(self.enemy.origin-self.origin);
 		if(infront(self.enemy)&&r<100)
 		{
