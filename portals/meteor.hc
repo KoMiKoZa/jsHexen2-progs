@@ -278,7 +278,10 @@ float pick_up;
 		else
 		{
 			if(!let_go)
-				if(self.pain_finished=-1)		//Throw it at my goal!
+				if(self.pain_finished==-1)		//Throw it at my goal!
+								// [2026-06-12] jsH2+ was "=" (assignment): always true, so the
+								// tornado ALWAYS threw at its goal and never did the random
+								// scatter - and corrupted pain_finished doing it. (HoT/uhexen2)
 					self.enemy.velocity=dir*350*self.scale;
 				else
 				{

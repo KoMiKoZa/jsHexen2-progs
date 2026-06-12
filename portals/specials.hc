@@ -24,7 +24,9 @@ void CheckAbilities ()
 				self.drawflags(+)DRF_TRANSLUCENT|MLS_ABSLIGHT;
 			}
 		}
-		else if(self.drawflags&DRF_TRANSLUCENT|MLS_ABSLIGHT)
+		else if(self.drawflags&(DRF_TRANSLUCENT|MLS_ABSLIGHT))	// [2026-06-12] jsH2+ precedence:
+						// "&a|b" parsed as "(x&a)|b" - always true, so the fade-back
+						// branch ran constantly. (HoT/uhexen2)
 		{
 			self.still_time=-1;
 			if(self.abslight<1)

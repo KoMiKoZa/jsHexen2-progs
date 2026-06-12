@@ -146,7 +146,8 @@ void misc_fireball()
 	thinktime self : random(5);
 	self.think = fire_fly;
 	if (!self.speed)
-		self.speed == 1000;
+		self.speed = 1000;	// [2026-06-12] jsH2+ was "==" (a comparison doing nothing):
+					// speed stayed 0 and lavaballs barely rose. (HoT/uhexen2)
 }
 
 void fire_fly()

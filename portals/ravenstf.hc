@@ -484,7 +484,12 @@ void create_raven_shot2(vector location,float add_yaw,float nexttime,float rotat
 	missile.owner = self.owner;
 	missile.movetype = MOVETYPE_FLYMISSILE;
 	missile.solid = SOLID_BBOX;
-	missile.solid = DAMAGE_YES;
+	// [2026-06-12] jsH2+ removed "missile.solid = DAMAGE_YES;" - a typo'd second assignment
+	// that clobbered the collision type to SOLID_TRIGGER (DAMAGE_YES==1==SOLID_TRIGGER).
+	// Deliberately NOT promoted to takedamage=DAMAGE_YES: this missile has no health or
+	// th_die wiring, so making it damageable would call a null death function (crash) on
+	// the first hit - and every sibling raven missile is explicitly DAMAGE_NO. HoT/uhexen2
+	// deletes the line too; the ravens simply fly as proper solid missiles again.
 		
 // set missile speed	
 	missile.dmg = 30;
