@@ -576,6 +576,9 @@ void eidolon_roar () [++ $howl1 .. $howl60]
 	if(self.frame==$howl60)
 	{
 		self.movetype = MOVETYPE_NONE;
+		self.flags(-)FL_GODMODE;	// [2026-06-12] jsH2+ howl complete - become vulnerable
+						// (the roar plays at the intro AND after the grow; both
+						// protected windows end here)
 		self.th_pain = eidolon_check_fake;
 		self.attack_finished=time+3;
 		self.think=eidolon_guarding;
@@ -796,6 +799,8 @@ float pain_chance;
 
 	if(self.dmg>=2000&&self.scale<1)
 	{
+		self.flags(+)FL_GODMODE;	// [2026-06-12] jsH2+ untouchable through fake-die + grow
+						// (removed again when the post-grow roar finishes)
 		self.th_pain=SUB_Null;
 		if(attacker.classname=="player")
 			AwardExperience(attacker,self,self.experience_value);
@@ -1301,7 +1306,11 @@ void monster_eidolon(void)
 	self.movetype = MOVETYPE_STEP;
 	self.takedamage=DAMAGE_YES;
 	self.monsterclass=CLASS_FINAL_BOSS;
-	self.flags(+)FL_MONSTER;
+	self.flags(+)FL_MONSTER|FL_GODMODE;	// [2026-06-12] jsH2+ (fix from HoT/uhexen2, S-8d41):
+				// true immunity through the intro howl. Vanilla only nulled th_pain, which
+				// stops pain REACTIONS but not death - killing Eidolon during the intro or
+				// the grow transformation died from an invalid state and blocked the finale.
+				// eidolon_roar drops the flag when the howl completes ($howl60).
 	self.flags2(+)FL_ALIVE|FL_SMALL;
 	self.thingtype=THINGTYPE_FLESH;
 
