@@ -57,12 +57,14 @@ Each fix is one commit. The commit hash is the unique ID — `git show <hash>`
 shows exactly what changed.
 
 <details open>
-<summary><h3>📜 1.0.0 (in development) — 34 fixes &nbsp;<sub><i>(click to collapse)</i></sub></h3></summary>
+<summary><h3>📜 1.0.0 (in development) — 36 fixes &nbsp;<sub><i>(click to collapse)</i></sub></h3></summary>
 
 <br>
 
 | Commit | Date | Fix | What it does |
 |---|---|---|---|
+| `b40cabd` | 2026-06-12 | DM rules leaking into SP/coop | The `noexit` rule (kills players touching level exits) and the time/frag limits ran in *every* game mode — leftover deathmatch cvars could murder you at a single-player exit or end an SP/coop map out of nowhere. Both now require deathmatch. (HoT/uhexen2) |
+| `b40cabd` | 2026-06-12 | Impulse 11 progression cheat | `impulse 11` let any player set the server's cross-level progression flags in any mode — skipping hub progression with one console command. Disabled, exactly as HoT does. |
 | `a97a976` | 2026-06-12 | Flag arithmetic corruption | Five places set entity flags with `+=` (arithmetic add) instead of the bitwise operator — if the flag was already on, the whole flag set got corrupted (re-init, force-shield recast, summon paths). All five converted. (HoT/uhexen2) |
 | `a97a976` | 2026-06-12 | Summoned weretiger head gib | The weretiger's head-gib model is only precached by its own spawn function, which summoned spawns skip — head-gibbing a summoned weretiger hit an unprecached model. Now precached in the summon path too. (HoT/uhexen2) |
 | `df8dc35` | 2026-06-12 | Corpses re-firing map logic | Corpses kept the living monster's target and targetname — gibbing or touching a corpse could re-fire scripted events meant for the live monster. Cleared when the corpse is made. (Shanjaq/uhexen2-progs) |
