@@ -267,11 +267,8 @@ void HomeThink()
 	{
 		updateSoundPos(self,CHAN_BODY);
 		updateSoundPos(self,CHAN_WEAPON);
-		if(self.t_width<time)
-		{
-			sound(self,CHAN_BODY,"succubus/buzz2.wav",1,ATTN_LOOP);
-			self.t_width=time+99999999999999;
-		}
+		// [2026-06-12] jsH2+ flight loop removed (user decision): this was the SECOND buzz2
+		// copy - the spawn played another on CHAN_WEAPON simultaneously. Both gone.
 	}
 
 	if(self.thingtype==THINGTYPE_FIRE)
