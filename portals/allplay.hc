@@ -143,7 +143,11 @@ void player_pain (entity attacker,float total_damage)
 			else
 			{
 				if(self.level>6)
-					self.greenmana+=total_damage*(self.level - 2/10);
+					self.greenmana+=total_damage*((self.level - 2)/10);	// [2026-06-13] jsH2+ was
+						// "(self.level - 2/10)" = level-0.2: precedence typo multiplying green
+						// mana gain ~7-10x at high levels - damage taken refilled it almost
+						// instantly. Intent per the blue-mana line below: (level-2)/10.
+						// (Spotted by Pa3PyX; minimal parenthesization only.)
 				self.bluemana+=total_damage*(self.level/10);
 			}
 			if(self.bluemana>self.max_mana)

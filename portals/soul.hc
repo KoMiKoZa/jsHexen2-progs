@@ -37,21 +37,34 @@ void () crusader_soul_touch =
 
 void () necro_soul_touch =
 {
+	float pot_mult;
+
 	if(!other.flags2&FL_ALIVE)
 		return;
 
 	if ((other.classname == "player") && (other.playerclass==CLASS_NECROMANCER))
 	{
 		sound (self, CHAN_VOICE, "items/artpkup.wav", 1, ATTN_NORM);
-		other.health += self.health;
-		if (other.health>other.max_health)
-			other.health = other.max_health;
-		
-		other.bluemana += self.bluemana;
+		// [2026-06-13] jsH2+ (fix by Pa3PyX, shipped by HoT/uhexen2): the mana grants below
+		// read self.bluemana/greenmana, which NOTHING ever set - the "devour a life force"
+		// mana mechanic was dead code since release. Restored per the manual's own words
+		// ("Soul Spheres quickly lose their potency, so the Necromancer must be swift!"):
+		// potency decays from 15 to 0 over the sphere's 15s life, health gain = 2x potency
+		// and only when below max (so it no longer cancels Mystic Urn overheal either).
+		pot_mult = 15.0 - time + self.lifetime;
+		if (pot_mult < 0)
+			pot_mult = 0;
+		if (other.health < other.max_health)
+		{
+			other.health += 2.0 * pot_mult;
+			if (other.health > other.max_health)
+				other.health = other.max_health;
+		}
+		other.bluemana += pot_mult;
 		if (other.bluemana > other.max_mana)
 			other.bluemana = other.max_mana;
-		
-		other.greenmana += self.greenmana;
+
+		other.greenmana += pot_mult;
 		if (other.greenmana > other.max_mana)
 			other.greenmana = other.max_mana;
 
@@ -154,6 +167,7 @@ void necromancer_sphere (entity ent)
 	new2.flags=0;
 	new2.lifespan = 15;  // Alive for 15 seconds
 	new2.health = new2.lifespan * 2;
+	new2.lifetime = time;	// [2026-06-13] jsH2+ birth stamp for the touch potency decay (Pa3PyX)
 
 	new2.avelocity_y = 200;
 	sound (new, CHAN_VOICE,"raven/soul.wav", 1, ATTN_NORM);

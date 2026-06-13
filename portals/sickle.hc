@@ -98,9 +98,14 @@ void sickle_fire ()
 
 				sound (self, CHAN_BODY, "weapons/drain.wav", 1, ATTN_NORM);
 
-				self.health += point_chance;
-				if (self.health>self.max_health)
-					self.health = self.max_health;
+				if (self.health < self.max_health)
+				{	// [2026-06-13] jsH2+ (spotted by Pa3PyX): the unconditional clamp
+					// CANCELLED Mystic Urn overheal - one leech proc slashed up to
+					// ~100 bonus HP down to max. Leech only heals when below max now.
+					self.health += point_chance;
+					if (self.health>self.max_health)
+						self.health = self.max_health;
+				}
 			}
 		}
 
