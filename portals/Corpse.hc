@@ -62,9 +62,14 @@ vector newmaxs;
 //Won't be necc to pass headmdl once everything has it's .headmodel
 //value set in spawn
 	self.netname="corpse";
-	self.target = "";		// [2026-06-12] jsH2+ (Shanjaq S6): corpses kept their living target/
-	self.targetname = "";		// targetname - gibbing or re-touching a corpse could re-fire map
-					// logic meant for the live monster, or collide with named triggers.
+	// [2026-06-13] jsH2+ REVERTED the corpse target/targetname clearing (was df8dc35, adopted
+	// from Shanjaq S6). A/B-confirmed regression: a wall-clung spider killed via its death
+	// ANIMATION (not gibbed) makes its corpse here; clearing the corpse's targetname broke the
+	// map's normal cleanup of that corpse, and on demo1 (Blackmarsh) it cascaded into a spurious
+	// changelevel to demo3 (a far-away player, just firing a projectile, got yanked to the next
+	// map). Vanilla keeps target/targetname on corpses and has been stable for 25 years; S6's
+	// benefit (corpse can't re-fire the live monster's map logic) was theoretical and never
+	// observed, so the cherry-pick is a net negative. Back to vanilla.
     self.th_die = chunk_death;
 	self.touch = obj_push;
     self.health = random(10,25);
