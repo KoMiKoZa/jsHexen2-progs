@@ -57,12 +57,15 @@ Each fix is one commit. The commit hash is the unique ID — `git show <hash>`
 shows exactly what changed.
 
 <details open>
-<summary><h3>📜 1.0.0 (in development) — 36 fixes &nbsp;<sub><i>(click to collapse)</i></sub></h3></summary>
+<summary><h3>📜 1.0.0 (in development) — 39 fixes &nbsp;<sub><i>(click to collapse)</i></sub></h3></summary>
 
 <br>
 
 | Commit | Date | Fix | What it does |
 |---|---|---|---|
+| `856878a` | 2026-06-13 | Succubus mana typo | A precedence typo (`level - 2/10` instead of `(level - 2)/10`) made damage taken refill the Demoness's green mana ~7–10× too fast at high levels. Parenthesized — the adjacent blue-mana line shows the intended formula. (Spotted by Pa3PyX.) |
+| `856878a` | 2026-06-13 | Soul spheres grant mana | The Necromancer's soul spheres were supposed to grant mana — the manual even warns "Soul Spheres quickly lose their potency, so the Necromancer must be swift!" — but the code read values nothing ever set: the mechanic was dead since release. Restored with the documented decay: full potency if grabbed fast, fading to nothing over the sphere's 15 seconds. (Fix by Pa3PyX, shipped by HoT/uhexen2.) |
+| `856878a` | 2026-06-13 | Leech vs Mystic Urn | The sickle's life-leech (and soul-sphere health) clamped your health to maximum unconditionally — one leech proc instantly deleted up to ~100 HP of Mystic Urn overheal. Healing now only applies when below max; overheal is preserved. (Spotted by Pa3PyX.) |
 | `b40cabd` | 2026-06-12 | DM rules leaking into SP/coop | The `noexit` rule (kills players touching level exits) and the time/frag limits ran in *every* game mode — leftover deathmatch cvars could murder you at a single-player exit or end an SP/coop map out of nowhere. Both now require deathmatch. (HoT/uhexen2) |
 | `b40cabd` | 2026-06-12 | Impulse 11 progression cheat | `impulse 11` let any player set the server's cross-level progression flags in any mode — skipping hub progression with one console command. Disabled, exactly as HoT does. |
 | `a97a976` | 2026-06-12 | Flag arithmetic corruption | Five places set entity flags with `+=` (arithmetic add) instead of the bitwise operator — if the flag was already on, the whole flag set got corrupted (re-init, force-shield recast, summon paths). All five converted. (HoT/uhexen2) |
