@@ -57,7 +57,7 @@ Each fix is one commit. The commit hash is the unique ID — `git show <hash>`
 shows exactly what changed.
 
 <details open>
-<summary><h3>📜 1.0.0 (in development) — 39 fixes &nbsp;<sub><i>(click to collapse)</i></sub></h3></summary>
+<summary><h3>📜 1.0.0 (in development) — 38 fixes &nbsp;<sub><i>(click to collapse)</i></sub></h3></summary>
 
 <br>
 
@@ -70,7 +70,6 @@ shows exactly what changed.
 | `b40cabd` | 2026-06-12 | Impulse 11 progression cheat | `impulse 11` let any player set the server's cross-level progression flags in any mode — skipping hub progression with one console command. Disabled, exactly as HoT does. |
 | `a97a976` | 2026-06-12 | Flag arithmetic corruption | Five places set entity flags with `+=` (arithmetic add) instead of the bitwise operator — if the flag was already on, the whole flag set got corrupted (re-init, force-shield recast, summon paths). All five converted. (HoT/uhexen2) |
 | `a97a976` | 2026-06-12 | Summoned weretiger head gib | The weretiger's head-gib model is only precached by its own spawn function, which summoned spawns skip — head-gibbing a summoned weretiger hit an unprecached model. Now precached in the summon path too. (HoT/uhexen2) |
-| `df8dc35` | 2026-06-12 | Corpses re-firing map logic | Corpses kept the living monster's target and targetname — gibbing or touching a corpse could re-fire scripted events meant for the live monster. Cleared when the corpse is made. (Shanjaq/uhexen2-progs) |
 | `f4f79a2` | 2026-06-12 | Skullwizard blinks at ghosts | His teleport-out lasts up to 3 seconds; if his target died or despawned meanwhile, he re-placed himself relative to a stale reference (which reads as the map origin). He now drops the dead target and reappears randomly, as designed for the no-enemy case. (HoT/uhexen2) |
 | `f4f79a2` | 2026-06-12 | Fish schools swim to nowhere | Fish follow a school leader; a dead or removed leader read as coordinates 0,0,0 and the whole school migrated to the map origin. Orphaned fish now keep their last heading. (HoT/uhexen2) |
 | `f4f79a2` | 2026-06-12 | Stuck bolts warp away | Crossbow bolts and stickmines stuck to an entity followed it — and if the host was *removed* rather than killed (or its slot recycled), they warped to wherever the slot now points, classically the map origin. They now detach and fall. (Shanjaq/uhexen2-progs) |
