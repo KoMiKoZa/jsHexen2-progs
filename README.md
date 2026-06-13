@@ -8,10 +8,12 @@ Game-logic source (`progs.dat`) for **Hexen II: Portal of Praevus**, maintained
 for the [jsHexen2+ engine](https://github.com/KoMiKoZa) project.
 
 Based on **Raven's v1.21 of the Hexen II progs** — the final official source —
-with bugs fixed one commit at a time. No balance changes, no redesigns:
-if it crashed, blocked progress, or plainly misbehaved, it gets fixed.
-If it would change how the game *feels*, it doesn't go in (or ships as an
-opt-in toggle, off by default).
+fixed one commit at a time. Priority goes to correctness: crashes, progression
+blockers, and plain misbehavior. Content that shipped broken or unfinished is
+restored to what it was meant to do, and in a few deliberate cases a mechanic
+that never actually worked as designed is reworked rather than left limping —
+kept rare and grounded in the original intent. Pure balance is left alone; where
+a change is a matter of taste, it can ship as an optional toggle.
 
 > [!IMPORTANT]
 > **Your saves are safe.** The save-format fields are never touched, so any
