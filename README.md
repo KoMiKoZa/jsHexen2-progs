@@ -2,12 +2,12 @@
 
 ![License: GPL v2](https://img.shields.io/badge/License-GPL_v2-blue.svg)
 ![Progs](https://img.shields.io/badge/progs-1.0.0--dev-orange.svg)
-![Base](https://img.shields.io/badge/base-Raven_v1.21-8B0000.svg)
+![Base](https://img.shields.io/badge/base-Raven_v1.12a-8B0000.svg)
 
 Game-logic source (`progs.dat`) for **Hexen II: Portal of Praevus**, maintained
 for the [jsHexen2+ engine](https://github.com/KoMiKoZa) project.
 
-Based on **Raven's v1.21 of the Hexen II progs** — the final official source —
+Based on **Raven's v1.12a of the Hexen II progs** — the final official source —
 fixed one commit at a time. Priority goes to correctness: crashes, progression
 blockers, and plain misbehavior. Content that shipped broken or unfinished is
 restored to what it was meant to do, and in a few deliberate cases a mechanic
@@ -46,7 +46,7 @@ Current: **jsHexen2+ Progs 1.0.0 (in development)**
 The version is printed in the console when a map loads:
 
 ```
-jsHexen2+ Progs 1.0.0 (based on Raven v1.21)
+jsHexen2+ Progs 1.0.0 (based on Raven v1.12a)
 ```
 
 Numbering is semantic: MAJOR = generation, MINOR = each released fix batch,
@@ -101,8 +101,8 @@ shows exactly what changed.
 | `68cc25e` | 2026-06-12 | Two-state torch light | The torch finally looks like its sound cues: full burn is a big warm light, the "going out" sound drops it to the vanilla dim size for the 7-second gutter, then it dies. The light is full-size from the moment you light up, and refreshing with a new torch works exactly during the gutter warning — a torch burning strong can't be relit, so hammering the use key no longer wastes torches. (On engines without the paired render change, both phases simply look vanilla.) |
 | `f997888` | 2026-06-12 | Infinite-torch exploit | A torch is now consumed the moment you light it, like every other artifact. Vanilla only consumed it at burn-out — and refreshing the torch in its last 5 seconds postpones burn-out forever, so one torch could burn eternally without ever leaving your inventory. Visible change: the inventory count drops when you light up, and refreshing costs a torch. (Spotted by Math; same fix as SoT.) |
 | `660f17b` | 2026-06-12 | Torch light bug | The torch no longer turns into a wide white light or goes dark when firing the Tempest Staff, and the *burn* system (catching fire, or water putting that fire out) no longer snuffs the torch's light along with it. Root cause: `EF_TORCHLIGHT` was `6` — two other flags glued together — so a burning torch secretly carried a white light that appeared whenever something else touched the player's light. It is now its own flag, and the staff/burn code never strips a light the torch owns. Also made dim-phase use actually relight (vanilla silently did nothing); the relight rule was later refined — see the two-state commit. |
-| `e872eb7` | 2026-06-12 | Version print | The console shows `jsHexen2+ Progs 1.0.0 (based on Raven v1.21)` on every map load, so you can always tell which progs you're running. |
-| `78436a8` | 2026-06-12 | Vanilla import | Raven v1.21-final mission-pack source, untouched baseline. |
+| `e872eb7` | 2026-06-12 | Version print | The console shows `jsHexen2+ Progs 1.0.0 (based on Raven v1.12a)` on every map load, so you can always tell which progs you're running. |
+| `78436a8` | 2026-06-12 | Vanilla import | Raven v1.12a-final mission-pack source, untouched baseline. |
 
 </details>
 
