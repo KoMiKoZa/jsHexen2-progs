@@ -540,8 +540,13 @@ void vorpal_normal_fire (void)
 		victim = victim.chain;
 	}
 
-	if (trace_ent.flags & FL_MONSTER)  // Only monsters make it use mana
-		self.bluemana -= 2;
+	if (damage_flg)  // [2026-06-15] jsH2+ Bill 2 blue for the AoE SPLASH only - the OTHER nearby
+		self.bluemana -= 2;	// monsters the loop above hit. The direct melee target is excluded
+					// from that loop and is already billed 2 by vorpal_melee (line ~423), so
+					// damage_flg must be set ONLY by a genuine blast hit (above) - never from
+					// the melee, or a plain single hit pays twice (= 4, the bug just found).
+					// Vanilla read the stale post-loop trace_ent, billing whiffs and double-
+					// billing melee hits erratically. Now: single hit = 2; +2 only on a splash.
 
 }
 
