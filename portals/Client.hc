@@ -1030,10 +1030,19 @@ entity spot;
 
 	self.dmg = 2;   		// initial water damage
 
-	setsize (self, '-16 -16 0', '16 16 56');	
+	setsize (self, '-16 -16 0', '16 16 56');
 	self.hull=HULL_PLAYER;
 	self.view_ofs = '0 0 50';
 	self.proj_ofs='0 0 44';
+	if(self.scale<=0)	// [2026-06-13] jsH2+ ClientReEnter (living-player level re-entry) normalizes the
+		self.scale=1;	// player's size like PutClientInServer (Client.hc:697 self.scale=1) - but it
+				// FORGOT .scale, so a corrupt negative scale from the previous level (SF
+				// uhexen2 bug #42: ~-1.568 after the Death boss) survived the transition and
+				// broke jumping (velocity_z += 270*self.scale pushed the player DOWN). Clamp
+				// matches the engine's own monster idiom (MONSTERS.hc:326). This is the
+				// symptom-robust safety net; the upstream corruptor that writes a negative
+				// player scale is still unidentified (the tornado scale-subtraction was ruled
+				// out - its .owner chain resolves to the tornato entity, not the player).
 
 	spot = SelectSpawnPoint ();
 	setorigin(self, spot.origin + '0 0 1');
