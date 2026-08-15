@@ -1314,70 +1314,110 @@ void MonsterDropStuff(void)
 	DropBackpack();
 }
 
-float RandomMonsterGoodies ()
+// [2026-08-15] jsH2+ Takes the drop entity now, and writes the rolled loot
+// into IT rather than into self (the corpse). Vanilla wrote to self, but
+// DropBackpack has already finished copying self -> item by the time it calls
+// this, and nothing copies again afterwards. So every random monster drop in
+// the game landed on a corpse nobody reads and left the item empty, which sent
+// the caller down the single-artifact branch to the "Bad backpack!" dead end.
+// Broken in Raven's original and still broken in HoT/uhexen2 today.
+float RandomMonsterGoodies (entity item)
 {
 float chance;
-float it_total;	
+float it_total;
+
+	it_total = 0;	// [2026-08-15] jsH2+ QuakeC locals are not zero-initialized
 
 	// Grunts drop only instant items
 	if (self.monsterclass == CLASS_GRUNT)
 	{
-		if (random() < .15) // %15 chance he'll drop something	
+		if (random() < .15) // %15 chance he'll drop something
 		{
 			chance = random();
 			if (chance < .25)
-				self.greenmana = 10;
+				item.greenmana = 10;
 			else if (chance < .50)
-				self.bluemana = 10;
+				item.bluemana = 10;
 			else if (chance < .75)
 			{
-				self.greenmana = 10;
-				self.bluemana = 10;
+				item.greenmana = 10;
+				item.bluemana = 10;
 			}
 			else
 			{
-				self.spawn_health = 1;
+				item.spawn_health = 1;
 			}
-			it_total+=1;
+			// [2026-08-15] jsH2+ no it_total here. Grunts only ever roll mana
+			// or health, and the caller's `total` deliberately does not count
+			// those - it tests them separately. Vanilla returned 1 anyway, so
+			// a mana roll was mistaken for an artifact.
 		}
 	}
 
 	// Henchmen drop instant items or lesser artifacts
 	else if (self.monsterclass == CLASS_HENCHMAN)
 	{
-		if (random() < .15) // %15 chance he'll drop something	
+		if (random() < .15) // %15 chance he'll drop something
 		{
 			chance = random();
 
 			if (chance < .08)
-				self.greenmana = 10;
+				item.greenmana = 10;
 			else if (chance < .16)
-				self.bluemana = 10;
+				item.bluemana = 10;
 			else if (chance < .24)
 			{
-				self.greenmana = 10;
-				self.bluemana = 10;
+				item.greenmana = 10;
+				item.bluemana = 10;
 			}
 			else if (chance < .32)
 			{
-				self.spawn_health = 1;
+				item.spawn_health = 1;
 			}
 			else if (chance < .40)
-				self.cnt_torch = 1;
+			{
+				item.cnt_torch = 1;
+				it_total+=1;
+			}
 			else if (chance < .48)
-				self.cnt_h_boost = 1;
+			{
+				item.cnt_h_boost = 1;
+				it_total+=1;
+			}
 			else if (chance < .56)
-				self.cnt_mana_boost = 1;
+			{
+				item.cnt_mana_boost = 1;
+				it_total+=1;
+			}
 			else if (chance < .64)
-				self.cnt_teleport = 1;
+			{
+				item.cnt_teleport = 1;
+				it_total+=1;
+			}
 			else if (chance < .72)
-				self.cnt_tome = 1;
+			{
+				item.cnt_tome = 1;
+				it_total+=1;
+			}
 			else if (chance < .80)
-				self.cnt_haste = 1;
+			{
+				item.cnt_haste = 1;
+				it_total+=1;
+			}
 			else if (chance < .90)
-				self.cnt_blast = 1;
-			it_total+=1;
-		}		
+			{
+				item.cnt_blast = 1;
+				it_total+=1;
+			}
+			// [2026-08-15] jsH2+ chance >= .90 rolls nothing, and now correctly
+			// reports nothing. Vanilla incremented it_total unconditionally, so
+			// that 10% window claimed a drop it had never assigned. Grunt and
+			// Leader both terminate with a bare else; this chain is the only one
+			// that doesn't, which reads as an oversight rather than intent - so
+			// the probability table is left exactly as Raven wrote it and only
+			// the accounting is corrected. The caller's existing "nothing to put
+			// in the backpack" cleanup handles it silently from here.
+		}
 	}
 	// Leaders drop armor or artifacts
 	else if (self.monsterclass == CLASS_LEADER)
@@ -1387,41 +1427,45 @@ float it_total;
 			chance = random();
 		
 			 if (chance < .05)
-				self.cnt_torch = 1;
+				item.cnt_torch = 1;
 			else if (chance < .10)
-				self.cnt_h_boost = 1;
+				item.cnt_h_boost = 1;
 			else if (chance < .15)
-				self.cnt_sh_boost = 1;
+				item.cnt_sh_boost = 1;
 			else if (chance < .20)
-				self.cnt_mana_boost = 1;
+				item.cnt_mana_boost = 1;
 			else if (chance < .25&&!(world.spawnflags&MISSIONPACK))
-				self.cnt_teleport = 1;
+				item.cnt_teleport = 1;
 			else if (chance < .30)
-				self.cnt_tome = 1;
+				item.cnt_tome = 1;
 			else if (chance < .35)
-				self.cnt_summon = 1;
+				item.cnt_summon = 1;
 			else if (chance < .40)
-				self.cnt_invisibility = 1;
+				item.cnt_invisibility = 1;
 			else if (chance < .45)
-				self.cnt_glyph = 1;
+				item.cnt_glyph = 1;
 			else if (chance < .50)
-				self.cnt_haste = 1;
+				item.cnt_haste = 1;
 			else if (chance < .55)
-				self.cnt_blast = 1;
+				item.cnt_blast = 1;
 			else if (chance < .60)
-				self.cnt_polymorph = 1;
+				item.cnt_polymorph = 1;
 			else if (chance < .65)
-				self.cnt_cubeofforce = 1;
+				item.cnt_cubeofforce = 1;
 			else if (chance < .70)
-				self.cnt_invincibility = 1;
+				item.cnt_invincibility = 1;
 			else if (chance < .75)
-				self.armor_amulet = 20;
+				item.armor_amulet = 20;
 			else if (chance < .80)
-				self.armor_bracer = 20;
+				item.armor_bracer = 20;
 			else if (chance < .85)
-				self.armor_breastplate = 20;
+				item.armor_breastplate = 20;
 			else
-				self.armor_helmet = 20;
+				item.armor_helmet = 20;
+			// [2026-08-15] jsH2+ unconditional here is correct: every Leader
+			// outcome is an artifact or a piece of armor, and the bare else
+			// guarantees one is always assigned. The MISSIONPACK-gated teleport
+			// falls through to the next branch rather than dropping out.
 			it_total+=1;
 		}
 	}
@@ -1552,7 +1596,7 @@ float total;
 
 	if (!total && !item.bluemana && !item.greenmana && !item.spawn_health) 
 		if(self.classname!="player")
-			total=RandomMonsterGoodies();
+			total=RandomMonsterGoodies(item);	// [2026-08-15] jsH2+ was rolling loot onto the corpse, not the drop
 
 	if (!total && !item.bluemana && !item.greenmana && !item.spawn_health) 
 	{	// Nothing to put in the backpack
@@ -1678,7 +1722,22 @@ float total;
 		}
 		else
 		{
-//			dprint("Bad backpack!");
+			// [2026-08-15] jsH2+ un-commented. This branch means total said an
+			// artifact was in the drop and none of the fields agree - genuinely
+			// "should never happen" now that RandomMonsterGoodies writes to the
+			// item and counts only what it assigned. It was muted here while it
+			// fired constantly; silencing it hid the loss rather than fixing it,
+			// and players kept getting nothing. If this ever prints again it is
+			// a real defect, so it should be loud.
+			// Reports the source entity, matching the "fell out of level"
+			// diagnostic near the top of this file. Chasing the original
+			// report cost a round-trip purely to find out which monster it
+			// was; a bare "Bad backpack!" is not actionable.
+			dprint("Bad backpack! from ");
+			dprint(old_self.classname);
+			dprint(" at ");
+			dprint(vtos(old_self.origin));
+			dprint("\n");
 			remove(item);
 			self = old_self;
 			return;
@@ -1699,7 +1758,16 @@ float total;
 		item.nextthink = time + 120;	// remove after 2 minutes
 		item.think = SUB_Remove;
 
-		if (!total)
+		// [2026-08-15] jsH2+ was `if (!total)`, which binned the backpack it had
+		// just finished building whenever the contents were mana or health only.
+		// `total` counts artifacts and armor and nothing else - mana and instant
+		// health are carried in their own fields and tested separately, exactly
+		// as the identical guard further up does. A drop of blue AND green mana
+		// with no artifact therefore reached here with total == 0 (both single-
+		// mana shortcuts above require one kind, not both), got a full bag built
+		// for it, and was deleted on the next line. Silent: no message, nothing
+		// dropped. Also fires on player death in coop/DM carrying both manas.
+		if (!total && !item.bluemana && !item.greenmana && !item.spawn_health)
 		{
 			remove(item);
 			return;
