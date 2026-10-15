@@ -611,9 +611,19 @@ entity() SelectSpawnPoint =
 	{
 	dprint("dmatch start\n");
 		spot = lastspawn;
+		ok = 0;	// [2026-10-15] jsH2+ wraps through the spot list (see below)
 		while (1)
 		{
 			spot = find(spot, classname, "info_player_deathmatch");
+			// [2026-10-15] jsH2+ a map with no info_player_deathmatch never left this loop
+			// (the runaway counter then killed the server); after three wraps
+			// fall through to the info_player_start search below.
+			if (spot == world)
+			{
+				ok += 1;
+				if (ok >= 3)
+					break;
+			}
 			if (spot != world&&random()<0.5)//add some randomness
 			{
 				if (spot == lastspawn)
