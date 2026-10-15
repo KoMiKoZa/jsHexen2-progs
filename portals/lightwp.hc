@@ -387,10 +387,20 @@ void lightning_fire_normal (void)
 			// flashes) instead of EF_DIMLIGHT (the torch's orange). The staff and the torch
 			// no longer share a bit at all - the original light-theft bug class is gone at
 			// the root. lefty ownership + AFL_TORCH guard protect a full-blaze torch's BRIGHT.
+			// [2026-10-15] jsH2+ ...except the full-blaze torch marks itself with that same
+			// BRIGHT bit (68cc25e), so AFL_TORCH was the wrong owner test: a guttering torch
+			// (AFL_TORCH set, no BRIGHT) made the staff keep its own light, and once the torch
+			// died nothing removed it - a stray white light. The strips below now defer only
+			// to a torch in full blaze (EF_TORCHLIGHT, set exactly while it owns BRIGHT), and
+			// lefty is reset when the staff adds the light, so a stale lefty from a weapon
+			// switch can't make the staff skip its own cleanup.
 			if(self.effects&EF_BRIGHTLIGHT)
 				self.lefty=TRUE;
 			else
+			{
 				self.effects(+)EF_BRIGHTLIGHT;
+				self.lefty=FALSE;
+			}
 //			self.drawflags(+)MLS_ABSLIGHT;
 //			self.abslight=(self.weaponframe - $normal1)/15;
 		}
@@ -398,7 +408,7 @@ void lightning_fire_normal (void)
 		{
 			// [2026-06-12] jsH2+ never strip a light the torch owns (AFL_TORCH): at $normal16 the
 			// in-loop branch consumes lefty and the exit branches below re-test it in the SAME call.
-			if(!self.lefty && !(self.artifact_flags&AFL_TORCH))
+			if(!self.lefty && !(self.effects&EF_TORCHLIGHT))	// [2026-10-15] jsH2+ was AFL_TORCH (see above)
 				self.effects(-)EF_BRIGHTLIGHT;
 			else
 				self.lefty=FALSE;
@@ -412,7 +422,7 @@ void lightning_fire_normal (void)
 	{
 		if(self.effects&EF_BRIGHTLIGHT)
 		{
-			if(!self.lefty && !(self.artifact_flags&AFL_TORCH))	// [2026-06-12] jsH2+ torch owns the light
+			if(!self.lefty && !(self.effects&EF_TORCHLIGHT))	// [2026-10-15] jsH2+ a full-blaze torch owns the light (was AFL_TORCH)
 				self.effects(-)EF_BRIGHTLIGHT;
 			else
 				self.lefty=FALSE;
@@ -431,7 +441,7 @@ void lightning_fire_normal (void)
 	{
 		if(self.effects&EF_BRIGHTLIGHT)
 		{
-			if(!self.lefty && !(self.artifact_flags&AFL_TORCH))	// [2026-06-12] jsH2+ torch owns the light
+			if(!self.lefty && !(self.effects&EF_TORCHLIGHT))	// [2026-10-15] jsH2+ a full-blaze torch owns the light (was AFL_TORCH)
 				self.effects(-)EF_BRIGHTLIGHT;
 			else
 				self.lefty=FALSE;
@@ -579,7 +589,7 @@ void lightning_select (void)
 void lightning_deselect (void)
 {
 	stopSound(self,CHAN_WEAPON);	// [2026-06-12] jsH2+ weapon switched away mid-charge: end the hum
-	if(!self.lefty && !(self.artifact_flags&AFL_TORCH))
+	if(!self.lefty && !(self.effects&EF_TORCHLIGHT))	// [2026-10-15] jsH2+ was AFL_TORCH (see lightning_fire_normal)
 		self.effects(-)EF_BRIGHTLIGHT;	// [2026-06-12] jsH2+ drop the charge light too (vanilla left its
 						// light stale on a mid-fire weapon switch until the next staff use)
 	self.wfs = advanceweaponframe($select12,$select1);
