@@ -492,12 +492,6 @@ void() respawn =
 			changelevel (mapname, startspot);
 		else
 			localcmd ("restart restore\n");
-		// [2026-10-19] jsH2+ PlayerDeathThink called this on every frame a button
-		// stayed down while dead, so one press could queue two restarts before the
-		// first ran; the second broke the connection ("signon 1 when at 1"). Back to
-		// DEAD_DEAD: it now takes a release and a new press, and the queued restart
-		// runs at the start of the next frame anyway.
-		self.deadflag = DEAD_DEAD;
 	}
 };
 
