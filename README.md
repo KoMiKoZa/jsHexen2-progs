@@ -59,13 +59,12 @@ Each fix is one commit. The commit hash is the unique ID — `git show <hash>`
 shows exactly what changed.
 
 <details open>
-<summary><h3>📜 1.0.0 (in development) — 49 fixes &nbsp;<sub><i>(click to collapse)</i></sub></h3></summary>
+<summary><h3>📜 1.0.0 (in development) — 48 fixes &nbsp;<sub><i>(click to collapse)</i></sub></h3></summary>
 
 <br>
 
 | Commit | Date | Fix | What it does |
 |---|---|---|---|
-| `bccf0cd` | 2026-10-19 | Respawn press could break the game | In single player, holding the button a moment too long after dying could fire the respawn twice; the second restart arrived while the first was still connecting and dropped you out of the game. One press now means one respawn. (The engine side of the same report — respawning into your own corpse — is fixed in jsHexen2+.) |
 | `b7c19e3` | 2026-10-19 | Solid shards from a frozen enemy | Shattering a frozen enemy in single player threw out solid, opaque chunks even though the frozen body is see-through ice. Every other ice debris in the game — breakable ice, and the same shatter in co-op/deathmatch — is drawn see-through and self-lit; this one path was missed. The pieces now match. |
 | `3582715` | 2026-10-15 | Pickup sound on every tomed hammer throw | Tomed, the Crusader's hammer is thrown and flies back to you on every attack — and each catch played the weapon-pickup sound, so a tomed fight was a constant stream of "you picked up a weapon". That sound was a placeholder: Raven's own note at that spot plans the hammer's select animation as the catch, and that animation already plays. The catch is now silent apart from it; picking up an actual weapon still sounds as before. |
 | `e2e0748` | 2026-10-15 | Stray white light after the torch | Charging the Tempest Staff while your torch was guttering (its last seconds, after the blaze dies down) left a steady white glow on you once the torch went out, and it stayed until you next charged the staff — through Tome of Power too. The staff's charge light and the full-blaze torch use the same light bit, and the staff only kept its hands off that bit "while a torch is active" — but a guttering torch is active without owning the bright light, so the staff kept its own light lit and nothing removed it when the torch died. The staff now defers only to a torch that is actually in full blaze, which is exactly when the torch owns that light. A full-blaze torch still keeps its light through a charge and dims on schedule; the earlier torch-light fix stands. |
