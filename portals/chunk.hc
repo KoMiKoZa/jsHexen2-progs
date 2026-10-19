@@ -126,15 +126,7 @@ entity chunk;
 		final = random();
 
 		if(loser.frozen>0)
-		{
 			setmodel (chunk, "models/shardice.mdl");
-			// [2026-10-19] jsH2+ see-through and self-lit, like the frozen body
-			// they break from (icemace.hc) and Raven's other ice debris (the
-			// THINGTYPE_ICE chunks below, the co-op/DM shatter effect); this
-			// single-player path alone left them solid.
-			chunk.drawflags(+)DRF_TRANSLUCENT|MLS_ABSLIGHT;
-			chunk.abslight=0.5;
-		}
 		else if(loser.model=="models/spider.mdl")
 		{
 			if (final < 0.33)
