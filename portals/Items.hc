@@ -1489,6 +1489,7 @@ float LOOSE_AMULET		= 104;
 float LOOSE_BRACER		= 105;
 float LOOSE_BREASTPLATE	= 106;
 float LOOSE_HELMET		= 107;
+float LOOSE_MAX			= 8;	// more items than this and the drop stays one bag (see DropBackpack)
 
 // Never called: the engine lists the option only when the loaded progs defines this.
 void jsp_loosedrops (void)
@@ -1498,30 +1499,29 @@ void jsp_loosedrops (void)
 void LooseDropOne (float kind, float amount, float i, float a0)
 {
 entity it, oself;
+float a, s;
 
 	it = spawn();
 	setorigin(it, self.origin + '0 0 40');
-	it.flags(+)FL_ITEM;
-	it.solid = SOLID_TRIGGER;
-	it.movetype = MOVETYPE_TOSS;
+	it.flags = FL_ITEM;
+	it.solid = SOLID_TRIGGER;	// StartItem (owner set) makes it PUSHPULL and keeps this velocity
 	it.owner = self;
-	it.artifact_ignore_owner_time = time + 2;
 	it.artifact_ignore_time = time + 0.1;
 
-	// golden-angle steps keep every heading well apart without knowing the count
-	makevectors('0 1 0' * (a0 + i * 137.5));
+	// golden-angle steps (137.5 degrees; Hexen II cos/sin take degrees) keep every
+	// heading well apart without knowing the count.
+	// Breakables and item_spawner keep the vanilla straight pop (spawner prizes sit on
+	// pedestals); from the second item on, Raven's commented-out 20 u/s spread.
+	a = a0 + i * 137.5;
+	s = 20 * (i > 0);
+	it.velocity_z = 200;
 	if (self.flags & FL_MONSTER)
 	{
-		it.velocity = v_forward * random(80,120);
+		s = random(80,120);
 		it.velocity_z = 300;
 	}
-	else
-	{	// breakables and item_spawner keep the vanilla straight pop (spawner prizes sit
-		// on pedestals); from the second item on, Raven's commented-out 20 u/s spread
-		if (i > 0)
-			it.velocity = v_forward * 20;
-		it.velocity_z = 200;
-	}
+	it.velocity_x = cos(a) * s;	// component math: vector temporaries cost three globals each
+	it.velocity_y = sin(a) * s;
 
 	oself = self;
 	self = it;
@@ -1560,13 +1560,8 @@ float LooseDropRun (float kind, float n, float amount, float i, float a0)
 void DropLooseItems (entity holder)
 {
 float i, a0;
-vector fwd, rt, up;
 
-	fwd = v_forward;	// the caller's th_die may still read these
-	rt = v_right;
-	up = v_up;
 	a0 = random(360);
-
 	i = LooseDropRun(ARTIFACT_TORCH, holder.cnt_torch, 0, 0, a0);
 	i = LooseDropRun(ARTIFACT_HP_BOOST, holder.cnt_h_boost, 0, i, a0);
 	i = LooseDropRun(ARTIFACT_SUPER_HP_BOOST, holder.cnt_sh_boost, 0, i, a0);
@@ -1583,23 +1578,48 @@ vector fwd, rt, up;
 	i = LooseDropRun(ARTIFACT_CUBEOFFORCE, holder.cnt_cubeofforce, 0, i, a0);
 	i = LooseDropRun(ARTIFACT_INVINCIBILITY, holder.cnt_invincibility, 0, i, a0);
 
-	// equal blue and green (every random roll) is the existing combined-mana pickup
+	// one each from here; equal blue and green (every random roll) is the existing
+	// combined-mana pickup
 	if (holder.bluemana && (holder.bluemana == holder.greenmana))
-		i = LooseDropRun(LOOSE_MANA_BOTH, 1, holder.bluemana, i, a0);
+	{
+		LooseDropOne(LOOSE_MANA_BOTH, holder.bluemana, i, a0);
+		i += 1;
+	}
 	else
 	{
-		i = LooseDropRun(LOOSE_MANA_BLUE, holder.bluemana > 0, holder.bluemana, i, a0);
-		i = LooseDropRun(LOOSE_MANA_GREEN, holder.greenmana > 0, holder.greenmana, i, a0);
+		if (holder.bluemana)
+		{
+			LooseDropOne(LOOSE_MANA_BLUE, holder.bluemana, i, a0);
+			i += 1;
+		}
+		if (holder.greenmana)
+		{
+			LooseDropOne(LOOSE_MANA_GREEN, holder.greenmana, i, a0);
+			i += 1;
+		}
 	}
-	i = LooseDropRun(LOOSE_HEALTH, holder.spawn_health > 0, 0, i, a0);
-	i = LooseDropRun(LOOSE_AMULET, holder.armor_amulet > 0, 0, i, a0);
-	i = LooseDropRun(LOOSE_BRACER, holder.armor_bracer > 0, 0, i, a0);
-	i = LooseDropRun(LOOSE_BREASTPLATE, holder.armor_breastplate > 0, 0, i, a0);
-	i = LooseDropRun(LOOSE_HELMET, holder.armor_helmet > 0, 0, i, a0);
-
-	v_forward = fwd;
-	v_right = rt;
-	v_up = up;
+	if (holder.spawn_health)
+	{
+		LooseDropOne(LOOSE_HEALTH, 0, i, a0);
+		i += 1;
+	}
+	if (holder.armor_amulet)
+	{
+		LooseDropOne(LOOSE_AMULET, 0, i, a0);
+		i += 1;
+	}
+	if (holder.armor_bracer)
+	{
+		LooseDropOne(LOOSE_BRACER, 0, i, a0);
+		i += 1;
+	}
+	if (holder.armor_breastplate)
+	{
+		LooseDropOne(LOOSE_BREASTPLATE, 0, i, a0);
+		i += 1;
+	}
+	if (holder.armor_helmet)
+		LooseDropOne(LOOSE_HELMET, 0, i, a0);
 }
 
 /*
@@ -1610,7 +1630,7 @@ DropBackpack
 void DropBackpack(void)
 {
 entity item,old_self;
-float total;
+float total, loose;
 
 	item = spawn();
 
@@ -1743,8 +1763,14 @@ float total;
 	item.artifact_ignore_owner_time = time + 2;
 	item.artifact_ignore_time = time + 0.1;
 
-	if ((self.classname != "player") && cvar("jsp_loosedrops"))
-	{	// [2026-11-11] jsH2+ loose drops (see DropLooseItems); a player's pack stays a bag
+	// [2026-11-11] jsH2+ loose drops; a player's pack stays a bag, and so does a drop of more
+	// than LOOSE_MAX items (only custom maps carry that many) so it can't flood the map.
+	// total counts artifacts and armor; mana and health add up to three more.
+	loose = (self.classname != "player") && cvar("jsp_loosedrops");
+	if (loose)
+		loose = (total + (item.bluemana > 0) + (item.greenmana > 0) + (item.spawn_health > 0) <= LOOSE_MAX);
+	if (loose)
+	{
 		DropLooseItems(item);
 		remove(item);
 	}
