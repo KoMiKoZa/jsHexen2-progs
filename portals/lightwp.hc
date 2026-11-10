@@ -350,6 +350,12 @@ vector org;
 void()lightning_ready_power;
 void()lightning_ready_normal;
 void()lightning_close_normal;
+
+// [2026-11-11] jsH2+ never called: the engine lists the option only when the loaded progs defines this
+void jsp_tempestcharge (void)
+{
+}
+
 //void()lightning_to_normal;
 //void()lightning_to_power;
 void lightning_fire_normal (void)
@@ -434,9 +440,12 @@ void lightning_fire_normal (void)
 	// release-anywhere rule): press starts the charge, holding to frame 12 looses the ball,
 	// releasing any earlier cancels it (no ball, no mana). Held fire recovers (13-16),
 	// wraps, and charges the next ball. Follow-through always plays to completion.
+	// [2026-11-11] jsH2+ the release-cancel is the jsp_tempestcharge option (JS Progs page).
+	// Off, or on another engine, a tap fires a full windup as in vanilla; the pacing,
+	// re-entry guard, sound and light fixes stay either way.
 	else if(self.greenmana<6||
 			self.bluemana<6||
-			(!self.button0&&(self.weaponframe<$normal13 || self.weaponframe==$normal16))
+			(!self.button0&&((cvar("jsp_tempestcharge")&&self.weaponframe<$normal13) || self.weaponframe==$normal16))
 			)
 	{
 		if(self.effects&EF_BRIGHTLIGHT)
