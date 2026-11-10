@@ -35,9 +35,12 @@ Hexen II as you actually play it.
 > on the official v1.12 data layout — any engine that runs Portal of Praevus
 > loads it: [Hammer of Thyrion / uhexen2](https://sourceforge.net/projects/uhexen2/),
 > FTE's Hexen II support, forks, even the original 1998 expansion exe.
-> One cosmetic feature (the two-state torch light) is paired with a jsHexen2+
-> render upgrade and simply looks vanilla elsewhere; everything else is pure
-> game logic and behaves identically on any engine.
+> The bug fixes behave identically on any engine. The deliberate redesigns
+> (loose monster drops, the Tempest Staff charge, the two-size torch light and
+> water dousing the torch) are **JS Progs options**: jsHexen2+ registers a
+> `jsp_*` setting for each, on by default, and lists them on its Options →
+> JS Progs page. Other engines don't have those settings, so there these
+> progs play the original behaviour.
 
 ## Version
 
@@ -59,12 +62,16 @@ Each fix is one commit. The commit hash is the unique ID — `git show <hash>`
 shows exactly what changed.
 
 <details open>
-<summary><h3>📜 1.0.0 (in development) — 48 fixes &nbsp;<sub><i>(click to collapse)</i></sub></h3></summary>
+<summary><h3>📜 1.0.0 (in development) — 52 fixes &nbsp;<sub><i>(click to collapse)</i></sub></h3></summary>
 
 <br>
 
 | Commit | Date | Fix | What it does |
 |---|---|---|---|
+| `29e414e` | 2026-11-11 | Torch options | *(JS Progs options)* The two-size torch light and water dousing the torch (both `68cc25e`) can each be switched off on jsHexen2+'s JS Progs page (`jsp_torchblaze`, `jsp_torchdouse`); off, the torch keeps one size for its whole burn and burns on under water, as in the original. Other engines get the original behaviour. Paying for a torch when you light it stays: it closes the infinite-torch exploit. |
+| `cfc07ce` | 2026-11-11 | Tempest Staff charge option | *(JS Progs option)* The charged trigger (`03db4a6`) can be switched off on the JS Progs page (`jsp_tempestcharge`): a tap then fires a full windup, as in the original. The pacing, sound and light fixes from that commit stay either way. Other engines get the original trigger. |
+| `f39ee64` | 2026-11-11 | Loose monster drops | *(JS Progs option, on by default in jsHexen2+)* A killed monster's drop used to pop straight up onto the corpse, and anything beyond a single item — two kinds, a stack, the blue-and-green mana roll — came as one bag. Now a monster throws each item out on its own, the way Quake throws its backpack, so they land spread around it. Pots, chests and barrels split their contents too but pop them up gently; triggered prize spawners stay where the mapper put them. Deathmatch and coop player packs are unchanged. Switch: `jsp_loosedrops`; other engines keep the original drop. |
+| `28d692c` | 2026-11-11 | Dropped armor gave nothing | A piece of armor dropped by an enemy — or by a coop/DM player — printed "You have the Amulet of Protection" and gave you nothing. The pickup decides what you get from the item's type name, and only map-placed armor ever had one; dropped pieces came out nameless. They're named now. Hits the armor that leader-class monsters drop since `22b5c8a` made their drops work. |
 | `6419bcb` | 2026-11-11 | Lifted objects fly off sideways | The lift (impulse 13) only pushes an object up, yet a barrel, chair or pot could come down well to the side, always the same way. Objects resting on the ground don't move, but they keep whatever sideways speed they landed with after a shove or a blast, and nothing ever clears it. The lift took them off the ground and that old speed carried them away: a barrel that had landed from a 120 u/s throw came down 69 units to the side. The lift now clears that leftover speed, so the object goes straight up and lands where it stood. A barrel that is rolling keeps its roll. |
 | `3582715` | 2026-10-15 | Pickup sound on every tomed hammer throw | Tomed, the Crusader's hammer is thrown and flies back to you on every attack — and each catch played the weapon-pickup sound, so a tomed fight was a constant stream of "you picked up a weapon". That sound was a placeholder: Raven's own note at that spot plans the hammer's select animation as the catch, and that animation already plays. The catch is now silent apart from it; picking up an actual weapon still sounds as before. |
 | `e2e0748` | 2026-10-15 | Stray white light after the torch | Charging the Tempest Staff while your torch was guttering (its last seconds, after the blaze dies down) left a steady white glow on you once the torch went out, and it stayed until you next charged the staff — through Tome of Power too. The staff's charge light and the full-blaze torch use the same light bit, and the staff only kept its hands off that bit "while a torch is active" — but a guttering torch is active without owning the bright light, so the staff kept its own light lit and nothing removed it when the torch died. The staff now defers only to a torch that is actually in full blaze, which is exactly when the torch owns that light. A full-blaze torch still keeps its light through a charge and dims on schedule; the earlier torch-light fix stands. |
