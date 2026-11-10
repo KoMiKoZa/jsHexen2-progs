@@ -758,6 +758,30 @@ The monster has an enemy it is trying to kill
 =============
 */
 
+// [2026-11-11] jsH2+ The enemy is gone (dead or stoned) and nothing else is in
+// sight: go back to the patrol, or stand for good. Vanilla left goalentity on
+// the dead enemy, so any monster that went back to walking - a path patroller,
+// or an archer whose between-shots pause had run out (archer.hc sets pausetime,
+// and ai_stand walks once it passes) - walked at the corpse forever: through
+// it, on to the next wall, and back. movetogoal never stops at its goal while
+// enemy is world, and the chase code won't turn around, so it paces. This is
+// what spawning without a path, or reaching the end of one, already does.
+void ai_lost_enemy ()
+{
+	if (self.pathentity.classname == "path_corner")
+	{
+		self.goalentity = self.pathentity;
+		self.ideal_yaw = vectoyaw(self.goalentity.origin - self.origin);
+		self.th_walk ();
+	}
+	else
+	{
+		self.goalentity = world;
+		self.pausetime = 99999999;
+		self.th_stand ();
+	}
+}
+
 void(float dist) ai_run =
 {
 	
@@ -783,19 +807,13 @@ void(float dist) ai_run =
 		{
 			if(!FindTarget(TRUE))	//Look for other enemies in the area
 			{
-				if (self.pathentity)
-					self.th_walk ();
-				else
-					self.th_stand ();
+				ai_lost_enemy ();
 				return;
 			}
 		}
 		else
 		{
-			if (self.pathentity)
-				self.th_walk ();
-			else
-				self.th_stand ();
+			ai_lost_enemy ();
 			return;
 		}
 	}
