@@ -27,7 +27,14 @@ entity	temp;
 	self = other;
 	other = temp;
 
-	self.goalentity = self.pathentity = find (world, targetname, other.target);
+	// [2026-11-11] jsH2+ a corner with no target ends the path. Vanilla still
+	// searched for it, and find() with an empty name matches the first entity
+	// with no targetname: the player (e1). So a patroller reaching the last
+	// corner walked to the player, alive or dead, and paced over the corpse.
+	if (other.target != "")
+		self.goalentity = self.pathentity = find (world, targetname, other.target);
+	else
+		self.goalentity = self.pathentity = world;
 	self.ideal_yaw = vectoyaw(self.goalentity.origin - self.origin);
 	if (!self.pathentity)
 	{
