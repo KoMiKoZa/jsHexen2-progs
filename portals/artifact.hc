@@ -461,7 +461,7 @@ void DouseTorch()
 	self.torchtime = 0;
 	KillTorch();
 }
-// [2026-11-11] jsH2+ never called: the engine lists each option only when the loaded progs defines it
+// [2026-11-11] jsH2+ [JSH2 REDESIGN] never called: the engine lists each option only when the loaded progs defines it
 void jsp_torchblaze (void)
 {
 }
@@ -487,7 +487,7 @@ void DimTorch()
 void FullTorch()
 {
 	sound (self, CHAN_BODY, "raven/fire1.wav", 1, ATTN_NORM);
-	if (cvar("jsp_torchblaze"))	// [2026-11-11] jsH2+ JS Progs option; off = one torch size all burn (vanilla)
+	if (cvar("jsp_torchblaze"))	// [2026-11-11] jsH2+ [JSH2 REDESIGN] JS Progs option; off = one torch size all burn (vanilla)
 	{	// EF_TORCHLIGHT and BRIGHT go together: the staff code reads TORCHLIGHT as "the torch owns BRIGHT"
 		self.effects(+)EF_TORCHLIGHT;
 		self.effects(+)EF_BRIGHTLIGHT;	// [2026-06-12] jsH2+ full-blaze marker: transmits to the client,
@@ -548,7 +548,7 @@ void UseTorch()
 	if ((self.artifact_flags & AFL_TORCH) && (self.torchthink != KillTorch))
 		return;
 
-	if ((self.waterlevel > 2) && cvar("jsp_torchdouse"))	// [2026-11-11] jsH2+ JS Progs option
+	if ((self.waterlevel > 2) && cvar("jsp_torchdouse"))	// [2026-11-11] jsH2+ [JSH2 REDESIGN] JS Progs option
 	{	// [2026-06-12] jsH2+ head under water: the torch won't take - fizzle, nothing consumed
 		sound (self, CHAN_BODY, "misc/fout.wav", 1, ATTN_NORM);
 		return;
@@ -557,7 +557,7 @@ void UseTorch()
 	sound (self, CHAN_WEAPON, "raven/littorch.wav", 1, ATTN_NORM);
 
 	self.effects(+)EF_DIMLIGHT;   // set player to emit light
-	if (cvar("jsp_torchblaze"))	// [2026-11-11] jsH2+ JS Progs option (see FullTorch)
+	if (cvar("jsp_torchblaze"))	// [2026-11-11] jsH2+ [JSH2 REDESIGN] JS Progs option (see FullTorch)
 	{
 		self.effects(+)EF_TORCHLIGHT;	// [2026-06-12] jsH2+ full blaze from the first frame (the old 1s
 		self.effects(+)EF_BRIGHTLIGHT;	// "catching" beat kept the light small, reading as a stutter now

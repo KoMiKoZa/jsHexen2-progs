@@ -1477,7 +1477,7 @@ float it_total;
 	return it_total;
 }
 
-// [2026-11-11] jsH2+ loose drops, the jsp_loosedrops option on jsHexen2+'s JS Progs
+// [2026-11-11] jsH2+ [JSH2 REDESIGN] loose drops, the jsp_loosedrops option on jsHexen2+'s JS Progs
 // page. Anything that is not a player drops its contents as separate pickups instead
 // of one bag, and a monster flings them out the way Quake throws its backpack. Other
 // engines don't register the cvar, read 0, and keep the vanilla drop.
@@ -1491,7 +1491,7 @@ float LOOSE_BREASTPLATE	= 106;
 float LOOSE_HELMET		= 107;
 float LOOSE_MAX			= 8;	// more items than this and the drop stays one bag (see DropBackpack)
 
-// Never called: the engine lists the option only when the loaded progs defines this.
+// [2026-11-11] jsH2+ [JSH2 REDESIGN] never called: the engine lists the option only when the loaded progs defines this.
 void jsp_loosedrops (void)
 {
 }
@@ -1763,7 +1763,7 @@ float total, loose;
 	item.artifact_ignore_owner_time = time + 2;
 	item.artifact_ignore_time = time + 0.1;
 
-	// [2026-11-11] jsH2+ loose drops; a player's pack stays a bag, and so does a drop of more
+	// [2026-11-11] jsH2+ [JSH2 REDESIGN] loose drops; a player's pack stays a bag, and so does a drop of more
 	// than LOOSE_MAX items (only custom maps carry that many) so it can't flood the map.
 	// total counts artifacts and armor; mana and health add up to three more.
 	loose = (self.classname != "player") && cvar("jsp_loosedrops");
