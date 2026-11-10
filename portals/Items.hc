@@ -865,6 +865,8 @@ void spawn_item_armor_helmet(void)
 	self.hull=HULL_POINT;
 	self.touch = armor_touch;
 	self.netname = STR_ARMORHELMET;
+	self.classname = "item_armor_helmet";	// [2026-11-11] jsH2+ armor_touch gives armor by classname, and a
+			// dropped piece (spawn() leaves it empty) handed out nothing
 
 	StartItem ();
 }
@@ -886,6 +888,7 @@ void spawn_item_armor_breastplate (void)
 	self.hull=HULL_POINT;
 	self.touch = armor_touch;
 	self.netname = STR_ARMORBREASTPLATE;
+	self.classname = "item_armor_breastplate";
 
 	StartItem ();
 }
@@ -907,6 +910,7 @@ void spawn_item_armor_bracer(void)
 	self.hull=HULL_POINT;
 	self.touch = armor_touch;
 	self.netname = STR_ARMORBRACER;
+	self.classname = "item_armor_bracer";
 
 	StartItem ();
 }
@@ -928,6 +932,7 @@ void spawn_item_armor_amulet(void)
 	self.hull=HULL_POINT;
 	self.touch = armor_touch;
 	self.netname = STR_ARMORAMULET;
+	self.classname = "item_armor_amulet";
 
 	StartItem ();
 }
