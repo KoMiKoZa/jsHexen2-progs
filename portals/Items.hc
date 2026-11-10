@@ -1477,6 +1477,131 @@ float it_total;
 	return it_total;
 }
 
+// [2026-11-11] jsH2+ loose drops, the jsp_loosedrops option on jsHexen2+'s JS Progs
+// page. Anything that is not a player drops its contents as separate pickups instead
+// of one bag, and a monster flings them out the way Quake throws its backpack. Other
+// engines don't register the cvar, read 0, and keep the vanilla drop.
+float LOOSE_MANA_BOTH	= 100;	// kinds past the ARTIFACT_* range (1-15)
+float LOOSE_MANA_BLUE	= 101;
+float LOOSE_MANA_GREEN	= 102;
+float LOOSE_HEALTH		= 103;
+float LOOSE_AMULET		= 104;
+float LOOSE_BRACER		= 105;
+float LOOSE_BREASTPLATE	= 106;
+float LOOSE_HELMET		= 107;
+
+// Never called: the engine lists the option only when the loaded progs defines this.
+void jsp_loosedrops (void)
+{
+}
+
+void LooseDropOne (float kind, float amount, float i, float a0)
+{
+entity it, oself;
+
+	it = spawn();
+	setorigin(it, self.origin + '0 0 40');
+	it.flags(+)FL_ITEM;
+	it.solid = SOLID_TRIGGER;
+	it.movetype = MOVETYPE_TOSS;
+	it.owner = self;
+	it.artifact_ignore_owner_time = time + 2;
+	it.artifact_ignore_time = time + 0.1;
+
+	// golden-angle steps keep every heading well apart without knowing the count
+	makevectors('0 1 0' * (a0 + i * 137.5));
+	if (self.flags & FL_MONSTER)
+	{
+		it.velocity = v_forward * random(80,120);
+		it.velocity_z = 300;
+	}
+	else
+	{	// breakables and item_spawner keep the vanilla straight pop (spawner prizes sit
+		// on pedestals); from the second item on, Raven's commented-out 20 u/s spread
+		if (i > 0)
+			it.velocity = v_forward * 20;
+		it.velocity_z = 200;
+	}
+
+	oself = self;
+	self = it;
+	if (kind < LOOSE_MANA_BOTH)
+		spawn_artifact(kind, NO_RESPAWN);
+	else if (kind == LOOSE_MANA_BOTH)
+		spawn_item_mana_both(amount);
+	else if (kind == LOOSE_MANA_BLUE)
+		spawn_item_mana_blue(amount);
+	else if (kind == LOOSE_MANA_GREEN)
+		spawn_item_mana_green(amount);
+	else if (kind == LOOSE_HEALTH)
+		spawn_instant_health();
+	else if (kind == LOOSE_AMULET)
+		spawn_item_armor_amulet();
+	else if (kind == LOOSE_BRACER)
+		spawn_item_armor_bracer();
+	else if (kind == LOOSE_BREASTPLATE)
+		spawn_item_armor_breastplate();
+	else
+		spawn_item_armor_helmet();
+	self = oself;
+}
+
+float LooseDropRun (float kind, float n, float amount, float i, float a0)
+{
+	while (n > 0)
+	{
+		LooseDropOne(kind, amount, i, a0);
+		i += 1;
+		n -= 1;
+	}
+	return i;
+}
+
+void DropLooseItems (entity holder)
+{
+float i, a0;
+vector fwd, rt, up;
+
+	fwd = v_forward;	// the caller's th_die may still read these
+	rt = v_right;
+	up = v_up;
+	a0 = random(360);
+
+	i = LooseDropRun(ARTIFACT_TORCH, holder.cnt_torch, 0, 0, a0);
+	i = LooseDropRun(ARTIFACT_HP_BOOST, holder.cnt_h_boost, 0, i, a0);
+	i = LooseDropRun(ARTIFACT_SUPER_HP_BOOST, holder.cnt_sh_boost, 0, i, a0);
+	i = LooseDropRun(ARTIFACT_MANA_BOOST, holder.cnt_mana_boost, 0, i, a0);
+	i = LooseDropRun(ARTIFACT_TELEPORT, holder.cnt_teleport, 0, i, a0);
+	i = LooseDropRun(ARTIFACT_TOME, holder.cnt_tome, 0, i, a0);
+	i = LooseDropRun(ARTIFACT_SUMMON, holder.cnt_summon, 0, i, a0);
+	i = LooseDropRun(ARTIFACT_INVISIBILITY, holder.cnt_invisibility, 0, i, a0);
+	i = LooseDropRun(ARTIFACT_GLYPH, holder.cnt_glyph, 0, i, a0);
+	i = LooseDropRun(ARTIFACT_HASTE, holder.cnt_haste, 0, i, a0);
+	i = LooseDropRun(ARTIFACT_BLAST, holder.cnt_blast, 0, i, a0);
+	i = LooseDropRun(ARTIFACT_POLYMORPH, holder.cnt_polymorph, 0, i, a0);
+	i = LooseDropRun(ARTIFACT_FLIGHT, holder.cnt_flight, 0, i, a0);
+	i = LooseDropRun(ARTIFACT_CUBEOFFORCE, holder.cnt_cubeofforce, 0, i, a0);
+	i = LooseDropRun(ARTIFACT_INVINCIBILITY, holder.cnt_invincibility, 0, i, a0);
+
+	// equal blue and green (every random roll) is the existing combined-mana pickup
+	if (holder.bluemana && (holder.bluemana == holder.greenmana))
+		i = LooseDropRun(LOOSE_MANA_BOTH, 1, holder.bluemana, i, a0);
+	else
+	{
+		i = LooseDropRun(LOOSE_MANA_BLUE, holder.bluemana > 0, holder.bluemana, i, a0);
+		i = LooseDropRun(LOOSE_MANA_GREEN, holder.greenmana > 0, holder.greenmana, i, a0);
+	}
+	i = LooseDropRun(LOOSE_HEALTH, holder.spawn_health > 0, 0, i, a0);
+	i = LooseDropRun(LOOSE_AMULET, holder.armor_amulet > 0, 0, i, a0);
+	i = LooseDropRun(LOOSE_BRACER, holder.armor_bracer > 0, 0, i, a0);
+	i = LooseDropRun(LOOSE_BREASTPLATE, holder.armor_breastplate > 0, 0, i, a0);
+	i = LooseDropRun(LOOSE_HELMET, holder.armor_helmet > 0, 0, i, a0);
+
+	v_forward = fwd;
+	v_right = rt;
+	v_up = up;
+}
+
 /*
 ===============
 DropBackpack
@@ -1618,7 +1743,12 @@ float total;
 	item.artifact_ignore_owner_time = time + 2;
 	item.artifact_ignore_time = time + 0.1;
 
-	if ((total == 1 && !item.bluemana && !item.greenmana && !item.spawn_health) ||
+	if ((self.classname != "player") && cvar("jsp_loosedrops"))
+	{	// [2026-11-11] jsH2+ loose drops (see DropLooseItems); a player's pack stays a bag
+		DropLooseItems(item);
+		remove(item);
+	}
+	else if ((total == 1 && !item.bluemana && !item.greenmana && !item.spawn_health) ||
 	    (total == 0 &&  item.bluemana && !item.greenmana && !item.spawn_health)  ||
 		(total == 0 && !item.bluemana &&  item.greenmana && !item.spawn_health)  ||
 	    (total == 0 && !item.bluemana && !item.greenmana &&  item.spawn_health))
