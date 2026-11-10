@@ -287,6 +287,15 @@ float inertia, lift;
 		lift=(self.strength/40+0.5)*300/inertia;
 		if(lift>300)
 			lift=300;
+// [2026-11-11] jsH2+ the lift goes straight up. A step or pushpull object resting on the
+// ground doesn't move, but keeps the sideways speed it landed with (a shove, a blast), so
+// a lifted barrel flew off in that old direction. A rolling barrel keeps its speed: its
+// think needs it.
+		if((trace_ent.movetype==MOVETYPE_STEP||trace_ent.movetype==MOVETYPE_PUSHPULL)&&trace_ent.think!=obj_barrel_roll)
+		{
+			trace_ent.velocity_x=0;
+			trace_ent.velocity_y=0;
+		}
 		trace_ent.velocity_z+=lift;
 
 		if (trace_ent.flags&FL_ONGROUND)
