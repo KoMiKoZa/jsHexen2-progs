@@ -888,16 +888,36 @@ void  DropInventoryItem (void)
 {
 	entity item,holdent;
 	float throwflag,torch_thrown;
+	vector throwstart,throwspot;
 
 	makevectors(self.v_angle);
-	traceline(self.origin + self.proj_ofs,self.origin + self.proj_ofs + v_forward * 60,FALSE,self);
+	// [2026-11-11] jsH2+ Raven placed the item at a fixed spot along the view
+	// (eye + up 10 + forward 40 + right 8) and checked only a thin 60-unit line
+	// from the eye. Its box (StartItem: '-16 -16 -38' '16 16 24') then started in
+	// a low ceiling on an up throw and hung there, or ~3 units into the floor on
+	// a +50 down throw; steeper down throws were refused. Now the box is traced
+	// from the thrower's own spot (its bottom at the thrower's feet) to Raven's spot, and
+	// starts where it stops: short of a ceiling, floor or wall, never inside one.
+	// Monsters and players are ignored (nomonsters): the item is SOLID_TRIGGER and
+	// never collides with them, so one in melee range must not refuse the throw.
+	// Refused only when even the start has no room for the item's box, which is 62
+	// tall against a standing player's 56: crouched in a low tunnel, or under a
+	// ceiling 56-61 above the feet (where Raven's item stuck in the ceiling).
+	// Direction and speed as before. Raven's remove(item) on refusal ran before
+	// the spawn on a local QC does not clear between calls: world on a first
+	// refusal, but after any throw the last thrown item, which a later refused
+	// throw deleted (or a reused edict it freed). It is gone.
+	throwstart = self.origin;
+	throwstart_z = self.origin_z + self.mins_z + 38;
+	tracearea (throwstart, self.origin + self.proj_ofs + v_up * 10 + v_forward * 40 + v_right * 8,
+		'-16 -16 -38', '16 16 24', TRUE, self);
 
-	if (trace_fraction < 1)
+	if (trace_allsolid || trace_startsolid)
 	{
-		remove(item);
 		centerprint(self,"Not enough room to throw");
 		return;
 	}
+	throwspot = trace_endpos;
 
 	item = spawn();
 
@@ -1023,7 +1043,7 @@ void  DropInventoryItem (void)
 		item.velocity_y += random(-20,20);	// standing in one place and throwing multiple items
 		item.velocity_z = 200;
 		makevectors(self.v_angle);
-		setorigin(item,self.origin + self.proj_ofs + v_up * 10 + v_forward * 40 + v_right * 8);
+		setorigin(item,throwspot);	// [2026-11-11] jsH2+ traced spot, see the top
 		
 		sound(self,CHAN_BODY,"misc/whoosh.wav",1,ATTN_NORM);
 		if(torch_thrown)
