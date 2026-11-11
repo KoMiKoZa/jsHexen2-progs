@@ -36,9 +36,9 @@ No entity fields are added or reordered, so the save layout is Raven's. Fixes ar
 saves made before them still load. Where something already stored in a save keeps its old
 behaviour, the changelog row says so.
 
-## For engine maintainers
+## For other source ports
 
-If you take a fix from here, check it first. This code is developed with AI assistance, alongside the jsHexen2
+If you work on another Hexen II source port (uHexen2, FTE, or others) and take a fix from here, check it first. This code is developed with AI assistance, alongside the jsHexen2
 engine and tested on it. A row that names a bug as Raven's is our reading of the cause, and it
 can be wrong: a fix may depend on jsHexen2's behaviour, or correct an earlier change of ours
 rather than the original code. Compare against Raven's source yourself.
