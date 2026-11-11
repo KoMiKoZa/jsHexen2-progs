@@ -1477,8 +1477,8 @@ float it_total;
 	return it_total;
 }
 
-// [2026-11-11] jsH2+ [JSH2 REDESIGN] loose drops, the jsp_loosedrops option on jsHexen2+'s jsHexen2 Progs
-// page. Anything that is not a player drops its contents as separate pickups instead
+// [2026-11-11] jsH2+ [JSH2 REDESIGN] loose drops, the jsp_loosedrops option on the jsHexen2 Progs page.
+// Anything that is not a player drops its contents as separate pickups instead
 // of one bag, and a monster flings them out the way Quake throws its backpack. Other
 // engines don't register the cvar, read 0, and keep the vanilla drop.
 float LOOSE_MANA_BOTH	= 100;	// kinds past the ARTIFACT_* range (1-15)
