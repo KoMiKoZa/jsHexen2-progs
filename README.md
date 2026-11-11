@@ -153,5 +153,4 @@ in `jsh2/`; without them, every later build shows as "Unknown jsHexen2 progs".
 
 ## Licence
 
-GPL v2. The baseline is Raven's released Hexen II mission-pack HexenC source, distributed under
-GPL v2, as in Hammer of Thyrion / uHexen2.
+GPL v2, the licence of Raven's Hexen II source release that this code is based on.
