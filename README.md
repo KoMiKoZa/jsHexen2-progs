@@ -151,6 +151,6 @@ Keep the first 16 characters of the connect message in `Client.hc` (`ClientConne
 `jsHexen2+ Progs `. jsHexen2 looks for them to tell a build of these progs from another program
 in `jsh2/`; without them, every later build shows as "Unknown jsHexen2 progs".
 
-## Licence
+## License
 
-GPL v2, the licence of Raven's Hexen II source release that this code is based on.
+GPL v2, the license of Raven's Hexen II source release that this code is based on.
