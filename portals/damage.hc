@@ -700,17 +700,24 @@ float armor_calc(entity targ,float damage)
 
 	total_armor_protection = 0;
 
+	// [2026-11-11] jsH2+ the table holds four pieces per class; Raven indexed it
+	// [playerclass - 1 + piece], so every class but the Paladin read a mix of other
+	// classes' values (Crusader 65%, Necromancer 60%, Assassin 45% with all four).
+	// The HUD already shows these intended values. perpiece doubles as the class's
+	// table offset here (one global fewer); the damage split below sets it afresh.
+	perpiece = (targ.playerclass - 1) * 4;
+
 	if (targ.armor_amulet)
-		total_armor_protection += ClassArmorProtection[targ.playerclass - 1]; 
+		total_armor_protection += ClassArmorProtection[perpiece];
 
 	if (targ.armor_bracer)
-		total_armor_protection += ClassArmorProtection[targ.playerclass - 1 + 1];
+		total_armor_protection += ClassArmorProtection[perpiece + 1];
 
 	if (targ.armor_breastplate)
-		total_armor_protection += ClassArmorProtection[targ.playerclass - 1 + 2];
+		total_armor_protection += ClassArmorProtection[perpiece + 2];
 
 	if (targ.armor_helmet)
-		total_armor_protection += ClassArmorProtection[targ.playerclass - 1 + 3];
+		total_armor_protection += ClassArmorProtection[perpiece + 3];
 
 	total_armor_protection += targ.level * .001;
 
