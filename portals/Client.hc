@@ -2362,6 +2362,9 @@ called when a player connects to a server
 */
 void() ClientConnect =
 {
+	// [2026-11-11] jsH2+ keep the first 16 characters "jsHexen2+ Progs " exactly: the engine's
+	// install check (MOD_JSH2_PROGS_MARK) finds this string to tell our builds from someone
+	// else's program in jsh2/. Reword it and every later build shows as "Unknown jsHexen2 progs".
 	sprint (self, "jsHexen2+ Progs 1.0.0 (based on Raven v1.12a)\n");	// [2026-06-13] jsH2+ version identity (was mislabeled v1.21 - the jsH2 engine version; Raven mission-pack progs is v1.12a, CRC 26905)
 	bprint (self.netname);
 	bprint (STR_JOINEDTHEGAME);

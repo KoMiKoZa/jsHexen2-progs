@@ -155,6 +155,16 @@ the copy inside the paks.
 > keep the original as `progs_vanilla.dat` so you can always A/B against
 > stock behavior.
 
+**In jsHexen2+,** put it in `jsh2/` instead, and leave the original in
+`Portals/`: the engine loads `jsh2/progs.dat` first and offers the original
+Portal of Praevus program as a separate choice on the Game code line.
+
+> [!IMPORTANT]
+> Keep the start of the connect message in `Client.hc` (`ClientConnect`)
+> exactly `jsHexen2+ Progs `. jsHexen2+ looks for those 16 characters to tell
+> a build of these progs from someone else's program in `jsh2/`; without them
+> every later build shows as "Unknown jsHexen2 progs".
+
 ## Layout
 
 - `portals/` — the mission-pack game-logic source (`.hc` files + `Progs.src`)
