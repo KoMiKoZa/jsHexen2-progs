@@ -30,6 +30,38 @@ are on by default.
 Other engines do not register these variables, so `cvar()` returns 0 there and the mechanic
 behaves as in Raven's code, the same as switching it off in jsHexen2.
 
+### Adding a switch to your own mod
+
+Any progs can add switches to that page (jsHexen2 0.9.8 or later). Declare one with a function
+whose name starts with `jsp_` and that returns the label, an optional tooltip and an optional
+`off` for a switch that starts off:
+
+```c
+string jsp_mymod_bigjump (void)
+{
+	return "Big Jump|Jumps go twice as high. Off: the normal jump.";
+}
+```
+
+Then read it where the behavior happens:
+
+```c
+if (cvar("jsp_mymod_bigjump"))
+	self.velocity_z = self.velocity_z * 2;
+```
+
+Nothing calls the function; jsHexen2 reads the text from the compiled progs. Keep these rules:
+
+- The `return` with a string constant must be the function's only statement. An empty
+  `void jsp_mymod_bigjump (void) {}` also works and shows the name as the label.
+- Labels are cut at 24 characters and tooltips at 256. `"Label||off"` starts off without a tooltip.
+- A switch belongs to its name, not to your mod, so put your mod's name in it. Two mods that
+  declare `jsp_bigjump` share one setting.
+- Every other engine reads 0, so write the code so that 0 is the original behavior.
+- `cvar()` runs on the server: in multiplayer the host's settings apply to everyone. Read the
+  value each time you need it if a change should apply right away.
+- Up to 32 switches per progs. The player's choices are saved in `config.cfg`.
+
 ## Saves
 
 No entity fields are added or reordered, so the save layout is Raven's. Fixes are written so that
