@@ -157,6 +157,11 @@ void obj_push()
 vector pushdir,pushangle;
 float ontop,pushed,inertia,force,walkforce;
 
+// [2026-11-11] jsH2+ ontop starts clear. It is only set below when something stands on top,
+// and a local keeps its old value between calls, so a side push could find it still set
+// from an earlier call and be ignored.
+	ontop=FALSE;
+
 	if(other.solid==SOLID_PHASE||other.movetype==MOVETYPE_FLYMISSILE||other.movetype==MOVETYPE_BOUNCEMISSILE)
 		return;
 
@@ -190,7 +195,10 @@ float ontop,pushed,inertia,force,walkforce;
 			other.velocity=v_forward*300;
 			other.flags(-)FL_ONGROUND;
 		}
-		if(other.flags&FL_CLIENT&&!other.frozen)
+// [2026-11-11] jsH2+ a player standing on a barrel, chair, barstool or pushable brush
+// stands on it: before, every step on top pushed it the way they moved, so it slid out
+// from under them, and landing on one shoved it east.
+		if(other.flags&FL_CLIENT&&!other.frozen&&self.movetype!=MOVETYPE_PUSHPULL)
 			ontop = FALSE;
 		else
 		{
