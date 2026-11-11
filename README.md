@@ -1,4 +1,4 @@
-<p align="center"><img src="assets/icon.png" width="96" height="96" alt="jsHexen2 Progs"></p>
+<p align="center"><img src=".github/icon.png" width="96" height="96" alt="jsHexen2 Progs"></p>
 
 # jsHexen2 Progs
 
