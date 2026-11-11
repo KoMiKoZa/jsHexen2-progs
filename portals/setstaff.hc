@@ -575,7 +575,9 @@ void setstaff_readyfire (void)
 	if(self.weaponframe>$build15)
 		self.weaponframe=$build1;
 
-	if(self.weaponframe==$build1)
+	// [2026-11-11] jsH2+ build1 is shown for 4 thinks (weaponframe_cnt), so the charge
+	// sound restarted 4 times in its first 0.15 s. Play it on the first think only.
+	if(self.weaponframe==$build1 && self.weaponframe_cnt==0)
 		sound(self,CHAN_WEAPON,"assassin/build.wav",1,ATTN_NORM);
 
 	if (self.weaponframe >= $build1 && self.weaponframe < $build15)
@@ -640,7 +642,12 @@ void() ass_setstaff_fire =
 	if (self.artifact_active & ART_TOMEOFPOWER)  // Pause for firing in power up mode
 		self.th_weapon=setstaff_powerfire;
 	else
+	{
+		// [2026-11-11] jsH2+ every charge starts its count at 0. The field is shared
+		// (the grenade throw counts it), and a weapon switch mid-charge leaves it set.
+		self.weaponframe_cnt=0;
 		self.th_weapon=setstaff_readyfire;
+	}
 
 	thinktime self : 0;
 	self.nextthink=time;
