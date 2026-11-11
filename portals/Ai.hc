@@ -397,7 +397,11 @@ float		r;
 	if(!deathmatch&&(self.classname=="monster_imp_lord"||self.classname=="cube_of_force"))
 		return FindMonsterTarget();
 
-	if (sight_entity_time >= time&&sight_entity!=world)
+	// [2026-11-11] jsH2+ the sight shortcut copies another monster's enemy; when that
+	// enemy is dead (or none), skip it and search clients as usual. Vanilla took it
+	// anyway: idle imps flipped onto a dead player's corpse and back for up to 1 s, and
+	// with both enemies world the equality below returned TRUE, so ai_walk skipped its move.
+	if (sight_entity_time >= time&&sight_entity!=world&&(sight_entity.enemy.flags2 & FL_ALIVE))
 	{
 		client = sight_entity;
 		if (client.enemy == self.enemy)
