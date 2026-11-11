@@ -702,10 +702,13 @@ float armor_calc(entity targ,float damage)
 
 	// [2026-11-11] jsH2+ the table holds four pieces per class; Raven indexed it
 	// [playerclass - 1 + piece], so every class but the Paladin read a mix of other
-	// classes' values (Crusader 65%, Necromancer 60%, Assassin 45% with all four).
-	// The HUD already shows these intended values. perpiece doubles as the class's
-	// table offset here (one global fewer); the damage split below sets it afresh.
+	// classes' values (totals in the README row for 27e0dda). The HUD already shows
+	// these intended values. perpiece doubles as the class's table offset here (one
+	// global fewer); the damage split below sets it afresh. A class outside 1-5 reads
+	// the Paladin's block: an array index out of range is a progs error that ends the game.
 	perpiece = (targ.playerclass - 1) * 4;
+	if (perpiece < 0 || perpiece > 16)
+		perpiece = 0;
 
 	if (targ.armor_amulet)
 		total_armor_protection += ClassArmorProtection[perpiece];
