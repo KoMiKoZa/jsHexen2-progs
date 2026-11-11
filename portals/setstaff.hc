@@ -622,6 +622,21 @@ void setstaff_readyfire (void)
 
 void() ass_setstaff_fire =
 {
+	// [2026-11-11] jsH2+ re-entry guard: W_WeaponFrame calls W_Attack every server frame
+	// while fire is held and attack_finished has passed. The charge never sets
+	// attack_finished, so this entry re-ran per frame and its nextthink=time ran
+	// setstaff_readyfire per server frame instead of on the 20 Hz anim clock: a full
+	// charge took 0.78 s at 72 Hz physics, not 14 frames * 4 thinks * 0.05 = 2.8 s.
+	// A tap sets attack_finished = time + 0, so each click also cut setstaff_settle short
+	// and fired again. While the staff's own chain owns the weapon, leave it alone: the
+	// next shot waits for the settle (0.4 s). attack_finished stays Raven's power/10, so
+	// weapon switching (blocked while it is pending) is not held up. The guard ignores the
+	// Tome: toggling it mid-animation lets the running chain finish, and the next press
+	// uses the new mode.
+	if (self.th_weapon == setstaff_settle || self.th_weapon == setstaff_readyfire
+		|| self.th_weapon == setstaff_powerfire)
+		return;
+
 	if (self.artifact_active & ART_TOMEOFPOWER)  // Pause for firing in power up mode
 		self.th_weapon=setstaff_powerfire;
 	else
