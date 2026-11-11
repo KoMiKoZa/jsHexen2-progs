@@ -32,7 +32,7 @@ behaves as in Raven's code, the same as switching it off in jsHexen2.
 
 ### Adding a switch to your own mod
 
-Any progs can add switches to that page (jsHexen2 0.9.8 or later). Declare one with a function
+Any progs can add switches to that page. Declare one with a function
 whose name starts with `jsp_` and that returns the label, an optional tooltip and an optional
 `off` for a switch that starts off:
 
