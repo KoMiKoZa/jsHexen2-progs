@@ -221,7 +221,7 @@
 //rj.float ordr_cnt;			// Number of items in order
 
 // make sure you change references to:
-//    max_ammo2()   DropBackpack()   BackpackTouch()
+//    DropBackpack()   BackpackHasRoom()   BackpackTouch()   BagListItems()
 // when adding or changing inventory fields
 .float cnt_torch;			// Count of inventory item - Torch
 .float cnt_h_boost;			// Count of inventory item - Health Boost

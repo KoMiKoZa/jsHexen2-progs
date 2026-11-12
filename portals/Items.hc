@@ -958,9 +958,9 @@ PLAYER BACKPACKS
 
 //void GetPuzzle2(entity item, entity person, string which);
 
-// [2026-11-12] jsH2+ TRUE if the bag holds anything the player can still take. Checked
-// before max_ammo2, which trims the bag in place: a bag left on the ground keeps its full
-// contents for a teammate who has room.
+// [2026-11-12] jsH2+ TRUE if the bag holds anything the player can still take: BackpackTouch's
+// gate, with the same limits BackpackTake uses, so a bag left on the ground keeps its contents
+// for a teammate who has room.
 float BackpackHasRoom (entity bag, entity p)
 {
 	float	newweapons;
@@ -1023,6 +1023,8 @@ float BackpackTake (.float fld, string one, string many, float kind, float taken
 			n = room;
 		other.fld += n;
 		self.fld -= n;
+		if (kind == 1 && n == room)
+			other.fld = other.max_mana;		// exactly full, not a rounding hair under it
 	}
 
 	if (taken)
@@ -1118,6 +1120,14 @@ void BackpackTouch(void)
 //	remove the backpack once it's empty, change self to the player
 	if (!BagListItems (other, self, 0))		// [2026-11-12] jsH2+ was always removed
 		remove(self);
+	else
+	{
+		// [2026-11-12] jsH2+ a bag left with the rest waits a second before it gives again, so a
+		// player standing on it doesn't get a message, sound and flash for every shot that spends
+		// mana; and the bag list shows what's left at the next look
+		self.artifact_ignore_time = time + 1;
+		other.healtype = 0;
+	}
 	self = other;
 
 //	change to the weapon
