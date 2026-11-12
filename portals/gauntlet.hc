@@ -193,7 +193,7 @@ void gauntlet_b (void)
 	self.th_weapon = gauntlet_b;
 
 	if ((self.weaponframe == $2ndGnt4) || (self.weaponframe == $2ndGnt5))
-		self.weaponframe == $2ndGnt6;
+		self.weaponframe = $2ndGnt6;	// [2026-11-13] jsH2+ was "==", so frames 4 and 5 were never skipped
 
 	if (self.weaponframe == $2ndGnt6)
 		sound (self, CHAN_WEAPON, "weapons/gaunt1.wav", 1, ATTN_NORM);

@@ -587,14 +587,21 @@ entity	bubble;
 	setsize (bubble, '-8 -8 -8', '8 8 8');
 	self.cnt-=1;
 	self.think = make_bubbles;
-	if(self.cnt)
+	if(self.cnt>0)
 		thinktime self : random(0.05,.15);
 	else if(self.wait == -2)
 		remove(self);
-	else if(self.wait = -1)
-		self.nextthink=-1;
 	else
-		thinktime self : self.wait + ((random()*self.level) - self.level/2)/100;
+	{
+	// [2026-11-13] jsH2+ "self.wait = -1" here was always true, so no emitter ever spurted
+	// again, and a re-triggered one streamed forever because cnt was never refilled. The
+	// spurt size is kept in .count; an emitter from an older save has none and stays stopped.
+		self.cnt=self.count;
+		if(self.wait == -1||self.cnt<1)
+			self.nextthink=-1;
+		else
+			thinktime self : self.wait + ((random()*self.level) - self.level/2)/100;
+	}
 }
 
 /*QUAKED air_bubbles (0 .5 .8) (-8 -8 -8) (8 8 8)
@@ -611,6 +618,7 @@ void air_bubbles()
 	self.cnt+=((random()*self.level) - self.level/2)/10;
 	if(self.cnt<1)
 		self.cnt=1;
+	self.count=self.cnt;	// [2026-11-13] jsH2+ the spurt size, for make_bubbles to refill from
 	if(self.targetname)
 		self.use=make_bubbles;
 	else
