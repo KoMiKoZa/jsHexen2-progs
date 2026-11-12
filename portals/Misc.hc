@@ -595,7 +595,8 @@ entity	bubble;
 	{
 	// [2026-11-13] jsH2+ "self.wait = -1" here was always true, so no emitter ever spurted
 	// again, and a re-triggered one streamed forever because cnt was never refilled. The
-	// spurt size is kept in .count; an emitter from an older save has none and stays stopped.
+	// spurt size is kept in .count. An emitter from an older save has none: it finishes its
+	// spurt and stops, and each later trigger gives one bubble.
 		self.cnt=self.count;
 		if(self.wait == -1||self.cnt<1)
 			self.nextthink=-1;
