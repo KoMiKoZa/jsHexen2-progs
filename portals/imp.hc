@@ -826,6 +826,7 @@ void imp_abort_swoop () [++ $swpout1 .. $swpout15]
 			self.attack_finished=0;
 		else
 			self.attack_finished=time + 1;
+		self.touch=SUB_Null;	// [2026-11-12] jsH2+ a swoop that missed ends unarmed
 		self.think=imp_fly;
 		thinktime self : 0;
 	}
@@ -977,10 +978,16 @@ void() imp_touch =
 float damg,damg_plus;
 vector punch,dir;
 
-	
-	self.touch=SUB_Null;
-	if((self.frame >= $swpcyc1 && self.frame <= $swpcyc4 )||(self.frame>=$swoop16 &&self.frame<=$swoop20))
+	if(!other.takedamage&&other.solid!=SOLID_BSP)
+		return;	// [2026-11-12] jsH2+ missiles and other undamageable entities that touch
+			// the imp don't use up the swoop's hit.
+
+	// [2026-11-12] jsH2+ only a swoop counts: the dodge dive (imp_dive) plays the same frames.
+	if((self.think==imp_enter_swoop||self.think==imp_swoop_charge)&&
+		((self.frame >= $swpcyc1 && self.frame <= $swpcyc4 )||(self.frame>=$swoop16 &&self.frame<=$swoop20)))
 	{  // If we are in swoop attack frames
+		self.touch=SUB_Null;	// [2026-11-12] jsH2+ only an attack-frame contact uses up
+					// the hit (this was the function's first line).
 		self.flags (-) FL_ONGROUND;
 		sound (self, CHAN_WEAPON, "imp/swoophit.wav", 1, ATTN_NORM);
 
