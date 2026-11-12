@@ -114,10 +114,13 @@ They're fixed twice, on purpose:
 One row per change. `git show <hash>` shows exactly what changed.
 
 <details open>
-<summary><h3>1.0.0 (in development): 79 changes</h3></summary>
+<summary><h3>1.0.0 (in development): 82 changes</h3></summary>
 
 | Commit | Date | Change | What it does |
 |---|---|---|---|
+| `2a97ca9` | 2026-11-13 | Gauntlet second punch | The second punch of the Paladin's gauntlet combo was meant to skip two frames of its wind-up but never did. It now lands its hit a little sooner. |
+| `2a97ca9` | 2026-11-13 | Monster jump spots worked once | The spots in maps where monsters jump across a gap stopped working after the first monster used them. They now work for every monster, unless the map sets them to work once. In Portal of Praevus this changes tibet2 and tibet9: monsters jump each time they cross one. |
+| `2a97ca9` | 2026-11-13 | Bubble emitters | A map's bubble emitter set to repeat puffed once and stopped, and one triggered a second time streamed bubbles without end. They now puff every time the map says, and each trigger gives one puff. The maps that ship with the game don't use them this way. |
 | `607a622`, `286a21c` | 2026-11-13 | Medusas never stepped aside | A medusa without a clear shot at you was meant to step to the side to get one, but she kept coming straight at you. She now sidesteps. |
 | `607a622` | 2026-11-13 | Imps died in mid-air | An imp killed in flight played out its whole death while still falling. It now falls in its falling pose, lands with a thud and then finishes dying. |
 | `607a622` | 2026-11-13 | Doors that froze while closing | In rare cases a closing door froze at the end of its travel, without its closing sound, and the game still treated it as closing. It now stops as closed, with the sound. |
