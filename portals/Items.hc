@@ -958,6 +958,39 @@ PLAYER BACKPACKS
 
 //void GetPuzzle2(entity item, entity person, string which);
 
+// [2026-11-12] jsH2+ TRUE if the bag holds anything the player can still take. Checked
+// before max_ammo2, which trims the bag in place: a bag left on the ground keeps its full
+// contents for a teammate who has room.
+float BackpackHasRoom (entity bag, entity p)
+{
+	float	newweapons;
+
+	if (bag.cnt_torch > 0 && p.cnt_torch < MAX_INV) return TRUE;
+	if (bag.cnt_h_boost > 0 && p.cnt_h_boost < MAX_INV) return TRUE;
+	if (bag.cnt_sh_boost > 0 && p.cnt_sh_boost < MAX_INV) return TRUE;
+	if (bag.cnt_mana_boost > 0 && p.cnt_mana_boost < MAX_INV) return TRUE;
+	if (bag.cnt_teleport > 0 && p.cnt_teleport < MAX_INV) return TRUE;
+	if (bag.cnt_tome > 0 && p.cnt_tome < MAX_INV) return TRUE;
+	if (bag.cnt_summon > 0 && p.cnt_summon < MAX_INV) return TRUE;
+	if (bag.cnt_flight > 0 && p.cnt_flight < MAX_INV) return TRUE;
+	if (bag.cnt_glyph > 0 && p.cnt_glyph < MAX_INV) return TRUE;
+	if (bag.cnt_haste > 0 && p.cnt_haste < MAX_INV) return TRUE;
+	if (bag.cnt_blast > 0 && p.cnt_blast < MAX_INV) return TRUE;
+	if (bag.cnt_polymorph > 0 && p.cnt_polymorph < MAX_INV) return TRUE;
+	if (bag.cnt_invisibility > 0 && p.cnt_invisibility < MAX_INV) return TRUE;
+	if (bag.cnt_cubeofforce > 0 && p.cnt_cubeofforce < MAX_INV) return TRUE;
+	if (bag.cnt_invincibility > 0 && p.cnt_invincibility < MAX_INV) return TRUE;
+	if (bag.bluemana > 0 && p.bluemana < p.max_mana) return TRUE;
+	if (bag.greenmana > 0 && p.greenmana < p.max_mana) return TRUE;
+	if (bag.armor_amulet > p.armor_amulet) return TRUE;
+	if (bag.armor_bracer > p.armor_bracer) return TRUE;
+	if (bag.armor_breastplate > p.armor_breastplate) return TRUE;
+	if (bag.armor_helmet > p.armor_helmet) return TRUE;
+	newweapons = bag.items - (bag.items & p.items);
+	if (newweapons) return TRUE;
+	return FALSE;
+}
+
 void BackpackTouch(void)
 {
 	string	s;
@@ -971,6 +1004,11 @@ void BackpackTouch(void)
 	if (self.owner == other && self.artifact_ignore_owner_time > time)
 		return;
 	if (self.artifact_ignore_time > time) 
+		return;
+	// [2026-11-12] jsH2+ a bag with nothing the player can take stays on the ground, as single
+	// mana pickups do. Raven's code took it and printed "You get ...Nothing!", so in coop a player
+	// with full mana used up a teammate's dropped pack.
+	if (!BackpackHasRoom (self, other))
 		return;
 
 	ItemCount = 0;
