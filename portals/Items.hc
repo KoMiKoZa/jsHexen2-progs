@@ -991,19 +991,66 @@ float BackpackHasRoom (entity bag, entity p)
 	return FALSE;
 }
 
+float BagListItems (entity p, entity bag, float width);
+
+// [2026-11-12] jsH2+ One bag item, fld being its field, for BackpackTouch (self the bag, other the
+// player): moves what fits to the player, takes it out of the bag and prints it after taken earlier
+// items. kind 0 an artifact (up to MAX_INV), 1 mana (up to max_mana), 2 armor (only if better; the
+// bag's piece goes whole). one and many are the names for one and for several. Returns the new count.
+float BackpackTake (.float fld, string one, string many, float kind, float taken)
+{
+	float	n, room;
+
+	n = self.fld;
+	if (n <= 0)
+		return taken;
+	if (kind == 2)
+	{
+		if (n <= other.fld)
+			return taken;
+		other.fld = n;
+		self.fld = 0;
+	}
+	else
+	{
+		if (kind == 0)
+			room = MAX_INV - other.fld;
+		else
+			room = other.max_mana - other.fld;
+		if (room <= 0)
+			return taken;
+		if (n > room)
+			n = room;
+		other.fld += n;
+		self.fld -= n;
+	}
+
+	if (taken)
+		sprint (other, ", ");
+	if (kind != 2)
+	{
+		sprint (other, ftos (n));
+		sprint (other, " ");
+	}
+	if (n > 1 && kind == 0)
+		sprint (other, many);
+	else
+		sprint (other, one);
+	return taken + 1;
+}
+
 void BackpackTouch(void)
 {
-	string	s;
 	float	old, new;
 	float	ItemCount;
-		
+
 	if (other.classname != "player"||other.model=="models/sheep.mdl")
 		return;
 	if (other.health <= 0)
 		return;
 	if (self.owner == other && self.artifact_ignore_owner_time > time)
 		return;
-	if (self.artifact_ignore_time > time) 
+	if (self.artifact_ignore_time > time)
 		return;
 	// [2026-11-12] jsH2+ a bag with nothing the player can take stays on the ground, as single
 	// mana pickups do. Raven's code took it and printed "You get ...Nothing!", so in coop a player
@@ -1011,299 +1058,34 @@ void BackpackTouch(void)
 	if (!BackpackHasRoom (self, other))
 		return;
 
+	// [2026-11-12] jsH2+ the player takes what fits and the rest stays in the bag, which is removed
+	// only once it's empty. Raven's code trimmed the bag to what fitted (max_ammo2), gave that and
+	// removed the bag, so whatever didn't fit was lost. Only what was taken is printed; the stale
+	// number Raven printed before armor pieces and the Invisibility Sphere plural (which followed
+	// the Seals count) are gone with the old per-item code.
 	ItemCount = 0;
 	sprint (other, "You get ");
-
-	max_ammo2 (other,self);
-
-	if (self.cnt_torch > 0)
-	{
-		if (ItemCount) sprint(other,", ");
-		ItemCount += 1;
-
-		other.cnt_torch += self.cnt_torch;
-
-		s = ftos(self.cnt_torch);
-		sprint(other,s);
-		sprint(other," ");
-		sprint(other,STR_TORCH);
-		if (self.cnt_torch > 1)	// Plural
-			sprint(other,"es");
-	}
-	if (self.cnt_h_boost > 0)
-	{
-		if (ItemCount) sprint(other,", ");
-		ItemCount += 1;
-
-		other.cnt_h_boost += self.cnt_h_boost;
-
-		s = ftos(self.cnt_h_boost);
-		sprint(other,s);
-		sprint(other," ");
-		sprint(other,STR_HEALTHBOOST);
-		if (self.cnt_h_boost > 1)	// Plural
-			sprint(other,"s");
-	}
-	if (self.cnt_sh_boost > 0)
-	{
-		if (ItemCount) sprint(other,", ");
-		ItemCount += 1;
-
-		other.cnt_sh_boost += self.cnt_sh_boost;
-
-		s = ftos(self.cnt_sh_boost);
-		sprint(other,s);
-		sprint(other," ");
-		sprint(other,STR_SUPERHEALTHBOOST);
-		if (self.cnt_sh_boost > 1)	// Plural
-			sprint(other,"s");
-	}
-	if (self.cnt_mana_boost > 0)
-	{
-		if (ItemCount) sprint(other,", ");
-		ItemCount += 1;
-
-		other.cnt_mana_boost += self.cnt_mana_boost;
-
-		s = ftos(self.cnt_mana_boost);
-		sprint(other,s);
-		sprint(other," ");
-		if (self.cnt_mana_boost == 1)
-			sprint(other,STR_MANABOOST);
-		else
-			sprint(other,"Kraters of Might");
-	}
-	if (self.cnt_teleport > 0)
-	{
-		if (ItemCount) sprint(other,", ");
-		ItemCount += 1;
-
-		other.cnt_teleport += self.cnt_teleport;
-
-		s = ftos(self.cnt_teleport);
-		sprint(other,s);
-		sprint(other," ");
-		sprint(other,STR_TELEPORT);
-		if (self.cnt_teleport > 1)	// Plural
-			sprint(other,"s");
-	}
-	if (self.cnt_tome > 0)
-	{
-		if (ItemCount) sprint(other,", ");
-		ItemCount += 1;
-
-		other.cnt_tome += self.cnt_tome;
-
-		s = ftos(self.cnt_tome);
-		sprint(other,s);
-		sprint(other," ");
-		if (self.cnt_tome == 1)
-			sprint(other,STR_TOME);
-		else
-			sprint(other,"Tomes of Power");
-	}
-	if (self.cnt_summon > 0)
-	{
-		if (ItemCount) sprint(other,", ");
-		ItemCount += 1;
-
-		other.cnt_summon += self.cnt_summon;
-
-		s = ftos(self.cnt_summon);
-		sprint(other,s);
-		sprint(other," ");
-		if (self.cnt_summon == 1)
-			sprint(other,STR_SUMMON);
-		else
-			sprint(other,"Stones of Summoning");
-
-	}
-	if (self.cnt_flight > 0)
-	{
-		if (ItemCount) sprint(other,", ");
-		ItemCount += 1;
-
-		other.cnt_flight += self.cnt_flight;
-
-		s = ftos(self.cnt_flight);
-		sprint(other,s);
-		sprint(other," ");
-		if (self.cnt_flight == 1)
-			sprint(other,STR_RINGFLIGHT);
-		else
-			sprint(other,"Rings of Flight");
-
-	}
-	if (self.cnt_glyph > 0)
-	{
-		if (ItemCount) sprint(other,", ");
-		ItemCount += 1;
-
-		other.cnt_glyph += self.cnt_glyph;
-
-		s = ftos(self.cnt_glyph);
-		sprint(other,s);
-		sprint(other," ");
-		if (self.cnt_glyph == 1)
-			sprint(other,STR_GLYPH);
-		else
-			sprint(other,"Glyphs Of The Ancients");
-	}
-
-	if (self.cnt_haste > 0)
-	{
-		if (ItemCount) sprint(other,", ");
-		ItemCount += 1;
-
-		other.cnt_haste += self.cnt_haste;
-
-		s = ftos(self.cnt_haste);
-		sprint(other,s);
-		sprint(other," ");
-		sprint(other,STR_HASTE);
-	}
-	if (self.cnt_blast > 0)
-	{
-		if (ItemCount) sprint(other,", ");
-		ItemCount += 1;
-
-		other.cnt_blast += self.cnt_blast;
-
-		s = ftos(self.cnt_blast);
-		sprint(other,s);
-		sprint(other," ");
-		if (self.cnt_blast == 1)
-			sprint(other,STR_BLAST);
-		else
-			sprint(other,"Discs of Repulsion");
-	}
-	if (self.cnt_polymorph > 0)
-	{
-		if (ItemCount) sprint(other,", ");
-		ItemCount += 1;
-
-		other.cnt_polymorph += self.cnt_polymorph;
-
-		s = ftos(self.cnt_polymorph);
-		sprint(other,s);
-		sprint(other," ");
-		if (self.cnt_polymorph == 1)
-			sprint(other,STR_POLYMORPH);
-		else
-			sprint(other,"Seals of the Ovinomancer");
-	}
-	if (self.cnt_invisibility > 0)
-	{
-		if (ItemCount) sprint(other,", ");
-		ItemCount += 1;
-
-		other.cnt_invisibility += self.cnt_invisibility;
-
-		s = ftos(self.cnt_invisibility);
-		sprint(other,s);
-		sprint(other," ");
-		sprint(other,STR_INVISIBILITY);
-		if (self.cnt_polymorph > 1)
-			sprint(other,"s"); 
-	}
-	if (self.cnt_cubeofforce > 0)
-	{
-		if (ItemCount) sprint(other,", ");
-		ItemCount += 1;
-
-		other.cnt_cubeofforce += self.cnt_cubeofforce;
-
-		s = ftos(self.cnt_cubeofforce);
-		sprint(other,s);
-		sprint(other," ");
-		sprint(other,STR_CUBEOFFORCE);
-		if (self.cnt_cubeofforce > 1)
-			sprint(other,"s"); 
-
-	}
-	if (self.cnt_invincibility > 0)
-	{
-		if (ItemCount) sprint(other,", ");
-		ItemCount += 1;
-
-		other.cnt_invincibility += self.cnt_invincibility;
-
-		s = ftos(self.cnt_invincibility);
-		sprint(other,s);
-		sprint(other," ");
-		if (self.cnt_invincibility == 1)
-			sprint(other,STR_INVINCIBILITY);
-		else
-			sprint(other,"Icons of the Defender");
-	}
-	if (self.bluemana > 0)
-	{
-		if (ItemCount) sprint(other,", ");
-		ItemCount += 1;
-
-		other.bluemana += self.bluemana;
-
-		s = ftos(self.bluemana);
-		sprint(other,s);
-		sprint(other," ");
-		sprint(other,STR_BLUEMANA);
-	}
-	if (self.greenmana > 0)
-	{
-		if (ItemCount) sprint(other,", ");
-		ItemCount += 1;
-
-		other.greenmana += self.greenmana;
-
-		s = ftos(self.greenmana);
-		sprint(other,s);
-		sprint(other," ");
-		sprint(other,STR_GREENMANA);
-	}
-	
-	if (self.armor_amulet)
-	{
-		if (ItemCount) sprint(other,", ");
-		ItemCount += 1;
-
-		other.armor_amulet = self.armor_amulet;
-		sprint(other,s);
-		sprint(other," ");
-		sprint(other,STR_ARMORAMULET);
-	}
-
-	if (self.armor_bracer)
-	{
-		if (ItemCount) sprint(other,", ");
-		ItemCount += 1;
-
-		other.armor_bracer = self.armor_bracer;
-		sprint(other,s);
-		sprint(other," ");
-		sprint(other,STR_ARMORBRACER);
-	}
-
-	if (self.armor_breastplate)
-	{
-		if (ItemCount) sprint(other,", ");
-		ItemCount += 1;
-
-		other.armor_breastplate = self.armor_breastplate;
-		sprint(other,s);
-		sprint(other," ");
-		sprint(other,STR_ARMORBREASTPLATE);
-	}
-
-	if (self.armor_helmet)
-	{
-		if (ItemCount) sprint(other,", ");
-		ItemCount += 1;
-
-		other.armor_helmet = self.armor_helmet;
-		sprint(other,s);
-		sprint(other," ");
-		sprint(other,STR_ARMORHELMET);
-	}
+	ItemCount = BackpackTake (cnt_torch, STR_TORCH, "Torches", 0, ItemCount);
+	ItemCount = BackpackTake (cnt_h_boost, STR_HEALTHBOOST, "Quartz Flasks", 0, ItemCount);
+	ItemCount = BackpackTake (cnt_sh_boost, STR_SUPERHEALTHBOOST, "Mystic Urns", 0, ItemCount);
+	ItemCount = BackpackTake (cnt_mana_boost, STR_MANABOOST, "Kraters of Might", 0, ItemCount);
+	ItemCount = BackpackTake (cnt_teleport, STR_TELEPORT, "Chaos Devices", 0, ItemCount);
+	ItemCount = BackpackTake (cnt_tome, STR_TOME, "Tomes of Power", 0, ItemCount);
+	ItemCount = BackpackTake (cnt_summon, STR_SUMMON, "Stones of Summoning", 0, ItemCount);
+	ItemCount = BackpackTake (cnt_flight, STR_RINGFLIGHT, "Rings of Flight", 0, ItemCount);
+	ItemCount = BackpackTake (cnt_glyph, STR_GLYPH, "Glyphs Of The Ancients", 0, ItemCount);
+	ItemCount = BackpackTake (cnt_haste, STR_HASTE, STR_HASTE, 0, ItemCount);
+	ItemCount = BackpackTake (cnt_blast, STR_BLAST, "Discs of Repulsion", 0, ItemCount);
+	ItemCount = BackpackTake (cnt_polymorph, STR_POLYMORPH, "Seals of the Ovinomancer", 0, ItemCount);
+	ItemCount = BackpackTake (cnt_invisibility, STR_INVISIBILITY, "Invisibility Spheres", 0, ItemCount);
+	ItemCount = BackpackTake (cnt_cubeofforce, STR_CUBEOFFORCE, "Force Cubes", 0, ItemCount);
+	ItemCount = BackpackTake (cnt_invincibility, STR_INVINCIBILITY, "Icons of the Defender", 0, ItemCount);
+	ItemCount = BackpackTake (bluemana, STR_BLUEMANA, STR_BLUEMANA, 1, ItemCount);
+	ItemCount = BackpackTake (greenmana, STR_GREENMANA, STR_GREENMANA, 1, ItemCount);
+	ItemCount = BackpackTake (armor_amulet, STR_ARMORAMULET, STR_ARMORAMULET, 2, ItemCount);
+	ItemCount = BackpackTake (armor_bracer, STR_ARMORBRACER, STR_ARMORBRACER, 2, ItemCount);
+	ItemCount = BackpackTake (armor_breastplate, STR_ARMORBREASTPLATE, STR_ARMORBREASTPLATE, 2, ItemCount);
+	ItemCount = BackpackTake (armor_helmet, STR_ARMORHELMET, STR_ARMORHELMET, 2, ItemCount);
 
 	if (!ItemCount) sprint(other,"...Nothing!");
 
@@ -1324,6 +1106,7 @@ void BackpackTouch(void)
 		new = other.weapon;
 	old = other.items;
 	other.items (+) new;
+	self.items = 0;		// [2026-11-12] jsH2+ a bag left with the rest doesn't give its weapons twice
 
 //	change weapons
 	sprint (other, "\n");
@@ -1332,8 +1115,9 @@ void BackpackTouch(void)
 	sound (other, CHAN_ITEM, "weapons/ammopkup.wav", 1, ATTN_NORM);
 	stuffcmd (other, "bf\n");
 
-//	remove the backpack, change self to the player
-	remove(self);
+//	remove the backpack once it's empty, change self to the player
+	if (!BagListItems (other, self, 0))		// [2026-11-12] jsH2+ was always removed
+		remove(self);
 	self = other;
 
 //	change to the weapon
