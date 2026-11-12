@@ -97,11 +97,13 @@ correction to a batch. The jsHexen2 engine has its own version.
 One row per change. `git show <hash>` shows exactly what changed.
 
 <details open>
-<summary><h3>1.0.0 (in development): 66 changes</h3></summary>
+<summary><h3>1.0.0 (in development): 68 changes</h3></summary>
 
 | Commit | Date | Change | What it does |
 |---|---|---|---|
-| `8d98ee4` | 2026-11-12 | Full mana used up a dropped bag | Touching a bag with nothing in it you could carry (full mana, for example) took the bag anyway and printed "You get ...Nothing!", so in coop it used up a teammate's dropped pack. Such a bag now stays on the ground, as single mana pickups do, for someone who has room. A bag with anything you can take is picked up as before. |
+| `e95be96` | 2026-11-12 | Bag contents | **[JSH2 REDESIGN]** Aiming at a backpack within reach shows what's inside as a centered message to you alone: one line per item with its count, and items you can't take marked "(full)" in the console's lettering. In coop a player's pack is titled with their number ("Player 2's Backpack"). A game message stays up for 3 seconds before the list comes back. Switch: `jsp_baglist`; off, or on another engine, there's no list. |
+| `0778bc4` | 2026-11-12 | Bag pickup threw away what didn't fit | Touching a bag gave you what you could carry and lost the rest: with 23 Discs of Repulsion, a bag of 5 gave you 2 and the other 3 were gone. You now take what fits and the rest stays in the bag for you or a teammate. The bag goes once it's empty, or after its usual two minutes. The pickup message lists only what you took, without the stray number that came before armor pieces. |
+| `8d98ee4` | 2026-11-12 | Full mana used up a dropped bag | Touching a bag with nothing in it you could carry (full mana, for example) took the bag anyway and printed "You get ...Nothing!", so in coop it used up a teammate's dropped pack. Such a bag now stays on the ground, as single mana pickups do, for someone who has room. |
 | `a099c06` | 2026-11-12 | Returning tomed hammer shoves you | With the Tome, the Crusader's hammer flies back to you after each throw. On the way back it was solid to you, so when it reached you, you stopped dead for a moment, stepped up, or were pulled back. It now passes through you and is caught the moment it reaches you. |
 | `a099c06` | 2026-11-12 | Returning hammer hits | **[JSH2 REDESIGN]** On its way back, the tomed hammer strikes enemies in its path with the same hit as on the way out. It doesn't strike the same enemy twice in a row, so the one it bounced off isn't hit again. Switch: `jsp_hammerreturn`; off, or on another engine, it hurts nothing on the way back. |
 | `de01716` | 2026-11-12 | Imp swoop attack does nothing | An imp's swoop has one hit, and anything that touched the imp first used it up: your own shot during its wind-up, a wall it brushed, another imp's ice shot. The charge then flew into you and did no damage. Now only contact during the attack itself counts, and shots are ignored. A shot hitting the imp mid-charge no longer stuns it or flings it along the shot's path. |
