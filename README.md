@@ -97,9 +97,17 @@ correction to a batch. The jsHexen2 engine has its own version.
 Raven built Hexen II's game code with their own compiler, HCC. When one line calls two
 functions, HCC can let the second call's result overwrite the first's. The code reads correctly,
 but the game does something else: `visible() && infront()` ran as `infront() && infront()`, so
-golems fired through walls. Ten places in the shipped game were affected. They're rewritten so
-any compiler builds them correctly, and marked **[RAVEN HCC BUG]** below.
-[jsHexen2-hcc](https://github.com/KoMiKoZa/jsHexen2-hcc) fixes the compiler itself.
+golems fired through walls. Ten places in the shipped game were affected, marked
+**[RAVEN HCC BUG]** below.
+
+They're fixed twice, on purpose:
+
+- **Here, in the source.** Each of the ten lines is rewritten so that any compiler builds it
+  correctly: Raven's HCC, NHCC, uHexen2's hcc, or jsHexen2-hcc with `-noretfix`. Whoever builds
+  this code gets the fixed game, whatever compiler they use.
+- **In the compiler.** [jsHexen2-hcc](https://github.com/KoMiKoZa/jsHexen2-hcc) builds such lines
+  correctly and warns where it finds one, so the same mistake can't creep into new code here or
+  into other mods. On this source it finds none, which also confirms the ten were all of them.
 
 ## Changelog
 
