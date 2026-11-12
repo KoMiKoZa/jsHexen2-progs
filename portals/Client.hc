@@ -2348,6 +2348,8 @@ void() PlayerPostThink =
 		if(self.movechain.origin!=self.origin)
 			setorigin(self.movechain,self.origin);
 
+	BagListCheck ();	// [2026-11-12] jsH2+ [JSH2 REDESIGN] jsp_baglist, Items.hc
+
 //	if(self.friction!=1)
 //		self.friction=1;
 };

@@ -153,7 +153,16 @@ float lightstylevalue(float style) : 71;
 void cvar_set(string var, string val) : 72;
 
 // Same as sprint(), but centered.
-void centerprint(entity client, string s) : 73;
+// [2026-11-12] jsH2+ [JSH2 REDESIGN] every progs message goes through centerprint() below, which notes
+// the time on the player so the bag list (jsp_baglist, Items.hc) leaves the message up for 3 seconds.
+void centerprint_builtin(entity client, string s) : 73;
+
+void centerprint(entity client, string s)
+{
+	if (client.flags & FL_CLIENT)
+		client.walkframe = time + 3;	// walkframe: a Quake field nothing else uses
+	centerprint_builtin (client, s);
+}
 
 void ambientsound(vector pos, string samp, float vol, float atten) : 74;
 

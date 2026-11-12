@@ -1345,6 +1345,224 @@ void BackpackTouch(void)
 	W_SetCurrentWeapon ();
 }
 
+// [2026-11-12] jsH2+ [JSH2 REDESIGN] bag contents, the jsp_baglist option on the jsHexen2 Progs page.
+// Aiming at a backpack within reach shows its contents to that player as a centered message:
+// the header centered, then one bulleted line per item with the real count, " (full)" on items
+// the player couldn't take (BackpackHasRoom's rules). The progs can't join strings, so the text
+// is sent as a run of stuffcmd pieces that add up to one "centerprint <text>" console line on the
+// client ('@' starts a line). It is an ordinary center message, so the message background option
+// applies. State lives in Quake fields Raven's progs already declare and nothing else reads on
+// players or bags, so there are no new fields and saves load both ways: on the player,
+// scalerate = the next look, healamount = when the list was last sent, healtype = which bag it
+// showed, walkframe = until when a progs message holds the list off (set in centerprint(),
+// builtin.hc); on a bag, healtype = its id.
+// The list arrives as console text, which the client runs after the frame's other messages: a
+// progs message sent to the player later in the same frame is drawn first and then replaced.
+// Clients on other engines lack the "centerprint" command and print "Unknown command" instead.
+// Written to spend few globals: this progs is close to NHCC's 65536 limit.
+string jsp_baglist (void)
+{
+	return "Show Bag Contents|Aim at a backpack to see what's inside. Off: no list.";
+}
+
+// One bag item, fld being its field: kind 0 an artifact ("Name xN"), 1 mana ("Name N"), 2 armor
+// ("Name"); len is the length of name. With width 0 it returns the larger of w and this line's
+// length. Otherwise it sends the line, padded with spaces to width so the item lines line up on the
+// left while the client centers each line.
+float BagListOne (entity p, entity bag, .float fld, string name, float len, float kind, float width, float w)
+{
+	float	n, full;
+
+	n = floor (bag.fld);
+	if (n <= 0)
+		return w;
+	if (kind == 0)
+		full = (p.fld >= MAX_INV);
+	else if (kind == 1)
+		full = (p.fld >= p.max_mana);
+	else
+		full = (bag.fld <= p.fld);
+
+	len += 2;		// the bullet and its space
+	if (kind == 0)
+		len += 1;	// "x"
+	if (kind != 2)
+	{
+		len += 2;	// a space and the first digit
+		if (n >= 10) len += 1;
+		if (n >= 100) len += 1;
+		if (n >= 1000) len += 1;
+	}
+	if (full)
+		len += 7;
+	if (!width)
+	{
+		if (len > w)
+			return len;
+		return w;
+	}
+
+	// the byte before the space is 0x0F, conchars' small centered square (NHCC has no \x escape);
+	// ^1 draws a full line in the console style, ^0 the rest in the message style
+	if (full)
+		stuffcmd (p, "@^1 ");
+	else
+		stuffcmd (p, "@^0 ");
+	stuffcmd (p, name);
+	if (kind == 0)
+		stuffcmd (p, " x");
+	else if (kind == 1)
+		stuffcmd (p, " ");
+	if (kind != 2)
+		stuffcmd (p, ftos (n));
+	if (full)
+		stuffcmd (p, " (full)");
+	len = width - len;
+	while (len >= 4)
+	{
+		stuffcmd (p, "    ");
+		len -= 4;
+	}
+	while (len >= 1)
+	{
+		stuffcmd (p, " ");
+		len -= 1;
+	}
+	return w;
+}
+
+// Walks the bag in BackpackTouch's order (spawn_health isn't listed: BackpackTouch doesn't give it).
+// With width 0 it returns the widest line; otherwise it sends every line at that width.
+float BagListItems (entity p, entity bag, float width)
+{
+	float	w;
+
+	w = 0;
+	w = BagListOne (p, bag, cnt_torch, STR_TORCH, 5, 0, width, w);
+	w = BagListOne (p, bag, cnt_h_boost, STR_HEALTHBOOST, 12, 0, width, w);
+	w = BagListOne (p, bag, cnt_sh_boost, STR_SUPERHEALTHBOOST, 10, 0, width, w);
+	w = BagListOne (p, bag, cnt_mana_boost, STR_MANABOOST, 15, 0, width, w);
+	w = BagListOne (p, bag, cnt_teleport, STR_TELEPORT, 12, 0, width, w);
+	w = BagListOne (p, bag, cnt_tome, STR_TOME, 13, 0, width, w);
+	w = BagListOne (p, bag, cnt_summon, STR_SUMMON, 18, 0, width, w);
+	w = BagListOne (p, bag, cnt_flight, STR_RINGFLIGHT, 14, 0, width, w);
+	w = BagListOne (p, bag, cnt_glyph, STR_GLYPH, 21, 0, width, w);
+	w = BagListOne (p, bag, cnt_haste, STR_HASTE, 14, 0, width, w);
+	w = BagListOne (p, bag, cnt_blast, STR_BLAST, 17, 0, width, w);
+	w = BagListOne (p, bag, cnt_polymorph, STR_POLYMORPH, 23, 0, width, w);
+	w = BagListOne (p, bag, cnt_invisibility, STR_INVISIBILITY, 19, 0, width, w);
+	w = BagListOne (p, bag, cnt_cubeofforce, STR_CUBEOFFORCE, 10, 0, width, w);
+	w = BagListOne (p, bag, cnt_invincibility, STR_INVINCIBILITY, 20, 0, width, w);
+	w = BagListOne (p, bag, bluemana, STR_BLUEMANA, 9, 1, width, w);
+	w = BagListOne (p, bag, greenmana, STR_GREENMANA, 10, 1, width, w);
+	w = BagListOne (p, bag, armor_amulet, STR_ARMORAMULET, 20, 2, width, w);
+	w = BagListOne (p, bag, armor_bracer, STR_ARMORBRACER, 7, 2, width, w);
+	w = BagListOne (p, bag, armor_breastplate, STR_ARMORBREASTPLATE, 11, 2, width, w);
+	w = BagListOne (p, bag, armor_helmet, STR_ARMORHELMET, 6, 2, width, w);
+	return w;
+}
+
+void BagListShow (entity p, entity bag)
+{
+	entity	e;
+	float	w, n;
+
+	w = BagListItems (p, bag, 0);
+	if (!w)
+		return;		// nothing listed: instant health or weapons only
+
+	stuffcmd (p, "centerprint ");
+	// a player number, not the player's name: the name would go into the viewer's console line,
+	// where a ';' in it would run as a command. Client edicts are 1..maxclients, so the owner's
+	// place in the entity list is its number.
+	if (coop && bag.owner.classname == "player")
+	{
+		e = nextent (world);
+		n = 1;
+		while (e != bag.owner && n < 32)
+		{
+			e = nextent (e);
+			n += 1;
+		}
+		stuffcmd (p, "Player ");
+		stuffcmd (p, ftos (n));
+		stuffcmd (p, "'s Backpack");
+	}
+	else
+		stuffcmd (p, "Backpack");
+	BagListItems (p, bag, w);
+	stuffcmd (p, "\n");
+}
+
+// Called from PlayerPostThink. Looks about five times a second, and sends the list when the aimed
+// bag changes and then once a second while the player keeps aiming at it; when they look away the
+// list is taken down.
+void BagListCheck (void)
+{
+	entity	e, bag;
+	vector	eye, d;
+	float	along, best;
+
+	if (self.scalerate > time && self.scalerate <= time + 0.2)
+		return;
+	self.scalerate = time + 0.2;
+	if (!cvar ("jsp_baglist"))
+		return;
+	if (!(self.flags & FL_CLIENT) || self.health <= 0 || self.model == "models/sheep.mdl")
+		return;
+
+	// a bag is a trigger, which traceline passes through: take the nearest bag whose box center
+	// (17.5 below its origin) lies within 32 units of the line of sight and in reach, with nothing
+	// solid in between. 32 takes in a bag on the floor seen with a level view from about 90 away.
+	makevectors (self.v_angle);
+	eye = self.origin + self.view_ofs;
+	bag = world;
+	best = 128;
+	e = findradius (eye, 160);
+	while (e)
+	{
+		if (e.touch == BackpackTouch)
+		{
+			d = e.origin - eye;
+			d_z -= 17.5;
+			along = d * v_forward;
+			if (along > 0 && along < best && d * d - along * along < 1024)
+			{
+				traceline (eye, eye + d, TRUE, self);
+				if (trace_fraction == 1)
+				{
+					bag = e;
+					best = along;
+				}
+			}
+		}
+		e = e.chain;
+	}
+
+	if (self.walkframe > time && self.walkframe <= time + 3)
+	{
+		self.healtype = 0;		// a message replaced the list; shown at once on the next aim
+		return;
+	}
+	if (bag == world)
+	{
+		// the list is still the last message: take it down rather than leave it for scr_centertime.
+		// "@" (two empty lines) because a bare "centerprint" has no text and the client can't take that.
+		if (self.healtype)
+			stuffcmd (self, "centerprint @\n");
+		self.healtype = 0;
+		return;
+	}
+
+	if (!bag.healtype)
+		bag.healtype = 1 + floor (random () * 1000000);
+	if (self.healtype == bag.healtype && self.healamount <= time && time < self.healamount + 1)
+		return;
+	self.healtype = bag.healtype;
+	self.healamount = time;
+	BagListShow (self, bag);
+}
+
 void MonsterDropStuff(void)
 {
 
