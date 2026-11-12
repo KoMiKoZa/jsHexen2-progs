@@ -97,10 +97,11 @@ correction to a batch. The jsHexen2 engine has its own version.
 One row per change. `git show <hash>` shows exactly what changed.
 
 <details open>
-<summary><h3>1.0.0 (in development): 62 changes</h3></summary>
+<summary><h3>1.0.0 (in development): 63 changes</h3></summary>
 
 | Commit | Date | Change | What it does |
 |---|---|---|---|
+| `de01716` | 2026-11-12 | Imp swoop attack does nothing | An imp's swoop has one hit, and anything that touched the imp first used it up: your own shot during its wind-up, a wall it brushed, another imp's ice shot. The charge then flew into you and did no damage. Now only contact during the attack itself counts, and shots are ignored. A shot hitting the imp mid-charge no longer stuns it or flings it along the shot's path. |
 | `3a2360b` | 2026-11-11 | Scarab Staff charge sound stutters | The charge sound restarted four times at the start of each charge, because each charge frame lasts four game ticks. It now plays once per charge. |
 | `abb3791` | 2026-11-11 | Barrels slide away under a player | Standing on a barrel, chair or pushable brush pushed it the way the player moved, so it slid out from under them, and landing on one shoved it aside. A player on top now stands on it. A side push that was sometimes ignored now always works. |
 | `3540d74` | 2026-11-11 | Scarab Staff tap spam and fast charge | Tapping the Assassin's Scarab Staff fired a 33-damage pincer on every click, and a full charge took 0.8 s instead of 2.8 s at 72 Hz. Its fire code re-ran every server frame while fire was held. The next shot now waits for the 0.4 s settle animation, and a full charge takes 2.8 s at any frame rate. |
