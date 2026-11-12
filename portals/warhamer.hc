@@ -117,10 +117,19 @@ void hammer_bounce ()
 		}
 }
 
+// [2026-11-12] jsH2+ [JSH2 REDESIGN] never called: the engine lists the option only when the loaded progs defines this
+string jsp_hammerreturn (void)
+{
+	return "Returning Hammer Hits|The Crusader's tomed hammer also strikes enemies in its path on the way back. Off: it hurts nothing on the way back.";
+}
+
+void HammerTouch ();
+
 void() ThrowHammerThink =
 {
 vector destiny;
 float distance;
+entity oldother;
 	makevectors(self.controller.v_angle);
 	destiny=self.controller.origin+self.controller.proj_ofs+v_right*7+'0 0 -7';
 	distance=vlen(self.origin-destiny);	
@@ -139,6 +148,32 @@ float distance;
 	if (self.aflag == -1)
 	{
 	local vector dir;
+// [2026-11-12] jsH2+ the returning hammer is a trigger, so the thrower catches it the moment it
+// reaches them. Raven's stayed solid to the thrower (its owner is itself after 0.3 s), and on the
+// way back it blocked their movement: at a catch they stopped dead for a tick, stepped up or were
+// pulled back. A trigger still clips walls but passes through players and monsters.
+		if (self.solid != SOLID_TRIGGER && self.solid != SOLID_NOT)
+		{
+			self.solid = SOLID_TRIGGER;
+			setorigin (self, self.origin);	// relink it as a trigger
+			self.oldorigin = self.origin;	// a hammer from a save made before this change
+		}
+// [2026-11-12] jsH2+ [JSH2 REDESIGN] jsp_hammerreturn: strike the first thing the returning hammer
+// flew through since the last think (it flies through walls too, so nothing behind one). A
+// trigger is touched only by what moves into it, which a hammer crossing a monster in a few
+// ticks hardly ever meets.
+		if (self.movetype == MOVETYPE_NOCLIP && self.solid == SOLID_TRIGGER && cvar("jsp_hammerreturn"))
+		{
+			traceline (self.oldorigin, self.origin, FALSE, self);
+			if (trace_ent != world && !trace_startsolid)	// not from inside a wall it is crossing
+			{
+				oldother = other;
+				other = trace_ent;
+				HammerTouch ();
+				other = oldother;
+			}
+		}
+		self.oldorigin = self.origin;
 		dir = normalize(destiny - self.origin);
 		if (self.watertype < -2)
 			self.velocity = dir * self.speed*0.5;
@@ -181,6 +216,15 @@ float distance;
 void HammerTouch ()
 {
 float inertia;
+// [2026-11-12] jsH2+ [JSH2 REDESIGN] the returning hammer is a trigger (see ThrowHammerThink), so
+// anything that moves into it touches it, monsters walking too. With jsp_hammerreturn it strikes
+// them as on its way out, but not the same target twice in a row (goalentity, set by every
+// strike, the outbound one too): a monster standing in it would be struck on every move, and the
+// target it bounced off would be struck again at once. Off, or on another engine, only the
+// thrower's catch is left.
+	if (self.movetype == MOVETYPE_NOCLIP && other != self.controller)
+		if (!cvar("jsp_hammerreturn") || !other.takedamage || other == self.goalentity)
+			return;
 	if (other == self.controller)
 		if (self.aflag||self.bloodloss<time)
 			ThrowHammerReturn();
@@ -194,7 +238,8 @@ float inertia;
 //          spawn_touchblood(40);
 //          SpawnChunk(self.origin, self.velocity);
 	        other.punchangle_x = -20;
-		    self.enemy = other;  
+		    self.enemy = other;
+			self.goalentity = other;	// [2026-11-12] jsH2+ see the top of HammerTouch
 			CastLightning(3,10);
 			if(other.health&&other.solid!=SOLID_BSP&&other.movetype!=MOVETYPE_PUSH)
 			{
@@ -215,9 +260,16 @@ float inertia;
   
 	if (self.aflag < 1)
 	{
+		if (self.movetype != MOVETYPE_NOCLIP)
+			self.oldorigin = self.origin;	// [2026-11-12] jsH2+ where the first path strike starts (ThrowHammerThink)
 		self.aflag = -1;
 		self.movetype=MOVETYPE_NOCLIP;
-		self.solid=SOLID_PHASE;
+		if (self.solid != SOLID_TRIGGER && self.solid != SOLID_NOT)
+		{	// [2026-11-12] jsH2+ was SOLID_PHASE: see ThrowHammerThink. Relinked only on
+			// the change, as a relink inside a trigger touch would be touched again.
+			self.solid = SOLID_TRIGGER;
+			setorigin (self, self.origin);
+		}
 	}
 }
 
