@@ -97,13 +97,17 @@ correction to a batch. The jsHexen2 engine has its own version.
 One row per change. `git show <hash>` shows exactly what changed.
 
 <details open>
-<summary><h3>1.0.0 (in development): 71 changes</h3></summary>
+<summary><h3>1.0.0 (in development): 75 changes</h3></summary>
 
 | Commit | Date | Change | What it does |
 |---|---|---|---|
+| `dd3347c` | 2026-11-12 | Hurt imps and sheep staggered the wrong way | A hurt imp or sheep is meant to stagger away from whoever hit it. It always staggered toward the same compass direction instead, wherever you stood. It now backs away from you. |
+| `dd3347c` | 2026-11-12 | Mezzomen blocked shots from behind | A mezzoman is meant to block or charge only at a shot coming at his front. He also reacted to shots from the side or behind, which he couldn't see. Now only shots in front of him count. |
+| `dd3347c` | 2026-11-12 | Pentacles climbing down | The wall-crawling Pentacles started climbing down at random even when the step down was blocked. It now does so only when the step down works. |
+| `dd3347c` | 2026-11-12 | Narrow particle sprays | The meteor tornado's spray in water or lava, and the burst where Death's bones land, came out in a tighter spot than meant. They now spread as wide as written. |
 | `9fbe0c6` | 2026-11-12 | Players pushed each other from any side | In coop and deathmatch, running into another player is meant to push them only when you're moving toward them. The check never worked, so a player beside or behind you was pushed too. It now pushes only a player you're moving toward. |
 | `9fbe0c6` | 2026-11-12 | Golems fired their eye beam without seeing you | A golem charging its eye beam was meant to fire only if it could see you, but it fired whenever it faced you, behind a wall too. Without a line of sight it now goes back to chasing you. |
-| `9fbe0c6` | 2026-11-12 | Victory roar through walls | When a mezzoman or yakman killed its target, it roared or howled if the body lay in front of it, even out of sight behind a wall. It now does so only when it can see the body. |
+| `9fbe0c6` | 2026-11-12 | Victory roar through walls | When a mezzoman or yakman killed its target, it roared or howled whenever it faced the body, even out of sight behind a wall. It now does so only when it can see the body. |
 | `e95be96` | 2026-11-12 | Bag contents | **[JSH2 REDESIGN]** Aiming at a backpack within reach shows what's inside as a centered message to you alone: one line per item with its count, and items you can't take marked "(full)" in the console's lettering. In coop a player's pack is titled with their number ("Player 2's Backpack"). A game message stays up for 3 seconds before the list comes back. Switch: `jsp_baglist`; off, or on another engine, there's no list. |
 | `0778bc4` | 2026-11-12 | Bag pickup threw away what didn't fit | Touching a bag gave you what you could carry and lost the rest: with 23 Discs of Repulsion, a bag of 5 gave you 2 and the other 3 were gone. You now take what fits and the rest stays in the bag for you or a teammate. The bag goes once it's empty, or after its usual two minutes. The pickup message lists only what you took, without the stray number that came before armor pieces. |
 | `8d98ee4` | 2026-11-12 | Full mana used up a dropped bag | Touching a bag with nothing in it you could carry (full mana, for example) took the bag anyway and printed "You get ...Nothing!", so in coop it used up a teammate's dropped pack. Such a bag now stays on the ground, as single mana pickups do, for someone who has room. |
