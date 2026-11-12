@@ -237,7 +237,7 @@ void imp_die ()
 			self.velocity_x = self.velocity_y = 0.0;
 		}
 		else
-			self.frame==$death7;
+			self.frame=$death7;	// [2026-11-13] jsH2+ was "==": the death played out in mid-air
 	
 	MonsterCheckContents();
 	

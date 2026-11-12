@@ -484,12 +484,13 @@ float r, loscheck1,loscheck2;
 	traceline (org, dir, FALSE, self);
 	if (trace_ent != self.enemy)
 	{	// don't have a clear shot, so move to a side
+		// [2026-11-13] jsH2+ these two were "==", so the medusa never stepped aside
 		if (self.attack_state != AS_SLIDING)
-			self.attack_state == AS_SLIDING;
+			self.attack_state = AS_SLIDING;
 		return FALSE;
 	}
 	else
-		self.attack_state == AS_STRAIGHT;
+		self.attack_state = AS_STRAIGHT;
 			
 	destiny = self.enemy.origin+self.enemy.view_ofs;
 //FIXME: account for z difference
