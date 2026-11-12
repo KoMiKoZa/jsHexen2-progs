@@ -206,9 +206,10 @@ One row per change. `git show <hash>` shows exactly what changed.
 ## Building
 
 The source is in `portals/`. It builds with [jsHexen2-hcc](https://github.com/KoMiKoZa/jsHexen2-hcc), Raven's HCC with
-`-ot`, which reuses the globals that hold intermediate results. Raven's HCC and NHCC still
-build it, but they use 65,392 of the 65,536 globals a `progs.dat` can address, so new code will
-soon not fit. No compiler binary is included here.
+`-ot`, which reuses the globals that hold intermediate results. Raven's HCC and NHCC can't build
+it: they don't accept `\\` (a backslash) in a string, which the bag list uses for the `\1` lettering
+escape, and they would use 65,392 of the 65,536 globals a `progs.dat` can address. No compiler
+binary is included here.
 
 ```
 cd portals

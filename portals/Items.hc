@@ -1196,12 +1196,12 @@ float BagListOne (entity p, entity bag, .float fld, string name, float len, floa
 		return w;
 	}
 
-	// the byte before the space is 0x0F, conchars' small centered square (NHCC has no \x escape);
-	// ^1 draws a full line in the console style, ^0 the rest in the message style
+	// the byte before the space is 0x0F, conchars' small centered square (HCC has no \x escape);
+	// \1 draws a full line in the console style (\3, the message style, starts every line)
 	if (full)
-		stuffcmd (p, "@^1 ");
+		stuffcmd (p, "@\\1 ");
 	else
-		stuffcmd (p, "@^0 ");
+		stuffcmd (p, "@ ");
 	stuffcmd (p, name);
 	if (kind == 0)
 		stuffcmd (p, " x");
