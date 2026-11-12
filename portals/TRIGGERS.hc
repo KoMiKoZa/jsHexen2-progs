@@ -1576,32 +1576,26 @@ void() trigger_push =
 
 void() trigger_monsterjump_touch =
 {
-float jump_speed, jump_height;
 	if ( other.flags & (FL_MONSTER | FL_FLY | FL_SWIM) != FL_MONSTER )
 		return;
 
 // set XY even if not on ground, so the jump will clear lips
-// [2026-11-13] jsH2+ the Eidolon's boost goes in locals: scaling the trigger's own speed and
-// height made it grow on every touch
-	jump_speed = self.speed;
-	jump_height = self.height;
 	if(other.classname=="monster_eidolon")
 	{//blah
-		jump_height*=1.3;
-		jump_speed*=1.3;
+		self.height*=1.3;
+		self.speed*=1.3;
 	}
-	other.velocity_x = self.movedir_x * jump_speed;
-	other.velocity_y = self.movedir_y * jump_speed;
+	other.velocity_x = self.movedir_x * self.speed;
+	other.velocity_y = self.movedir_y * self.speed;
 	
 	if ( !(other.flags & FL_ONGROUND) )
 		return;
 	
 	other.flags(-)FL_ONGROUND;
 
-	other.velocity_z = jump_height;
+	other.velocity_z = self.height;
 
-	// [2026-11-13] jsH2+ was "self.wait=-1", always true, so every trigger turned off after one jump
-	if(self.wait==-1)
+	if(self.wait=-1)
 		self.touch=SUB_Null;
 
 	if(other.th_jump)

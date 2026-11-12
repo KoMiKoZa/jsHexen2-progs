@@ -114,14 +114,13 @@ They're fixed twice, on purpose:
 One row per change. `git show <hash>` shows exactly what changed.
 
 <details open>
-<summary><h3>1.0.0 (in development): 80 changes</h3></summary>
+<summary><h3>1.0.0 (in development): 79 changes</h3></summary>
 
 | Commit | Date | Change | What it does |
 |---|---|---|---|
-| `607a622` | 2026-11-13 | Monster jump spots worked once | The spots in maps where monsters jump across a gap stopped working after the first monster used them, so the rest couldn't follow. They now work for every monster, unless the map sets them to work only once. |
 | `607a622` | 2026-11-13 | Medusas never stepped aside | A medusa without a clear shot at you was meant to step to the side to get one, but she kept coming straight at you. She now sidesteps. |
 | `607a622` | 2026-11-13 | Imps died in mid-air | An imp killed in flight played out its whole death while still falling. It now falls in its falling pose, lands with a thud and then finishes dying. |
-| `607a622` | 2026-11-13 | Doors that never stopped | In rare cases a closing door reached its end without being stopped and kept moving. It now stops there. |
+| `607a622` | 2026-11-13 | Doors that froze while closing | In rare cases a closing door froze just short of shut, without its closing sound, and the game still treated it as closing. It now stops as closed, with the sound. |
 | `607a622` | 2026-11-13 | Silent crown capture | Taking the Sword and Crown in a team game was meant to play a thunderclap, but the sound was misnamed and nothing played. It plays now. |
 | `dd3347c` | 2026-11-12 | Hurt imps and sheep staggered the wrong way | **[RAVEN HCC BUG]** A hurt imp or sheep is meant to stagger away from whoever hit it. It always staggered toward the same compass direction instead, wherever you stood. It now backs away from you. |
 | `dd3347c` | 2026-11-12 | Mezzomen blocked shots from behind | **[RAVEN HCC BUG]** A mezzoman is meant to block or charge only at a shot coming at his front. He also reacted to shots from the side or behind, which he couldn't see. Now only shots in front of him count. |

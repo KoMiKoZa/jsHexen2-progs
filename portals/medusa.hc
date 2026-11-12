@@ -831,6 +831,11 @@ void medusa_hunt () [++ $medusa1 .. $medusa29]
 	else
 		ai_run(self.speed);
 
+	// [2026-11-13] jsH2+ only MedusaCheckAttack sets her back to straight, and it doesn't run
+	// while she can't see you, so she would keep sidestepping instead of hunting you
+	if(!enemy_vis&&self.attack_state==AS_SLIDING)
+		self.attack_state=AS_STRAIGHT;
+
 	if(!enemy_vis)
 		if(random()<0.1&&random()<0.5)
 			if(random()<0.5)
