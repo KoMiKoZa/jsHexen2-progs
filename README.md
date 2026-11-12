@@ -101,7 +101,7 @@ One row per change. `git show <hash>` shows exactly what changed.
 
 | Commit | Date | Change | What it does |
 |---|---|---|---|
-| `3a2360b` | 2026-11-11 | Scarab Staff charge sound stutters | The charge sound restarted four times in the first moment of a charge, because the first charge frame lasts four thinks. It now plays once per charge. |
+| `3a2360b` | 2026-11-11 | Scarab Staff charge sound stutters | The charge sound restarted four times at the start of each charge, because each charge frame lasts four game ticks. It now plays once per charge. |
 | `abb3791` | 2026-11-11 | Barrels slide away under a player | Standing on a barrel, chair or pushable brush pushed it the way the player moved, so it slid out from under them, and landing on one shoved it aside. A player on top now stands on it. A side push that was sometimes ignored now always works. |
 | `3540d74` | 2026-11-11 | Scarab Staff tap spam and fast charge | Tapping the Assassin's Scarab Staff fired a 33-damage pincer on every click, and a full charge took 0.8 s instead of 2.8 s at 72 Hz. Its fire code re-ran every server frame while fire was held. The next shot now waits for the 0.4 s settle animation, and a full charge takes 2.8 s at any frame rate. |
 | `1fb7bf7` | 2026-11-11 | Thrown items stuck in the ceiling or floor | A thrown inventory item was placed at a fixed spot in front of the view after a thin line check. Under a low ceiling it started inside the ceiling and hung there; thrown down, it started in the floor or was refused. It now starts where its box fits, and players or monsters next to you no longer block it. A refused throw no longer deletes the previous item. |
