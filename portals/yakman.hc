@@ -1050,6 +1050,7 @@ void yakman_howl () [++ $howl1 .. $howl36]
 
 void yakman_run () [++ $walk1 .. $walk24]
 {
+float seen;
 //	self.frame=$walk;
 //	self.think=self.th_run;
 //	thinktime self : 0.05;
@@ -1061,7 +1062,10 @@ void yakman_run () [++ $walk1 .. $walk24]
 	if(!self.enemy.flags2&FL_ALIVE&&self.enemy!=world)
 	{
 		self.monster_awake=FALSE;
-		if(visible(self.enemy)&&infront(self.enemy))
+		// [2026-11-12] jsH2+ HCC kept only the second call's result in "f() && g()",
+		// so the howl skipped the line-of-sight check
+		seen=visible(self.enemy);
+		if(seen&&infront(self.enemy))
 		{
 			self.enemy=world;
 			self.oldthink=self.th_run;

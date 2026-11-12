@@ -2225,6 +2225,7 @@ other players, etc.
 */
 void PlayerTouch (void)
 {
+vector push_dir;
 	if(other.classname=="monster_eidolon")
 		return;
 
@@ -2241,11 +2242,14 @@ void PlayerTouch (void)
 	if(other==world)
 		return;
 
+	// [2026-11-12] jsH2+ HCC kept only the second call's result in "f() * g()",
+	// so this direction test compared a direction with itself and always passed
+	push_dir=normalize(self.velocity);
 	if(coop||deathmatch)
 		if(random()<0.5)
 			if(other.classname=="player")
 				if(self.velocity!='0 0 0')//push other players
-					if(normalize(self.velocity)*normalize(other.origin-self.origin)>0.2)
+					if(push_dir*normalize(other.origin-self.origin)>0.2)
 						if(fabs(other.origin_z-self.origin_z)<48)
 						{
 						float push_mod;

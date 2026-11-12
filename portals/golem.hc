@@ -1015,15 +1015,18 @@ void GolemBBeamFireArch2(void) [$bgem18 GolemBBeamFireArch2]
 
 void GolemBBeamFire(void) [++ $bgem11..$bgem18]
 {
-	float r;
-	
+	float r, seen;
+
 	ai_face();
 
 	if (self.frame == $bgem18)
-	{	
+	{
 		r = random();
 
-		if (visible(self.enemy) && FacingIdeal())
+		// [2026-11-12] jsH2+ HCC kept only the second call's result in "f() && g()",
+		// so the golem fired without the line-of-sight check
+		seen = visible(self.enemy);
+		if (seen && FacingIdeal())
 		{
 			sound(self, CHAN_WEAPON, "golem/gbfire.wav", 1, ATTN_NORM);
 			

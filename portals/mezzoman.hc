@@ -1274,6 +1274,7 @@ void mezzo_roar () [++ $roar1 .. $roar30]
 
 void mezzo_run_think ()
 {
+float seen;
 //	if(self.shield.velocity!='0 0 0'&&self.shield.model!="models/null.spr")
 //		dprint("what the?\n");
 	mezzo_check_defense();
@@ -1300,7 +1301,10 @@ void mezzo_run_think ()
 	if(!self.enemy.flags2&FL_ALIVE&&self.enemy!=world)
 	{
 		self.monster_awake=FALSE;
-		if(visible(self.enemy)&&infront(self.enemy))
+		// [2026-11-12] jsH2+ HCC kept only the second call's result in "f() && g()",
+		// so the roar skipped the line-of-sight check
+		seen=visible(self.enemy);
+		if(seen&&infront(self.enemy))
 		{
 			self.oldthink=self.th_stand;
 			self.think=mezzo_roar;
