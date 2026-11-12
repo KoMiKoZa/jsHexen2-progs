@@ -226,6 +226,7 @@ void bone_think(void)
 
 void bone_touch(void)
 {
+float spread;
 	self.flags (-) FL_ONGROUND;
 
 	if (self.classname == "b4" || self.classname == "b5")
@@ -242,7 +243,10 @@ void bone_touch(void)
 	else
 		self.velocity_z /= 4;
 
-	particle4(self.origin + '0 0 10', random(20), 256+random(80, 95), PARTICLETYPE_GRAV, random(10));
+	// [2026-11-12] jsH2+ the spread goes through a local: HCC passed the last
+	// argument's random() in its place
+	spread = random(20);
+	particle4(self.origin + '0 0 10', spread, 256+random(80, 95), PARTICLETYPE_GRAV, random(10));
 
 	self.think = chunk_death;
 	thinktime self : 0.1;

@@ -559,7 +559,8 @@ float r;
 		}
 //		return;
 	}
-	else if(infront(enemy_proj)&&random()<0.5)
+	// [2026-11-12] jsH2+ random() first: HCC lost infront()'s result when a call followed it
+	else if(random()<0.5&&infront(enemy_proj))
 	{
 		thinktime self : 0;
 		if(self.think==mezzo_block_wait)

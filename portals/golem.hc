@@ -1016,11 +1016,11 @@ void GolemBBeamFireArch2(void) [$bgem18 GolemBBeamFireArch2]
 void GolemBBeamFire(void) [++ $bgem11..$bgem18]
 {
 	float r, seen;
-
+	
 	ai_face();
 
 	if (self.frame == $bgem18)
-	{
+	{	
 		r = random();
 
 		// [2026-11-12] jsH2+ HCC kept only the second call's result in "f() && g()",

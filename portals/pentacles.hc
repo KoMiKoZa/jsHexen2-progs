@@ -807,7 +807,8 @@ float goalheight,dot,goaldist;
 				{
 					if(!movestep(0,0,movespeed, FALSE))
 					{
-						if(movestep(0,0,0 - movespeed, FALSE)&&random()<0.5)
+						// [2026-11-12] jsH2+ random() first: HCC lost movestep()'s result when a call followed it
+						if(random()<0.5&&movestep(0,0,0 - movespeed, FALSE))
 						{
 							self.level=0 - movespeed;
 							self.t_width=time+7;

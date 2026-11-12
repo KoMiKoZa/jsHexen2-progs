@@ -500,7 +500,10 @@ void(float dist) ai_pain =
 //	ai_back (dist);
 float	away;
 	
-	away = vectoyaw (self.origin - self.enemy.origin)+90*random(0.5,-0.5);
+	// [2026-11-12] jsH2+ in "f() + g()" HCC kept only the second call's result,
+	// so the stagger lost its direction away from the enemy
+	away = vectoyaw (self.origin - self.enemy.origin);
+	away += 90*random(0.5,-0.5);
 	
 	walkmove (away, dist,FALSE);
 };

@@ -189,7 +189,7 @@ void() tornato_die = [++24 .. 47]
 void() tornato_spin = [++0 .. 23]
 {
 float distance,content;
-float pick_up;
+float pick_up, spread;
 
 	if(time>self.lifetime||self.torncount<self.owner.torncount - 1)
 	{
@@ -220,8 +220,12 @@ float pick_up;
 	if(content==CONTENT_WATER||content==CONTENT_LAVA)
 	{
 		self.velocity_z+=random(33,200);
-		particle4(self.origin,random(20),264*15,PARTICLETYPE_GRAV,random()*10);
-		particle4(self.origin,random(20),random(406,414),PARTICLETYPE_GRAV,random(10));
+		// [2026-11-12] jsH2+ the spread goes through a local: HCC passed the last
+		// argument's random() in its place
+		spread=random(20);
+		particle4(self.origin,spread,264*15,PARTICLETYPE_GRAV,random()*10);
+		spread=random(20);
+		particle4(self.origin,spread,random(406,414),PARTICLETYPE_GRAV,random(10));
 	}
 	else if(random()<0.2)
 	{
