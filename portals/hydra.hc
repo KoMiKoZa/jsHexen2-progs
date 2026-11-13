@@ -249,7 +249,7 @@ void hydra_swim(float thrust)
 	float dist;
 	float temp;
 
-	if (self.velocity) self.velocity = self.velocity * 0.7;
+	if (self.velocity != '0 0 0') self.velocity = self.velocity * 0.7;
 	
 	if (!self.enemy.flags2 & FL_ALIVE)
 	{
@@ -308,7 +308,7 @@ void hydra_float(void)
 {
 	float Length;
 
-	if (self.velocity) self.velocity = self.velocity * 0.7;
+	if (self.velocity != '0 0 0') self.velocity = self.velocity * 0.7;
 
 	Length = vhlen(self.origin - self.enemy.origin);
 

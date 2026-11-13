@@ -750,7 +750,7 @@ void deathhorse_move(void)
 {
 	float retval, r;
 	
-	if (self.velocity) 
+	if (self.velocity != '0 0 0') 
 		self.velocity = self.velocity * 0.9;
 
 	if (coop)

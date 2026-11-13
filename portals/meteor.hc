@@ -354,7 +354,7 @@ float pick_up, spread;
 					distance=vlen(self.goalentity.origin-self.origin);//Swoop in when close!
 				if(distance<256)
 					seekspeed+=(256-distance);
-				if(self.goalentity.velocity)
+				if(self.goalentity.velocity != '0 0 0')
 					seekspeed+=vlen(self.goalentity.velocity);
 				self.velocity=(self.velocity*3+normalize(self.goalentity.origin-self.origin)*seekspeed*self.scale)*0.25;//too fast?
 		}

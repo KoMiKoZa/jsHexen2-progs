@@ -349,7 +349,7 @@ float ontop,pushed,inertia,force,walkforce;
 					self.velocity_z=0;
 				self.flags-=FL_ONGROUND;
 			}
-			if(self.velocity)
+			if(self.velocity != '0 0 0')
 				pushed=TRUE;
 		}
 		else

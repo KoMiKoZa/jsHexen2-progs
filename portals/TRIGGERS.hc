@@ -662,7 +662,7 @@ string temp;
 		if(random()*100<self.failchance)
 			return;
 
-	if(self.mangle)
+	if(self.mangle != '0 0 0')
 	{
 		if(
 			(self.cnt==1&&other.aflag!=self.mangle_x)||
