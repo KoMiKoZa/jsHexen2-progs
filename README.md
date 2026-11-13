@@ -108,8 +108,8 @@ correctly, but HCC builds something else:
   `visible() && infront()` ran as `infront() && infront()`, so golems fired through walls. Ten
   places in the shipped game.
 - **`if (vector)`.** HCC tests only the vector's first part, x, so `if (self.velocity)` was false
-  for anything moving only straight up or down. 34 places in the shipped game, all meant "the
-  vector isn't zero".
+  for anything not moving along x, such as something falling straight down. 34 places in the
+  shipped game, all meant "the vector isn't zero".
 
 The places where this changes the game are marked **[RAVEN HCC BUG]** below. They're fixed
 twice, on purpose:

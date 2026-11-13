@@ -354,6 +354,7 @@ float pick_up, spread;
 					distance=vlen(self.goalentity.origin-self.origin);//Swoop in when close!
 				if(distance<256)
 					seekspeed+=(256-distance);
+				// [2026-11-14] jsH2+ whole vector: Raven's HCC tested only x, so a target falling straight down added no catch-up speed
 				if(self.goalentity.velocity != '0 0 0')
 					seekspeed+=vlen(self.goalentity.velocity);
 				self.velocity=(self.velocity*3+normalize(self.goalentity.origin-self.origin)*seekspeed*self.scale)*0.25;//too fast?
