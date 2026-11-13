@@ -48,7 +48,6 @@ float()eidolon_check_attack;
 //
 // globals
 //
-float	current_yaw;
 
 //
 // when a monster becomes angry at a player, that monster will be used
