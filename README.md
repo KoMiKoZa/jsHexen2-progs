@@ -23,16 +23,18 @@ apply regardless of the switches.
 
 The repository includes a few redesigns of existing mechanics. They are marked
 **[JSH2 REDESIGN]** in the changelog. Each one is declared as a switch for the jsHexen2 engine:
-the program reads a `jsp_*` console variable with `cvar()`, and defines an empty function of the
-same name so that jsHexen2 can list the switch on its Options → jsHexen2 Progs page. The switches
-are on by default.
+the program reads a `jsp_*` console variable with `cvar()`, and defines a
+marker function of the same name so that jsHexen2 lists the switch in the jsHexen2 Progs category
+of its Options menu. The markers for `jsp_loosedrops`, `jsp_tempestcharge` and `jsp_torchblaze`
+are empty, and the engine supplies their label and tooltip; later ones, such as `jsp_baglist`,
+return their own. The switches are on by default.
 
 Other engines do not register these variables, so `cvar()` returns 0 there and the mechanic
 behaves as in Raven's code, the same as switching it off in jsHexen2.
 
 ### Adding a switch to your own mod
 
-Any progs can add switches to that page. Declare one with a function
+Any progs can add switches to that category. Declare one with a function with no parameters
 whose name starts with `jsp_` and that returns the label, an optional tooltip and an optional
 `off` for a switch that starts off:
 
@@ -52,11 +54,16 @@ if (cvar("jsp_mymod_bigjump"))
 
 Nothing calls the function; jsHexen2 reads the text from the compiled progs. Keep these rules:
 
-- The `return` with a string constant must be the function's only statement. An empty
-  `void jsp_mymod_bigjump (void) {}` also works and shows the name as the label.
+- The `return` with a string constant must be the function's first statement. If anything comes
+  before it, or the function returns a variable or a computed string, the switch has no text.
+  An empty `void jsp_mymod_bigjump (void) {}` also works and shows a readable form of the name
+  as the label.
+- A name is `jsp_` followed by up to 27 letters, digits and underscores, 31 characters in all.
 - Labels are cut at 24 characters and tooltips at 256. `"Label||off"` starts off without a tooltip.
 - A switch belongs to its name, not to your mod, so put your mod's name in it. Two mods that
   declare `jsp_bigjump` share one setting.
+- `jsp_loosedrops`, `jsp_tempestcharge` and `jsp_torchblaze` belong to the engine: jsHexen2
+  always has them, on by default. Don't use them for your own switches.
 - Every other engine reads 0, so write the code so that 0 is the original behavior.
 - `cvar()` runs on the server: in multiplayer the host's settings apply to everyone. Read the
   value each time you need it if a change should apply right away.
