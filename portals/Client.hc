@@ -1540,11 +1540,48 @@ void() WaterMove =
 		self.flags(+)FL_INWATER;
 		self.dmgtime = 0;
 
+		if (cvar("jsp_swimstrokes"))	// [2026-11-13] jsH2+ [JSH2 REDESIGN] no stroke over the splash
+			self.swim_flag = time + 1.3;
 	}
 	
 	if (! (self.flags & FL_WATERJUMP) )
 		self.velocity = self.velocity - 0.8*self.waterlevel*frametime*self.velocity;
 };
+
+// [2026-11-13] jsH2+ [JSH2 REDESIGN] never called: the engine lists the option only when the loaded progs defines this
+string jsp_swimstrokes (void)
+{
+	return "Swim Strokes|Swimming in water or slime plays stroke sounds as you move. Off: only when you press jump to swim up.";
+}
+
+// [2026-11-13] jsH2+ [JSH2 REDESIGN] jsp_swimstrokes: Raven played a stroke only from PlayerJump.
+// 80 u/s is above the idle drift to the bottom (60 at most), so floating still is silent; wading
+// waist-deep on the floor is walking. CHAN_AUTO: the body channel carries the low-air beep.
+// The next stroke waits for the sample to finish (swim1 0.99 s, swim2 1.23 s) plus a short gap.
+void SwimStroke (void)
+{
+	if (!cvar("jsp_swimstrokes"))
+		return;
+	if (self.waterlevel < 2 || self.watertype == CONTENT_LAVA)
+		return;
+	if (self.waterlevel == 2 && (self.flags & FL_ONGROUND))
+		return;
+	if (self.movetype != MOVETYPE_WALK || (self.flags & FL_WATERJUMP))
+		return;
+	if (self.swim_flag >= time || vlen(self.velocity) < 80)
+		return;
+
+	if (random() < 0.5)
+	{
+		sound (self, CHAN_AUTO, "player/swim1.wav", 1, ATTN_NORM);
+		self.swim_flag = time + random(1.1,1.4);
+	}
+	else
+	{
+		sound (self, CHAN_AUTO, "player/swim2.wav", 1, ATTN_NORM);
+		self.swim_flag = time + random(1.35,1.65);
+	}
+}
 
 void CheckCrouch (void)
 {
@@ -1825,6 +1862,8 @@ void() PlayerPreThink =
 		PlayerJump ();
 	else
 		self.flags(+)FL_JUMPRELEASED;
+
+	SwimStroke ();	// [2026-11-13] jsH2+ [JSH2 REDESIGN] after the jump, which plays its own stroke first
 
 // teleporters can force a non-moving pause time	
 	if (time < self.pausetime)
