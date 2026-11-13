@@ -121,10 +121,11 @@ They're fixed twice, on purpose:
 One row per change. `git show <hash>` shows exactly what changed.
 
 <details open>
-<summary><h3>1.0.0 (in development): 82 changes</h3></summary>
+<summary><h3>1.0.0 (in development): 83 changes</h3></summary>
 
 | Commit | Date | Change | What it does |
 |---|---|---|---|
+| `d744e84` | 2026-11-13 | Swim strokes | **[JSH2 REDESIGN]** The swim stroke sound played only when you pressed jump to swim up, so plain swimming was silent. Swimming through deep water or slime now plays a stroke each time the last one has finished. Floating still, sinking and wading waist-deep stay silent. Switch: `jsp_swimstrokes`; off, or on another engine, a stroke plays only on jump. |
 | `2a97ca9` | 2026-11-13 | Gauntlet second punch | The second punch of the Paladin's gauntlet combo was meant to skip two frames of its wind-up but never did. It now lands its hit a little sooner. |
 | `2a97ca9` | 2026-11-13 | Monster jump spots worked once | The spots in maps where monsters jump across a gap stopped working after the first monster used them. They now work for every monster, unless the map sets them to work once. In Portal of Praevus this changes tibet2 and tibet9: monsters jump each time they cross one. |
 | `2a97ca9` | 2026-11-13 | Bubble emitters | A map's bubble emitter set to repeat puffed once and stopped, and one triggered a second time streamed bubbles without end. They now puff every time the map says, and each trigger gives one puff. The maps that ship with the game don't use them this way. |
