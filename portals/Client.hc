@@ -1343,10 +1343,20 @@ float wall_jump;
 		if (self.swim_flag < time)
 		{
 			self.swim_flag = time + 1;
+			// [2026-11-13] jsH2+ [JSH2 REDESIGN] jsp_swimstrokes: wait out the sample as SwimStroke does (same
+			// waits), so the next stroke neither cuts it nor plays over it; swim2 lasts 1.23 s, past Raven's 1 s
 			if (random() < 0.5)
+			{
 				sound (self, CHAN_BODY, "player/swim1.wav", 1, ATTN_NORM);
+				if (cvar("jsp_swimstrokes"))
+					self.swim_flag = time + random(1.1,1.4);
+			}
 			else
+			{
 				sound (self, CHAN_BODY, "player/swim2.wav", 1, ATTN_NORM);
+				if (cvar("jsp_swimstrokes"))
+					self.swim_flag = time + random(1.35,1.65);
+			}
 		}
 
 		return;
@@ -1558,6 +1568,7 @@ string jsp_swimstrokes (void)
 // 80 u/s is above the idle drift to the bottom (60 at most), so floating still is silent; wading
 // waist-deep on the floor is walking. CHAN_AUTO: the body channel carries the low-air beep.
 // The next stroke waits for the sample to finish (swim1 0.99 s, swim2 1.23 s) plus a short gap.
+// PlayerJump's stroke uses the same waits under the switch; keep the two in step.
 void SwimStroke (void)
 {
 	if (!cvar("jsp_swimstrokes"))
