@@ -146,8 +146,8 @@ entity lball;//,star1,star2;
 	thinktime lball : 0.2;
 	// [2026-06-12] jsH2+ flight loop removed (user decision): vanilla stacked TWO copies of
 	// the buzz2 loop on every ball - one here on CHAN_WEAPON at spawn, another from HomeThink
-	// on CHAN_BODY 0.02-0.5s later (via t_width, also removed). Discovered when the paced
-	// charge made the sound stack audible. The ball flies silent; buzz2 is the charge sound now.
+	// on CHAN_BODY 0.02-0.5s later (via t_width, also removed). The ball flies silent;
+	// buzz2 is the charge sound now.
 /*
 	star1=spawn();
 	lball.movechain = star1;
@@ -360,67 +360,63 @@ void jsp_tempestcharge (void)
 //void()lightning_to_power;
 void lightning_fire_normal (void)
 {
-// [2026-06-12] jsH2+ time-paced charge (user design). The mechanism, code-proven: th_weapon
+// [2026-06-12] jsH2+ charge-per-ball (user design). The mechanism, code-proven: th_weapon
 // runs on the player's 20Hz anim clock (HX_FRAME_TIME thinks in player_*.hc), BUT W_Attack
 // re-enters Suc_Litn_Fire every server frame while button0 is held and attack_finished has
 // elapsed, and that called this function DIRECTLY - so the first windup advanced at think
 // rate PLUS frame rate (~0.15s total, framerate-bound since retail: the first ball always
 // read as instant). Post-shot windups ran at honest 20Hz (the visible replay players saw).
-// Now: the Suc_Litn_Fire re-entry guard leaves the think chain as the only driver, and
-// advance is gated to one frame per 0.07s minimum - an even, framerate-independent charge;
-// release before frame 12 cancels. weaponframe_cnt is repurposed as the pacing timestamp
-// (the old fidle hold loop is gone - every ball is charged through the full windup).
+// Now: the Suc_Litn_Fire re-entry guard leaves the think chain as the only driver - one
+// frame per think, an even charge at any framerate; release before frame 12 cancels (the old
+// fidle hold loop is gone - every ball is charged through the full windup).
 // Fully charged + refire pending holds the pose at $normal12.
+// [2026-11-14] jsH2+ no slower gate on top of the think: a 0.07s gate checked on 0.05s thinks steps every 0.1s, and the lerp stalls between steps.
 // [2026-06-12] jsH2+ measured frame semantics (prong-tip vertex separation, sucwp4.mdl):
 // normal1-5 = tips CLOSED at rest, normal6-11 = tips snap OPEN and the ball builds between
 // them, normal12-16 = the clap that looses the ball, landing back closed (frame 16 matches
 // frame 1 - the artist built a seamless cycle). Vanilla's own animation IS the charge
 // weapon; it just played at one frame per 72Hz tick and was never visible.
-	if(self.weaponframe_cnt < time)
-	{
-		self.weaponframe_cnt = time + 0.07;
-		if (self.weaponframe != $normal12)	// hold the fully-charged pose; the fire branch
-			self.wfs = advanceweaponframe($normal1,$normal16);	// below moves us to $normal13
-		// [2026-06-12] jsH2+ full vanilla cycle 1..16 (the closed-rest experiment is retired -
-		// the model has no truly closed frame; a fully-shut rest would need model surgery,
-		// noted in PROGS_TRACKER as an optional future local-asset project).
-		if(self.weaponframe==$normal2)
-		{//FIXME:  WHY THE FUCK CAN'T I SET DRAWFLAGS?!!!!
-			sound(self,CHAN_WEAPON,"succubus/buzz2.wav",1,ATTN_NORM);	// [2026-06-12] jsH2+ charge hum
-										// (loop-marked sample: sustains through the charge, stopped at
-										// every exit; the ball's own firelbal.wav stays the only shot sound)
-			// [2026-06-12] jsH2+ the charge light is EF_BRIGHTLIGHT (white, like the tome
-			// flashes) instead of EF_DIMLIGHT (the torch's orange). The staff and the torch
-			// no longer share a bit at all - the original light-theft bug class is gone at
-			// the root. lefty ownership + AFL_TORCH guard protect a full-blaze torch's BRIGHT.
-			// [2026-10-15] jsH2+ ...except the full-blaze torch marks itself with that same
-			// BRIGHT bit (68cc25e), so AFL_TORCH was the wrong owner test: a guttering torch
-			// (AFL_TORCH set, no BRIGHT) made the staff keep its own light, and once the torch
-			// died nothing removed it - a stray white light. The strips below now defer only
-			// to a torch in full blaze (EF_TORCHLIGHT, set exactly while it owns BRIGHT), and
-			// lefty is reset when the staff adds the light, so a stale lefty from a weapon
-			// switch can't make the staff skip its own cleanup.
-			if(self.effects&EF_BRIGHTLIGHT)
-				self.lefty=TRUE;
-			else
-			{
-				self.effects(+)EF_BRIGHTLIGHT;
-				self.lefty=FALSE;
-			}
+	if (self.weaponframe != $normal12)	// hold the fully-charged pose; the fire branch
+		self.wfs = advanceweaponframe($normal1,$normal16);	// below moves us to $normal13
+	// [2026-06-12] jsH2+ full vanilla cycle 1..16 (the closed-rest experiment is retired -
+	// the model has no truly closed frame; a fully-shut rest would need model surgery,
+	// noted in PROGS_TRACKER as an optional future local-asset project).
+	if(self.weaponframe==$normal2)
+	{//FIXME:  WHY THE FUCK CAN'T I SET DRAWFLAGS?!!!!
+		sound(self,CHAN_WEAPON,"succubus/buzz2.wav",1,ATTN_NORM);	// [2026-06-12] jsH2+ charge hum
+									// (loop-marked sample: sustains through the charge, stopped at
+									// every exit; the ball's own firelbal.wav stays the only shot sound)
+		// [2026-06-12] jsH2+ the charge light is EF_BRIGHTLIGHT (white, like the tome
+		// flashes) instead of EF_DIMLIGHT (the torch's orange). The staff and the torch
+		// no longer share a bit at all - the original light-theft bug class is gone at
+		// the root. lefty ownership + AFL_TORCH guard protect a full-blaze torch's BRIGHT.
+		// [2026-10-15] jsH2+ ...except the full-blaze torch marks itself with that same
+		// BRIGHT bit (68cc25e), so AFL_TORCH was the wrong owner test: a guttering torch
+		// (AFL_TORCH set, no BRIGHT) made the staff keep its own light, and once the torch
+		// died nothing removed it - a stray white light. The strips below now defer only
+		// to a torch in full blaze (EF_TORCHLIGHT, set exactly while it owns BRIGHT), and
+		// lefty is reset when the staff adds the light, so a stale lefty from a weapon
+		// switch can't make the staff skip its own cleanup.
+		if(self.effects&EF_BRIGHTLIGHT)
+			self.lefty=TRUE;
+		else
+		{
+			self.effects(+)EF_BRIGHTLIGHT;
+			self.lefty=FALSE;
+		}
 //			self.drawflags(+)MLS_ABSLIGHT;
 //			self.abslight=(self.weaponframe - $normal1)/15;
-		}
-		else if(self.weaponframe==$normal16)
-		{
-			// [2026-06-12] jsH2+ never strip a light the torch owns (AFL_TORCH): at $normal16 the
-			// in-loop branch consumes lefty and the exit branches below re-test it in the SAME call.
-			if(!self.lefty && !(self.effects&EF_TORCHLIGHT))	// [2026-10-15] jsH2+ was AFL_TORCH (see above)
-				self.effects(-)EF_BRIGHTLIGHT;
-			else
-				self.lefty=FALSE;
+	}
+	else if(self.weaponframe==$normal16)
+	{
+		// [2026-06-12] jsH2+ never strip a light the torch owns (AFL_TORCH): at $normal16 the
+		// in-loop branch consumes lefty and the exit branches below re-test it in the SAME call.
+		if(!self.lefty && !(self.effects&EF_TORCHLIGHT))	// [2026-10-15] jsH2+ was AFL_TORCH (see above)
+			self.effects(-)EF_BRIGHTLIGHT;
+		else
+			self.lefty=FALSE;
 //			self.drawflags(-)MLS_ABSLIGHT;
 //			self.abslight=0;
-		}
 	}
 	self.th_weapon=lightning_fire_normal;
 	self.last_attack=time;
@@ -441,8 +437,8 @@ void lightning_fire_normal (void)
 	// releasing any earlier cancels it (no ball, no mana). Held fire recovers (13-16),
 	// wraps, and charges the next ball. Follow-through always plays to completion.
 	// [2026-11-11] jsH2+ [JSH2 REDESIGN] the release-cancel is the jsp_tempestcharge option (jsHexen2 Progs page).
-	// Off, or on another engine, a tap fires a full windup as in vanilla; the pacing,
-	// re-entry guard, sound and light fixes stay either way.
+	// Off, or on another engine, a tap fires a full windup as in vanilla; the re-entry
+	// guard, sound and light fixes stay either way.
 	else if(self.greenmana<6||
 			self.bluemana<6||
 			(!self.button0&&((cvar("jsp_tempestcharge")&&self.weaponframe<$normal13) || self.weaponframe==$normal16))
@@ -456,7 +452,7 @@ void lightning_fire_normal (void)
 				self.lefty=FALSE;
 		}
 		stopSound(self,CHAN_WEAPON);	// [2026-06-12] jsH2+ end the charge hum (buzz2 has a loop marker)
-		if (self.weaponframe > $normal1 && self.weaponframe < $normal12)
+		if (self.weaponframe > $normal1 && self.weaponframe <= $normal12)	// [2026-11-14] jsH2+ a release while held fully charged closes too, not snaps to rest
 			lightning_close_normal();	// [2026-06-12] jsH2+ canceled mid-charge: anim reverses back to rest
 		else
 			lightning_ready_normal();
@@ -477,18 +473,14 @@ void lightning_fire_normal (void)
 }
 
 // [2026-06-12] jsH2+ cancel transition: reverse the charge anim back to the closed rest pose
-// (paced like the charge). A re-press mid-close goes through Suc_Litn_Fire as usual and
+// (one frame per think, like the charge). A re-press mid-close goes through Suc_Litn_Fire as usual and
 // resumes the charge from the current frame - the guard there deliberately excludes this state.
 void lightning_close_normal (void)
 {
 	self.th_weapon=lightning_close_normal;
-	if(self.weaponframe_cnt < time)
-	{
-		self.weaponframe_cnt = time + 0.07;
-		self.wfs = advanceweaponframe($normal11,$normal1);
-		if (self.weaponframe == $normal1)
-			lightning_ready_normal();
-	}
+	self.wfs = advanceweaponframe($normal11,$normal1);
+	if (self.weaponframe == $normal1)
+		lightning_ready_normal();
 }
 
 void lightning_fire_power (void)
@@ -513,16 +505,15 @@ void lightning_fire_power (void)
 void() Suc_Litn_Fire =
 {
 	// [2026-06-12] jsH2+ re-entry guard: W_WeaponFrame calls W_Attack EVERY frame while
-	// button0 is down and attack_finished has elapsed, so this entry used to re-run per
-	// frame during the charge - wiping weaponframe_cnt (the pacing timestamp) and
-	// double-stepping the anim. Once the fire think chain owns the weapon, leave it alone.
+	// button0 is down and attack_finished has elapsed, so this entry runs every server
+	// frame during the charge. Once the fire think chain owns the weapon, leave it alone.
 	if(self.th_weapon==lightning_fire_normal||self.th_weapon==lightning_fire_power)
 		return;
 	self.weaponframe_cnt=FALSE;
 	if(self.artifact_active&ART_TOMEOFPOWER)
 		lightning_fire_power();
 	else
-		lightning_fire_normal();
+		self.th_weapon=lightning_fire_normal;	// [2026-11-14] jsH2+ the think below takes the first step, so the first charge frame lasts a whole think, not one server frame
 
 	thinktime self : 0;
 };
@@ -546,23 +537,18 @@ void lightning_ready_power (void)
 
 void lightning_ready_flip (void)
 {
-// [2026-06-12] jsH2+ paced: the idle spin flourish played one frame per 72Hz tick - a 0.2s
-// blur nobody could see. Now ~1.1s, the way the spin was animated to read.
+// [2026-11-14] jsH2+ one frame per think, the select's own pace: a slower pace right after the select makes the lerp stall.
+	self.wfs = advanceweaponframe($nidle1,$nidle16);
 	self.th_weapon=lightning_ready_flip;
-	if(self.weaponframe_cnt < time)
-	{
-		self.weaponframe_cnt = time + 0.07;
-		self.wfs = advanceweaponframe($nidle1,$nidle16);
-		if(self.wfs==WF_CYCLE_WRAPPED)
-			lightning_ready_normal();
-	}
+	if(self.wfs==WF_CYCLE_WRAPPED)
+		lightning_ready_normal();
 }
 
 void lightning_ready_normal (void)
 {
 // [2026-06-12] jsH2+ rest = vanilla $normal1 (the closed-rest experiment is retired - no
 // truly closed frame exists in the model; see PROGS_TRACKER for the model-surgery option).
-// The $nidle frames are the idle spin flourish, paced in lightning_ready_flip below.
+// The $nidle frames are the idle spin flourish (lightning_ready_flip below).
 	self.weaponframe=$normal1;
 	self.th_weapon=lightning_ready_normal;
 	if(self.artifact_active&ART_TOMEOFPOWER)
