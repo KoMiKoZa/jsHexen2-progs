@@ -101,7 +101,7 @@ correction to a batch. The jsHexen2 engine has its own version.
 
 ## Bugs caused by Raven's compiler
 
-Raven built Hexen II's game code with their own compiler, HCC. In two cases the code reads
+Raven built Hexen II's game code with their own compiler, HCC. In three cases the code reads
 correctly, but HCC builds something else:
 
 - **Two calls in one line.** HCC can let the second call's result overwrite the first's:
@@ -110,9 +110,12 @@ correctly, but HCC builds something else:
 - **`if (vector)`.** HCC tests only the vector's first part, x, so `if (self.velocity)` was false
   for anything not moving along x, such as something falling straight down. 34 places in the
   shipped game, all meant "the vector isn't zero".
+- **A local named like a global.** A local with the same name and type as a global isn't a new
+  variable in HCC: it is the global, so the function overwrites the global. 13 places in the
+  shipped game.
 
-The places where this changes the game are marked **[RAVEN HCC BUG]** below. They're fixed
-twice, on purpose:
+The places where this changes the game are marked **[RAVEN HCC BUG]** below. The first two are
+fixed twice, on purpose:
 
 - **Here, in the source.** Each of these lines is rewritten so that any compiler builds it
   correctly: Raven's HCC, NHCC, uHexen2's hcc, FTEQCC, or jsHexen2-hcc with `-noretfix` or
@@ -121,15 +124,19 @@ twice, on purpose:
   correctly and warns where it finds one, so the same mistake can't creep into new code here or
   into other mods. On this source it finds none, which also confirms these were all of them.
 
+The third is fixed here, in the source, so every compiler builds the same game. FTEQCC lists any
+such local with its warning F306; on this source it lists none.
+
 ## Changelog
 
 One row per change. `git show <hash>` shows exactly what changed.
 
 <details open>
-<summary><h3>1.0.0 (in development): 84 changes</h3></summary>
+<summary><h3>1.0.0 (in development): 85 changes</h3></summary>
 
 | Commit | Date | Change | What it does |
 |---|---|---|---|
+| `ddac294` | 2026-11-15 | Punch dagger stuck on one swing | **[RAVEN HCC BUG]** The Assassin's punch dagger is meant to take turns between its four swings. While a stone imp that hadn't come to life yet could see you, it repeated its last swing every time instead. It now always takes turns. |
 | `e8f8d81` | 2026-11-14 | Meteor tornado fell behind falling targets | **[RAVEN HCC BUG]** The tomed Meteor Staff's tornado speeds up by its target's speed to keep up with it, but a target falling or jumping straight up or down counted as standing still, so the tornado fell behind. It now keeps up with those too. |
 | `d744e84`, `884e2aa` | 2026-11-13 | Swim strokes | **[JSH2 REDESIGN]** The swim stroke sound played only when you pressed jump to swim up, so plain swimming was silent. Swimming through deep water or slime now plays a stroke each time the last one has finished, and the jump stroke waits for its sound to finish too, so strokes never cut off or overlap each other. Floating still, sinking and wading waist-deep stay silent. Switch: `jsp_swimstrokes`; off, or on another engine, a stroke plays only on jump, with Raven's timing. |
 | `2a97ca9` | 2026-11-13 | Gauntlet second punch | The second punch of the Paladin's gauntlet combo was meant to skip two frames of its wind-up but never did. It now lands its hit a little sooner. |
