@@ -118,7 +118,7 @@ void buddha_warp(void)
 	local entity spot;
 	local float cyc;
 
-	if (self.velocity)
+	if (self.velocity != '0 0 0')
 		self.velocity = '0 0 0';
 
 	spot = find (world, classname, "teleport_buddha");
@@ -145,7 +145,7 @@ void buddha_warp(void)
 
 void buddha_recharge_done(void) [++ $rechar20 .. $rechar30]
 {
-	if (self.velocity)
+	if (self.velocity != '0 0 0')
 		self.velocity = '0 0 0';
 
 	if (self.frame == $rechar30)
@@ -160,7 +160,7 @@ void buddha_recharge_done(void) [++ $rechar20 .. $rechar30]
 
 void buddha_recharge_wait(void) [++ $rewait1 .. $rewait30]
 {
-	if (self.velocity)
+	if (self.velocity != '0 0 0')
 		self.velocity = '0 0 0';
 
 	if (self.frame == $rewait1 && self.lifetime < time)
@@ -179,7 +179,7 @@ void buddha_recharge_wait(void) [++ $rewait1 .. $rewait30]
 
 void buddha_recharge(void) [++ $rechar1 .. $rechar20]
 {
-	if (self.velocity)
+	if (self.velocity != '0 0 0')
 		self.velocity = '0 0 0';
 
 	if (self.frame == $rechar1)
@@ -219,7 +219,7 @@ void buddha_spindown(void)
 {
 	local vector vect;
 
-	if (self.velocity)
+	if (self.velocity != '0 0 0')
 		self.velocity = '0 0 0';
 
 	if (self.frame < $birth24)
@@ -267,7 +267,7 @@ void buddha_spindown(void)
 
 void buddha_grow(void)
 {
-	if (self.velocity)
+	if (self.velocity != '0 0 0')
 		self.velocity = '0 0 0';
 
 	if (self.scale < 1)
@@ -302,7 +302,7 @@ void buddha_grow(void)
 
 void buddha_shrink(void)
 {
-	if (self.velocity)
+	if (self.velocity != '0 0 0')
 		self.velocity = '0 0 0';
 
 	if (self.scale > 0.1)
@@ -336,7 +336,7 @@ void buddha_shrink(void)
 
 void buddha_teleport(void) [++ $tele1 .. $tele26]
 {
-	if (self.velocity)
+	if (self.velocity != '0 0 0')
 		self.velocity = '0 0 0';
 
 	if (self.frame == $tele1)
@@ -506,7 +506,7 @@ void buddha_firewalker_spawn(void)
 
 void buddha_send_firewall(void) [++ $push33 .. $push70]
 {
-	if (self.velocity)
+	if (self.velocity != '0 0 0')
 		self.velocity = '0 0 0';
 
 	if (self.frame == $push34)
@@ -595,7 +595,7 @@ void buddha_do_firepillar(void) [++ $push1 .. $push30]
 {
 	local float rand;
 
-	if (self.velocity)
+	if (self.velocity != '0 0 0')
 		self.velocity = '0 0 0';
 
 	if (self.count == 0)
@@ -631,7 +631,7 @@ void buddha_do_firewall(void) [++ $push1 .. $push33]
 {
 	ai_face();
 	
-	if (self.velocity)
+	if (self.velocity != '0 0 0')
 		self.velocity = '0 0 0';
 
 	local vector vect;
@@ -740,7 +740,7 @@ void buddha_launch_proj(void)
 {
 	local vector spot1, spot2;
 
-	if (self.velocity)
+	if (self.velocity != '0 0 0')
 		self.velocity = '0 0 0';
 
 	makevectors(self.angles);
@@ -755,7 +755,7 @@ void buddha_launch_proj(void)
 
 void buddha_do_point(void) [++ $point1 .. $point12]
 {
-	if (self.velocity)
+	if (self.velocity != '0 0 0')
 		self.velocity = '0 0 0';
 
 	ai_face();
@@ -787,7 +787,7 @@ void buddha_end_lightning(void)[++ $attakC13 .. $attakC20]
 {
 	self.frags += 1;
 	
-	if (self.velocity)
+	if (self.velocity != '0 0 0')
 		self.velocity = '0 0 0';
 
 	if (self.frags > 16) 
@@ -812,7 +812,7 @@ void buddha_bring_lightning(void)
 {
 	local entity oself;
 
-	if (self.velocity)
+	if (self.velocity != '0 0 0')
 		self.velocity = '0 0 0';
 
 	if (self.wait < time)
@@ -836,7 +836,7 @@ void buddha_bring_lightning(void)
 
 void buddha_do_conjure(void) [++ $attakC1 .. $attakC13]
 {
-	if (self.velocity)
+	if (self.velocity != '0 0 0')
 		self.velocity = '0 0 0';
 
 	if (self.frame == $attakC13)
@@ -860,7 +860,7 @@ float buddha_decide_attack (void)
 {
 	local float rand;
 	
-	if (self.velocity)
+	if (self.velocity != '0 0 0')
 		self.velocity = '0 0 0';
 
 	rand = random();
@@ -921,7 +921,7 @@ void buddha_run (void) [++ $ready1 .. $ready20]
 {
 	local float ret;
 
-	if (self.velocity)
+	if (self.velocity != '0 0 0')
 		self.velocity = '0 0 0';
 
 	self.goalentity = self.enemy;
@@ -1044,7 +1044,7 @@ void buddha_get_new_target(void)[++ $ready1 .. $ready20]
 
 void buddha_die (void)[++ $death1 .. $death14]
 {
-	if (self.velocity)
+	if (self.velocity != '0 0 0')
 		self.velocity = '0 0 0';
 
 	entity beam;
@@ -1215,7 +1215,7 @@ void buddha_birth (void);
 
 void buddha_wait(void)
 {
-	if (self.velocity)
+	if (self.velocity != '0 0 0')
 		self.velocity = '0 0 0';
 	
 	if (self.lifetime < time)
@@ -1231,7 +1231,7 @@ void buddha_wait(void)
 
 void buddha_birth (void) [++ $birth1 .. $birth24]
 {
-	if (self.velocity)
+	if (self.velocity != '0 0 0')
 		self.velocity = '0 0 0';
 
 	if (self.frame == $birth16)
@@ -1258,7 +1258,7 @@ void buddha_birth (void) [++ $birth1 .. $birth24]
 
 void buddha_seek (void)
 {
-	if (self.velocity)
+	if (self.velocity != '0 0 0')
 		self.velocity = '0 0 0';
 
 	self.frame = $birth1;
@@ -1281,7 +1281,7 @@ void buddha_seek (void)
 
 void shard_think(void)
 {
-	if (self.velocity)
+	if (self.velocity != '0 0 0')
 		self.velocity = '0 0 0';
 
 	if ((self.frame == 0 || self.frame == 11 || self.frame == 22) && !self.attack_state & 1)
@@ -1462,7 +1462,7 @@ void shield_init(void)
 
 void buddha_spawn_shield(void)
 {
-	if (self.velocity)
+	if (self.velocity != '0 0 0')
 		self.velocity = '0 0 0';
 
 	newmis = spawn();

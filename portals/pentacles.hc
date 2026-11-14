@@ -315,7 +315,7 @@ void pent_keep_vel ()
 	self.think=pent_keep_vel;
 	if(self.velocity!='0 0 0')
 		self.movedir=normalize(self.velocity);
-	else if(self.movedir)
+	else if(self.movedir != '0 0 0')
 		self.velocity=self.movedir*500;
 //	else
 //		dprint("pent in air with no vel!\n");
@@ -327,7 +327,7 @@ void pent_ball () [++ $ball000 .. $ball010]
 	self.movechain.frame=self.frame;
 	if(self.velocity!='0 0 0')
 		self.movedir=normalize(self.velocity);
-	else if(self.movedir)
+	else if(self.movedir != '0 0 0')
 		self.velocity=self.movedir*500;
 //	else//remdp
 //		dprint("pent in air with no vel!\n");

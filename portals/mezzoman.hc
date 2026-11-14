@@ -690,9 +690,9 @@ float magnitude;//remainder, reflect_count,
 			}
 		}
 
-		if(other.movedir)
+		if(other.movedir != '0 0 0')
 			other.movedir=dir;
-		if(other.o_angle)
+		if(other.o_angle != '0 0 0')
 			other.o_angle=dir;
 
 		if(magnitude<other.speed)
