@@ -655,6 +655,7 @@ void icestaff_f5 (void)
 void icestaff_shard (void)
 {
 float r;
+	self.weaponframe=$idle1;	// [2026-11-14] jsH2+ start the picked sequence at its first frame, which fires; repeating the last sequence used to continue at its second frame and skip a shot
 	r=rint(random(4)) + 1;
 	if(r==1)
 		icestaff_f1();
