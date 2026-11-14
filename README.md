@@ -126,10 +126,15 @@ twice, on purpose:
 One row per change. `git show <hash>` shows exactly what changed.
 
 <details open>
-<summary><h3>1.0.0 (in development): 84 changes</h3></summary>
+<summary><h3>1.0.0 (in development): 89 changes</h3></summary>
 
 | Commit | Date | Change | What it does |
 |---|---|---|---|
+| `2081855` | 2026-11-14 | Tempest Staff draw spin | The spin after drawing the Tempest Staff ran at half the pace of the draw before it, so it hitched on every frame. It plays at Raven's pace again, about 0.8 s. |
+| `2081855` | 2026-11-14 | Tempest Staff charge pace | The charge stepped at half the game's animation pace, so it looked jerky. It now plays at the game's pace: a full charge takes about half a second, and held fire looses a ball every second, as in the original. Releasing at full charge lowers the staff instead of snapping it back. |
+| `b6281c9` | 2026-11-14 | Tomed Meteor Staff fired too fast | With the Tome of Power, the Meteor Staff's tornado had no cooldown and its fire animation ran once per server frame, so on a fast machine it fired 7 tornadoes a second, 20 green mana each. It now fires one per fire animation, about two a second on any machine, and the tornado leaves as you press fire, like the normal shot. |
+| `163ec37` | 2026-11-14 | Ice Mace skipped shots | The Ice Mace picks one of five swings at random and fires at the start of each. When it picked the swing it had just played, it began that swing halfway through and fired nothing. Every swing fires now, so held fire shoots at an even pace. |
+| `c533f4a` | 2026-11-14 | Flame Orb cast | The Flame Orb's fire code ran every server frame on top of the weapon's own timing, so the hand cast played two frames at a time and was over in a tenth of a second, and a faster machine fired faster. The cast now plays out in full, and the Flame Orb fires once per cast: about one stream a second, or one swarm every 1.7 s with the Tome of Power. |
 | `e8f8d81` | 2026-11-14 | Meteor tornado fell behind falling targets | **[RAVEN HCC BUG]** The tomed Meteor Staff's tornado speeds up by its target's speed to keep up with it, but a target falling or jumping straight up or down counted as standing still, so the tornado fell behind. It now keeps up with those too. |
 | `d744e84`, `884e2aa` | 2026-11-13 | Swim strokes | **[JSH2 REDESIGN]** The swim stroke sound played only when you pressed jump to swim up, so plain swimming was silent. Swimming through deep water or slime now plays a stroke each time the last one has finished, and the jump stroke waits for its sound to finish too, so strokes never cut off or overlap each other. Floating still, sinking and wading waist-deep stay silent. Switch: `jsp_swimstrokes`; off, or on another engine, a stroke plays only on jump, with Raven's timing. |
 | `2a97ca9` | 2026-11-13 | Gauntlet second punch | The second punch of the Paladin's gauntlet combo was meant to skip two frames of its wind-up but never did. It now lands its hit a little sooner. |
