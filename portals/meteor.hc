@@ -660,14 +660,14 @@ void meteor_power_fire (void)
 {
 	self.wfs = advanceweaponframe($fire1,$fire9);
 	self.th_weapon=meteor_power_fire;
-	if(self.weaponframe==$fire2 && self.attack_finished<=time)
-			FireMeteorTornado();
-
-	if(self.wfs==WF_CYCLE_WRAPPED)
+	// [2026-11-14] jsH2+ held fire with mana for another shot (W_CheckNoAmmo's tomed test) keeps cycling, one tornado per 0.45s cycle; going back through W_Attack would flash the idle frame between tornadoes.
+	if(self.wfs==WF_CYCLE_WRAPPED && !(self.button0 && self.greenmana>=12 && (self.artifact_active&ART_TOMEOFPOWER)))
 	{
-			self.last_attack=time;
-			meteor_ready_loop();
+		self.last_attack=time;
+		meteor_ready_loop();
 	}
+	else if(self.weaponframe==$fire1 && self.attack_finished<=time)	// [2026-11-14] jsH2+ was $fire2: the tornado leaves on the press like the normal meteor, not a think later
+		FireMeteorTornado();
 }
 
 void meteor_fire (void)
@@ -686,6 +686,10 @@ void meteor_fire (void)
 
 void() Cru_Met_Attack =
 {
+	// [2026-11-14] jsH2+ the tomed shot sets no cooldown, so W_Attack calls this every server frame while fire is held;
+	// its "thinktime self : 0" would step the cycle once per server frame, and the think chain already drives it.
+	if(self.th_weapon==meteor_power_fire)
+		return;
 	if(self.artifact_active&ART_TOMEOFPOWER)
 		self.th_weapon=meteor_power_fire;
 	else
