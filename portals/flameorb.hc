@@ -662,6 +662,10 @@ void flameorb_fire (void)
 
 void Suc_Forb_Fire()
 {
+	// [2026-11-14] jsH2+ W_Attack calls this every server frame while fire is held (the cycle sets no cooldown
+	// until it wraps), and each call stepped a frame on top of the think's own; once the cycle runs, the think drives it.
+	if(self.th_weapon==flameorb_fire)
+		return;
 	flameorb_fire();
 
 	thinktime self : 0;
