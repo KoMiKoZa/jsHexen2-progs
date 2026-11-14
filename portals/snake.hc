@@ -194,39 +194,39 @@ void snake_missile_think (void)
 
 void snake_missile_shoot(vector spot1)
 {
-	entity newmis;
+	entity new_missile;
 	vector diff;
 
-	newmis = spawn ();
-	newmis.owner = self;
-	newmis.movetype = MOVETYPE_FLYMISSILE;
-	newmis.solid = SOLID_BBOX;
+	new_missile = spawn ();
+	new_missile.owner = self;
+	new_missile.movetype = MOVETYPE_FLYMISSILE;
+	new_missile.solid = SOLID_BBOX;
 		
-    setmodel (newmis, "models/goop.mdl");
-	setsize (newmis, '0 0 0', '0 0 0');		
-	setorigin (newmis, spot1);
+    setmodel (new_missile, "models/goop.mdl");
+	setsize (new_missile, '0 0 0', '0 0 0');		
+	setorigin (new_missile, spot1);
 
-	newmis.angles = self.angles;
+	new_missile.angles = self.angles;
 
 	diff = (self.enemy.origin + self.enemy.view_ofs) - spot1;
-	newmis.velocity = normalize(diff);
-	newmis.angles = vectoangles(newmis.velocity);
+	new_missile.velocity = normalize(diff);
+	new_missile.angles = vectoangles(new_missile.velocity);
 
-	makevectors (newmis.angles);
-	newmis.velocity = newmis.velocity * 1000;
-	newmis.speed=1000;	//Speed
-	newmis.classname = "faminemissile";
-	newmis.angles = vectoangles(newmis.velocity);
+	makevectors (new_missile.angles);
+	new_missile.velocity = new_missile.velocity * 1000;
+	new_missile.speed=1000;	//Speed
+	new_missile.classname = "faminemissile";
+	new_missile.angles = vectoangles(new_missile.velocity);
 
-	newmis.veer=TRUE;		//No random wandering
-	newmis.turn_time=3;		//Lower the number, tighter the turn
-	newmis.ideal_yaw=TRUE;//Only track things in front
-	newmis.lockentity = self.enemy;
-	newmis.lifetime = time + 1.5;
-	newmis.think=snake_missile_think;
-	thinktime newmis : HX_FRAME_TIME;
+	new_missile.veer=TRUE;		//No random wandering
+	new_missile.turn_time=3;		//Lower the number, tighter the turn
+	new_missile.ideal_yaw=TRUE;//Only track things in front
+	new_missile.lockentity = self.enemy;
+	new_missile.lifetime = time + 1.5;
+	new_missile.think=snake_missile_think;
+	thinktime new_missile : HX_FRAME_TIME;
 
-	newmis.touch = spit_touch;
+	new_missile.touch = spit_touch;
 }
 
 void snake_missile (void)

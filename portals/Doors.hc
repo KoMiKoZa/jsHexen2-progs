@@ -1056,7 +1056,7 @@ Puzzle Pieces (use the puzzle_id value from the pieces)
 */
 void func_door()
 {
-float movedist, num_axes;
+float door_dist, num_axes;
 	door_sounds();
 
 	SetMovedir ();
@@ -1104,36 +1104,36 @@ float movedist, num_axes;
 	{
 //		dprint("Using new door code\n");
 		if(self.level)
-			movedist = self.level - self.lip;
+			door_dist = self.level - self.lip;
 		else
 		{
-			//was: movedist=fabs(self.movedir*self.size) - self.lip;
+			//was: door_dist=fabs(self.movedir*self.size) - self.lip;
 //			dprintv("Door movedir = %s\n",self.movedir);
 //			dprintv("Door size = %s\n",self.size);
 			num_axes=0;
-			movedist=0;
+			door_dist=0;
 			if(fabs(self.movedir_x)>0.001)
 			{
 //				dprint("X axis\n");
-				movedist+=fabs(self.movedir_x*self.size_x);
+				door_dist+=fabs(self.movedir_x*self.size_x);
 				num_axes+=1;
 			}
 			if(fabs(self.movedir_y)>0.001)
 			{
 //				dprint("Y axis\n");
-				movedist+=fabs(self.movedir_y*self.size_y);
+				door_dist+=fabs(self.movedir_y*self.size_y);
 				num_axes+=1;
 			}
 			if(fabs(self.movedir_z)>0.001)
 			{
 //				dprint("Z axis\n");
-				movedist+=fabs(self.movedir_z*self.size_z);
+				door_dist+=fabs(self.movedir_z*self.size_z);
 				num_axes+=1;
 			}
-			movedist=movedist/num_axes - self.lip;
-//			dprintf("Door movedist = %s\n",movedist);
+			door_dist=door_dist/num_axes - self.lip;
+//			dprintf("Door door_dist = %s\n",door_dist);
 		}
-		self.pos2 = self.pos1 + self.movedir*movedist;
+		self.pos2 = self.pos1 + self.movedir*door_dist;
 	}
 	else
 	{

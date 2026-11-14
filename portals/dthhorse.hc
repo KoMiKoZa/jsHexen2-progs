@@ -500,7 +500,7 @@ void death_missile_2_think (void)
 
 void death_missile_2(float dir)
 {
-	entity newmis;
+	entity new_missile;
 	vector diff;
 
 	if(!self.enemy.flags2&FL_ALIVE)
@@ -512,17 +512,17 @@ void death_missile_2(float dir)
 	self.cnt += 1;
 	self.attack_finished = time + 7;
 
-	newmis = spawn ();
-	newmis.enemy=newmis.lockentity=self.enemy;
-	newmis.owner = self;
-	newmis.movetype = MOVETYPE_FLYMISSILE;
-	newmis.solid = SOLID_BBOX;
+	new_missile = spawn ();
+	new_missile.enemy=new_missile.lockentity=self.enemy;
+	new_missile.owner = self;
+	new_missile.movetype = MOVETYPE_FLYMISSILE;
+	new_missile.solid = SOLID_BBOX;
 		
-    setmodel (newmis, "models/famshot.mdl");
-	setsize (newmis, '0 0 0', '0 0 0');		
-	setorigin (newmis, self.origin + '0 0 120');
+    setmodel (new_missile, "models/famshot.mdl");
+	setsize (new_missile, '0 0 0', '0 0 0');		
+	setorigin (new_missile, self.origin + '0 0 120');
 
-	newmis.angles = self.angles;
+	new_missile.angles = self.angles;
 
 	makevectors(self.angles);
 
@@ -531,33 +531,33 @@ void death_missile_2(float dir)
 //	else
 //		diff = v_forward * -16;
 
-	newmis.velocity = normalize(diff);
-	newmis.angles = vectoangles(newmis.velocity);
+	new_missile.velocity = normalize(diff);
+	new_missile.angles = vectoangles(new_missile.velocity);
 
 	if (dir == 0)
-		newmis.angles_y -= 25;
+		new_missile.angles_y -= 25;
 	else if (dir == 2)
-		newmis.angles_y += 25;
-	makevectors (newmis.angles);
+		new_missile.angles_y += 25;
+	makevectors (new_missile.angles);
 	
 
-	newmis.velocity = normalize(v_forward);
+	new_missile.velocity = normalize(v_forward);
 	
 	if (dir ==1)
-		newmis.speed=800;	//Speed
+		new_missile.speed=800;	//Speed
 	else
-		newmis.speed=700;	//Speed
+		new_missile.speed=700;	//Speed
 	
-	newmis.classname = "deathmissile";
-	newmis.angles = vectoangles(newmis.velocity);
+	new_missile.classname = "deathmissile";
+	new_missile.angles = vectoangles(new_missile.velocity);
 
-	newmis.veer=FALSE;	//No random wandering
-	newmis.turn_time=2.25;	//Lower the number, tighter the turn
-	newmis.lifetime = time + 3;
-	newmis.think=famine_missile_think;
-	thinktime newmis : 0.1;
+	new_missile.veer=FALSE;	//No random wandering
+	new_missile.turn_time=2.25;	//Lower the number, tighter the turn
+	new_missile.lifetime = time + 3;
+	new_missile.think=famine_missile_think;
+	thinktime new_missile : 0.1;
 
-	newmis.touch = famine_missile_touch;
+	new_missile.touch = famine_missile_touch;
 }
 
 void death_missile(void)

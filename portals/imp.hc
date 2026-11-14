@@ -1349,13 +1349,14 @@ float imp_find_target(void)
 	{	// We found a target
 		if (self.skin==2) 
 		{
-			float self_infront, self_vis, enemy_dist, r1, r2;
+			// [2026-11-15] jsH2+ not r2: HCC made a local r2 the punch dagger's swing counter
+			float self_infront, self_vis, enemy_dist, roll1, roll2;
 			self_infront=infront_of_ent(self,self.enemy);
 			self_vis=visible2ent(self,self.enemy);
 			enemy_dist=vlen(self.origin-self.enemy.origin);
-			r1=random();
-			r2=random();
-			if((self_infront&&self_vis&&r1<0.1&&r2<0.5&&enemy_dist<1000)||enemy_dist<=RANGE_MELEE)
+			roll1=random();
+			roll2=random();
+			if((self_infront&&self_vis&&roll1<0.1&&roll2<0.5&&enemy_dist<1000)||enemy_dist<=RANGE_MELEE)
 			{
 				self.goalentity = self.enemy;
 				self.think=stone_imp_awaken;

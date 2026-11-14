@@ -473,35 +473,35 @@ void firewalker_think(void)
 
 void buddha_firewalker_spawn(void)
 {
-	local entity newmis;
+	local entity new_missile;
 
-	newmis = spawn();
+	new_missile = spawn();
 
-	newmis.classname = "buddha_firewalker";
-	newmis.effects = EF_NODRAW;
-	newmis.movetype = MOVETYPE_FLY;
-	newmis.solid = SOLID_TRIGGER;
+	new_missile.classname = "buddha_firewalker";
+	new_missile.effects = EF_NODRAW;
+	new_missile.movetype = MOVETYPE_FLY;
+	new_missile.solid = SOLID_TRIGGER;
 
-	newmis.safe_time = time + 9999999;
-	newmis.velocity = '0 0 0';
-	newmis.owner = self;
+	new_missile.safe_time = time + 9999999;
+	new_missile.velocity = '0 0 0';
+	new_missile.owner = self;
 
-	setmodel(newmis, "models/null.spr");
-	setsize(newmis, '-100 -100 -100', '100 100 100');
-	newmis.angles = self.angles;
+	setmodel(new_missile, "models/null.spr");
+	setsize(new_missile, '-100 -100 -100', '100 100 100');
+	new_missile.angles = self.angles;
 
-	newmis.enemy = self.enemy;
+	new_missile.enemy = self.enemy;
 
-	makevectors(newmis.angles);
-	setorigin(newmis, self.origin + v_up * -48 + v_forward * 64);
-	newmis.velocity = v_forward * (125 + (skill * 25));
+	makevectors(new_missile.angles);
+	setorigin(new_missile, self.origin + v_up * -48 + v_forward * 64);
+	new_missile.velocity = v_forward * (125 + (skill * 25));
 
-	newmis.monsterclass = CLASS_BOSS;
-	newmis.touch = firewalker_check_damage;
+	new_missile.monsterclass = CLASS_BOSS;
+	new_missile.touch = firewalker_check_damage;
 
-	newmis.lifetime = time + random(5,10);
-	newmis.think = firewalker_think;
-	thinktime newmis : 0.05;
+	new_missile.lifetime = time + random(5,10);
+	new_missile.think = firewalker_think;
+	thinktime new_missile : 0.05;
 }
 
 void buddha_send_firewall(void) [++ $push33 .. $push70]
