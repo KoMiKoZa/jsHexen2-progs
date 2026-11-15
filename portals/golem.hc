@@ -219,6 +219,9 @@ void monster_golem_iron(void)
 	setmodel(self, "models/golem_i.mdl");
 	setsize(self, '-32 -32 0', '32 32 80');
 	GolemInit();
+	// [2026-11-15] jsH2+ [JSH2 REDESIGN] jsp_golembox: the player hull, as the stone golem has (see GolemIronHull)
+	if (cvar("jsp_golembox"))
+		self.hull = HULL_PLAYER;
 	if(!self.health)
 		self.health = 450;
 	if(!self.max_health)
@@ -419,6 +422,40 @@ void GolemStand(void) [++ $rest1..$rest22]
 	}
 }
 
+// [2026-11-15] jsH2+ [JSH2 REDESIGN] never called: the engine lists the option only when the loaded progs defines this
+string jsp_golembox (void)
+{
+	return "Iron Golem Size|Iron golems move in the player's box, so they follow you wherever their body fits. Off: Raven's box, much bigger than their body.";
+}
+
+//==========================================================================
+//
+// GolemIronHull
+//
+//==========================================================================
+
+// [2026-11-15] jsH2+ [JSH2 REDESIGN] jsp_golembox: the golem hull (96 x 100) is bigger than the iron
+// golem's body (64 x 80) and kept it from following you where its body fits. Read on each step so it
+// follows the switch and older saves. The player hull lies inside the golem hull, so switching to it
+// can't leave the golem in a wall; the way back waits until a step in place proves the golem hull fits.
+void GolemIronHull(void)
+{
+	if (self.classname != "monster_golem_iron")
+		return;
+
+	if (cvar("jsp_golembox"))
+	{
+		if (self.hull == HULL_GOLEM)
+			self.hull = HULL_PLAYER;
+	}
+	else if (self.hull == HULL_PLAYER)
+	{
+		self.hull = HULL_GOLEM;
+		if (!walkmove(0, 0, FALSE))
+			self.hull = HULL_PLAYER;
+	}
+}
+
 //==========================================================================
 //
 // GolemWalk
@@ -427,6 +464,7 @@ void GolemStand(void) [++ $rest1..$rest22]
 
 void GolemWalk(void) [++ $walk1..$walk34]
 {
+	GolemIronHull();
 	if(self.frame == $walk16 || self.frame == $walk33)
 	{
 		sound(self, CHAN_BODY, "golem/step.wav", 1, ATTN_NORM);
@@ -446,6 +484,7 @@ void GolemRun(void) [++ $run1..$run24]
 	float hdiff;
 	float dist, r;
 
+	GolemIronHull();
 	check_pos_enemy();
 	checkenemy();
 

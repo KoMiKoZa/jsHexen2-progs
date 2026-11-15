@@ -26,6 +26,7 @@ way. Where a fix makes a redesign's off state differ from Raven's, its changelog
 | Switch | What it covers |
 |---|---|
 | `jsp_baglist` | Aiming at a backpack within reach lists what's inside. |
+| `jsp_golembox` | Iron golems move in the player's box, so they follow you wherever their body fits. |
 | `jsp_hammerreturn` | The Crusader's tomed hammer strikes what it passes through on the way back. |
 | `jsp_loosedrops` | A killed monster throws each dropped item out separately instead of leaving one bag. |
 | `jsp_swimstrokes` | Swimming plays stroke sounds as you move, not only when you press jump, and one stroke never cuts off another. |
@@ -35,8 +36,8 @@ way. Where a fix makes a redesign's off state differ from Raven's, its changelog
 Each switch is a `jsp_*` console variable that the program reads with `cvar()`. It also defines a
 marker function of the same name so that jsHexen2 lists the switch in the jsHexen2 Progs category
 of its Options menu. The markers for `jsp_loosedrops`, `jsp_tempestcharge` and `jsp_torchblaze`
-are empty, and the engine supplies their label and tooltip; `jsp_baglist`, `jsp_hammerreturn`
-and `jsp_swimstrokes` return their own.
+are empty, and the engine supplies their label and tooltip; `jsp_baglist`, `jsp_golembox`,
+`jsp_hammerreturn` and `jsp_swimstrokes` return their own.
 
 Other engines do not register these variables, so `cvar()` returns 0 there and the mechanic
 behaves as in Raven's code, the same as switching it off in jsHexen2.
@@ -143,10 +144,11 @@ such local with its warning F306; on this source it lists none.
 One row per change. `git show <hash>` shows exactly what changed.
 
 <details open>
-<summary><h3>1.0.0 (in development): 69 game fixes, 9 Raven HCC fixes, 6 optional redesigns</h3></summary>
+<summary><h3>1.0.0 (in development): 69 game fixes, 9 Raven HCC fixes, 7 optional redesigns</h3></summary>
 
 | Commit | Date | Change | What it does |
 |---|---|---|---|
+| `6ac6c8c`, `a124426` | 2026-11-15 | Iron golem size | **[JSH2 REDESIGN]** An iron golem moves in the player's box, as stone golems and yakmen do, so it follows you wherever its body fits. In Raven's game it moves as a box 96 units wide and 100 tall around a body 64 wide and 80 tall, so it can't follow you through some places its body fits, and you can fight it from where it can't reach you. On egypt1, one chasing you stops partway down a ramp, where the corridor's ceiling is too low for its box; on egypt4, one on hard skill is placed where it can't move at all. With the switch on, the egypt1 golem comes down the ramp and fights, and the egypt4 golem leaves its spot. Its body can sink into walls and low ceilings, further than a stone golem's does. Switch: `jsp_golembox`; off, or on another engine, iron golems move in Raven's box. A golem from an older save, or one in play when you flip the switch, changes box the next time it walks or runs; going back to Raven's box waits until it stands where that box fits. Hexen II's maps place 20 iron golems, all on the Egypt maps; Portal of Praevus places none. |
 | `8d014e1` | 2026-11-15 | Silent barrels | Pushing a barrel made no sound, while a pushed chair scrapes along the floor. Barrels now make the same wooden scrape, as they do in Raven's HexenWorld. |
 | `03db4a6`, `cfc07ce`, `2081855`, `3802965` | 2026-11-15 | Tempest Staff charge | **[JSH2 REDESIGN]** Normal fire is a charge: hold fire and the ball leaves at full charge, about half a second after the press; let go earlier and the charge cancels at no cost. Held fire repeats at Raven's sustained rate, holding the charged pose between balls, and letting go at full charge closes the staff back to rest. The hum plays while the staff charges, and the ball flies silent. Tome mode is unchanged. Switch: `jsp_tempestcharge`; off, or on another engine, the staff plays as in Raven's game: every press fires after a full windup, held fire waits out the refire in Raven's hold animation, and the ball carries Raven's flight hum. One difference stays either way: the windup always plays at the game's animation pace, where Raven's could run once per server frame (see Tempest Staff fixes). The first ball comes about half a second after the press, not 69 ms as in Raven's at 72 frames a second. Held fire spaces balls about 1 s apart, not up to 1.1 s. Quick presses fire fewer balls than in Raven's game. |
 | `68cc25e`, `29e414e`, `e2e0748`, `943d0a0` | 2026-11-15 | Two-size torch light | **[JSH2 REDESIGN]** The torch is a large light at full burn and drops to the original size for its last 7 seconds, when the going-out sound plays. It can be refreshed only in the last 5 of those 7 seconds, so a burning torch can't be wasted. Engines without the matching render change show the original size throughout. Switch: `jsp_torchblaze`; off, or on another engine, the torch keeps one size for its whole burn and can be refreshed as in Raven's game, only in the last 5 seconds of its full burn. Two of Raven's faults stay fixed either way: each use after a refresh restarted the torch, so one torch burned forever for free (a refreshed torch now waits for its next full burn, and is paid for when lit, `f997888`), and another active effect, such as invisibility, let a player refresh at any point of the burn. |
