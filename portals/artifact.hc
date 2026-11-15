@@ -541,6 +541,8 @@ void UseTorch()
 // [2026-11-15] jsH2+ The phase now comes from torchthink. Raven's test, measured: no use during the 1s catch or the
 // gutter (effects is exactly EF_DIMLIGHT there), a refresh in the full burn (the caller allows its last 5s), and once
 // refreshed, every further use restarted the catch, because EF_TORCHLIGHT 6 left MUZZLEFLASH|BRIGHTLIGHT behind.
+// Any other effect bit (invisibility, invincibility, a muzzle flash) opened every phase the same way; reading the
+// phase keeps the rule whatever else the player has on.
 	if (self.artifact_flags & AFL_TORCH)
 	{
 		if (cvar("jsp_torchblaze"))	// [2026-11-15] jsH2+ [JSH2 REDESIGN] refresh only in the gutter, which its sound warns about
