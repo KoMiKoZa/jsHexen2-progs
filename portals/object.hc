@@ -366,8 +366,8 @@ float ontop,pushed,inertia,force,walkforce;
 //FIXME- find current think and set transition to run
 						self.think=sheep_trot;
 				}
-// [2026-11-15] jsH2+ barrels are wood and metal and take the wood push sound, as in Raven's
-// HexenWorld code; without this case a pushed barrel makes no sound.
+// [2026-11-15] Komi - Barrels are wood and metal, so they take the wood push sound, as in
+// Raven's HexenWorld code; without this case a pushed barrel makes no sound.
 				else if(self.thingtype==THINGTYPE_WOOD||self.thingtype==THINGTYPE_WOOD_METAL)
 				{
 					sound(self,CHAN_VOICE,"misc/pushwood.wav",1,ATTN_NORM);		
