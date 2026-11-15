@@ -268,7 +268,7 @@ void HomeThink()
 		updateSoundPos(self,CHAN_BODY);
 		updateSoundPos(self,CHAN_WEAPON);
 		// [2026-06-12] jsH2+ this started a SECOND buzz2 loop on top of the one FireLightningBall
-		// plays at spawn; removed. The spawn copy plays with jsp_tempestcharge off.
+		// plays at spawn; removed. The spawn copy plays only with jsp_tempestcharge off.
 	}
 
 	if(self.thingtype==THINGTYPE_FIRE)
