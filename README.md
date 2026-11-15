@@ -132,7 +132,7 @@ such local with its warning F306; on this source it lists none.
 One row per change. `git show <hash>` shows exactly what changed.
 
 <details open>
-<summary><h3>1.0.0 (in development): 90 changes</h3></summary>
+<summary><h3>1.0.0 (in development): 72 game fixes, 9 Raven HCC fixes, 9 optional redesigns</h3></summary>
 
 | Commit | Date | Change | What it does |
 |---|---|---|---|
