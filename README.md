@@ -101,7 +101,7 @@ correction to a batch. The jsHexen2 engine has its own version.
 
 ## Bugs caused by Raven's compiler
 
-Raven built Hexen II's game code with their own compiler, HCC. In two cases the code reads
+Raven built Hexen II's game code with their own compiler, HCC. In three cases the code reads
 correctly, but HCC builds something else:
 
 - **Two calls in one line.** HCC can let the second call's result overwrite the first's:
@@ -110,9 +110,12 @@ correctly, but HCC builds something else:
 - **`if (vector)`.** HCC tests only the vector's first part, x, so `if (self.velocity)` was false
   for anything not moving along x, such as something falling straight down. 34 places in the
   shipped game, all meant "the vector isn't zero".
+- **A local named like a global.** A local with the same name and type as a global isn't a new
+  variable in HCC: it is the global, so the function overwrites the global. 13 places in the
+  shipped game.
 
-The places where this changes the game are marked **[RAVEN HCC BUG]** below. They're fixed
-twice, on purpose:
+The places where this changes the game are marked **[RAVEN HCC BUG]** below. The first two are
+fixed twice, on purpose:
 
 - **Here, in the source.** Each of these lines is rewritten so that any compiler builds it
   correctly: Raven's HCC, NHCC, uHexen2's hcc, FTEQCC, or jsHexen2-hcc with `-noretfix` or
@@ -121,15 +124,19 @@ twice, on purpose:
   correctly and warns where it finds one, so the same mistake can't creep into new code here or
   into other mods. On this source it finds none, which also confirms these were all of them.
 
+The third is fixed here, in the source, so every compiler builds the same game. FTEQCC lists any
+such local with its warning F306; on this source it lists none.
+
 ## Changelog
 
 One row per change. `git show <hash>` shows exactly what changed.
 
 <details open>
-<summary><h3>1.0.0 (in development): 89 changes</h3></summary>
+<summary><h3>1.0.0 (in development): 90 changes</h3></summary>
 
 | Commit | Date | Change | What it does |
 |---|---|---|---|
+| `ddac294` | 2026-11-15 | Punch dagger stuck on one swing | **[RAVEN HCC BUG]** The Assassin's punch dagger is meant to take turns between its four swings. While a stone imp that comes to life when it sees you was watching you, the dagger used only its fourth swing. It now always takes turns. The maps that ship with the game have no stone imps of this kind. |
 | `2081855` | 2026-11-14 | Tempest Staff draw spin | The spin after drawing the Tempest Staff ran at half the pace of the draw before it, so it hitched on every frame. It plays at Raven's pace again, about 0.8 s. |
 | `2081855` | 2026-11-14 | Tempest Staff charge pace | The charge stepped at half the game's animation pace, so it looked jerky. It now plays at the game's pace: a full charge takes about half a second, and held fire looses a ball every second, as in the original. Releasing at full charge lowers the staff instead of snapping it back. |
 | `b6281c9` | 2026-11-14 | Tomed Meteor Staff fired too fast | With the Tome of Power, the Meteor Staff's tornado had no cooldown and its fire animation ran once per server frame, so on a fast machine it fired 7 tornadoes a second, 20 green mana each. It now fires one per fire animation, about two a second on any machine, and the tornado leaves as you press fire, like the normal shot. |

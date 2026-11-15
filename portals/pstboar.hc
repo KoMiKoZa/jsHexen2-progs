@@ -164,35 +164,35 @@ void hive_trail ()
 void()hive_touch;
 void throw_hive (void)
 {
-	entity newmis;
+	entity new_missile;
 	vector diff;
 
     makevectors(self.movechain.angles);
 	sound(self,CHAN_AUTO,"misc/whoosh.wav",1,ATTN_NORM);
-    newmis=spawn();
-    newmis.owner=self;
-    newmis.classname="hive";
-    newmis.movetype=MOVETYPE_BOUNCE;
-    newmis.solid=SOLID_BBOX;
-	newmis.takedamage=DAMAGE_YES;
-	newmis.touch=newmis.th_die=hive_touch;
-	newmis.lifetime=time + 2.5;
+    new_missile=spawn();
+    new_missile.owner=self;
+    new_missile.classname="hive";
+    new_missile.movetype=MOVETYPE_BOUNCE;
+    new_missile.solid=SOLID_BBOX;
+	new_missile.takedamage=DAMAGE_YES;
+	new_missile.touch=new_missile.th_die=hive_touch;
+	new_missile.lifetime=time + 2.5;
 
-	newmis.speed=500;
+	new_missile.speed=500;
 	
-	setorigin (newmis, self.origin + '0 0 110' + v_forward * 25);
-	diff = (self.enemy.origin + self.enemy.view_ofs) - newmis.origin;
-	newmis.velocity = normalize(diff)+v_up*0.5;
-	newmis.velocity = newmis.velocity * newmis.speed;
+	setorigin (new_missile, self.origin + '0 0 110' + v_forward * 25);
+	diff = (self.enemy.origin + self.enemy.view_ofs) - new_missile.origin;
+	new_missile.velocity = normalize(diff)+v_up*0.5;
+	new_missile.velocity = new_missile.velocity * new_missile.speed;
 
-	newmis.avelocity=randomv('-300 -300 -300','300 300 300');
-    setmodel(newmis,"models/boss/hive.mdl");
-	newmis.scale=2;
-	newmis.drawflags=MLS_POWERMODE;
-    setsize(newmis,'0 0 0','0 0 0');
+	new_missile.avelocity=randomv('-300 -300 -300','300 300 300');
+    setmodel(new_missile,"models/boss/hive.mdl");
+	new_missile.scale=2;
+	new_missile.drawflags=MLS_POWERMODE;
+    setsize(new_missile,'0 0 0','0 0 0');
 
-	newmis.think=hive_trail;
-	thinktime newmis : 0;
+	new_missile.think=hive_trail;
+	thinktime new_missile : 0;
 }
 
 
@@ -248,38 +248,38 @@ void pestilence_missile_think (void)
 
 void pestilence_missile(void)
 {
-	entity newmis;
+	entity new_missile;
 
 	sound(self,CHAN_AUTO,"pest/xbowfire.wav",1,ATTN_NORM);	
-	newmis = spawn ();
-	newmis.owner = self;
-	newmis.movetype = MOVETYPE_FLYMISSILE;
-	newmis.solid = SOLID_BBOX;
-	newmis.drawflags=MLS_POWERMODE;
+	new_missile = spawn ();
+	new_missile.owner = self;
+	new_missile.movetype = MOVETYPE_FLYMISSILE;
+	new_missile.solid = SOLID_BBOX;
+	new_missile.drawflags=MLS_POWERMODE;
 		
-    setmodel (newmis, "models/pestshot.mdl");
-	setsize (newmis, '0 0 0', '0 0 0');		
+    setmodel (new_missile, "models/pestshot.mdl");
+	setsize (new_missile, '0 0 0', '0 0 0');		
 
-	newmis.angles = self.movechain.angles;
+	new_missile.angles = self.movechain.angles;
 
 	makevectors(self.movechain.angles);	
-	newmis.velocity = normalize(v_forward);
-	newmis.angles = vectoangles(newmis.velocity);
-	newmis.avelocity_z=700;
+	new_missile.velocity = normalize(v_forward);
+	new_missile.angles = vectoangles(new_missile.velocity);
+	new_missile.avelocity_z=700;
 
-	setorigin (newmis, self.origin + '0 0 90' + v_forward * 20);
+	setorigin (new_missile, self.origin + '0 0 90' + v_forward * 20);
 	
-	newmis.speed=700;	//Speed
-	newmis.classname = "faminemissile";
+	new_missile.speed=700;	//Speed
+	new_missile.classname = "faminemissile";
 
-	newmis.veer=FALSE;	//No random wandering
-	newmis.turn_time=3;	//Lower the number, tighter the turn
-	newmis.ideal_yaw=FALSE;//Only track things in front
-	newmis.lifetime = time + 2;
-	newmis.think=pestilence_missile_think;
-	thinktime newmis : 0;
+	new_missile.veer=FALSE;	//No random wandering
+	new_missile.turn_time=3;	//Lower the number, tighter the turn
+	new_missile.ideal_yaw=FALSE;//Only track things in front
+	new_missile.lifetime = time + 2;
+	new_missile.think=pestilence_missile_think;
+	thinktime new_missile : 0;
 
-	newmis.touch = pestilence_missile_touch;
+	new_missile.touch = pestilence_missile_touch;
 }
 
 void pest_hurt (entity attacker,float total_dam)

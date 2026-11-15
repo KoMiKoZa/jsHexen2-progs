@@ -356,47 +356,47 @@ void famine_missile_think (void)
 
 void famine_missile(float dir)
 {
-	entity newmis;
+	entity new_missile;
 	vector diff;
 
-	newmis = spawn ();
-	newmis.owner = self;
-	newmis.movetype = MOVETYPE_FLYMISSILE;
-	newmis.solid = SOLID_BBOX;
+	new_missile = spawn ();
+	new_missile.owner = self;
+	new_missile.movetype = MOVETYPE_FLYMISSILE;
+	new_missile.solid = SOLID_BBOX;
 		
-    setmodel (newmis, "models/famshot.mdl");
-	setsize (newmis, '0 0 0', '0 0 0');		
-	setorigin (newmis, self.origin + '0 0 120');
+    setmodel (new_missile, "models/famshot.mdl");
+	setsize (new_missile, '0 0 0', '0 0 0');		
+	setorigin (new_missile, self.origin + '0 0 120');
 
-	newmis.angles = self.angles;
+	new_missile.angles = self.angles;
 
 	diff = (self.enemy.origin + self.enemy.view_ofs) - self.origin + '0 0 120' ;
-	newmis.velocity = normalize(diff);
-	newmis.angles = vectoangles(newmis.velocity);
+	new_missile.velocity = normalize(diff);
+	new_missile.angles = vectoangles(new_missile.velocity);
 
 	if (dir == 0)
-		newmis.angles_y -= 25;
+		new_missile.angles_y -= 25;
 	else if (dir == 2)
-		newmis.angles_y += 25;
-	makevectors (newmis.angles);
+		new_missile.angles_y += 25;
+	makevectors (new_missile.angles);
 	
 
-	newmis.velocity = normalize(v_forward);
+	new_missile.velocity = normalize(v_forward);
 	if (dir ==1)
-		newmis.speed=800;	//Speed
+		new_missile.speed=800;	//Speed
 	else
-		newmis.speed=700;	//Speed
-	newmis.classname = "faminemissile";
-	newmis.angles = vectoangles(newmis.velocity);
+		new_missile.speed=700;	//Speed
+	new_missile.classname = "faminemissile";
+	new_missile.angles = vectoangles(new_missile.velocity);
 
-	newmis.veer=FALSE;	//No random wandering
-	newmis.turn_time=5;	//Lower the number, tighter the turn
-	newmis.ideal_yaw=FALSE;//Only track things in front
-	newmis.lifetime = time + 2;
-	newmis.think=famine_missile_think;
-	thinktime newmis : 0;
+	new_missile.veer=FALSE;	//No random wandering
+	new_missile.turn_time=5;	//Lower the number, tighter the turn
+	new_missile.ideal_yaw=FALSE;//Only track things in front
+	new_missile.lifetime = time + 2;
+	new_missile.think=famine_missile_think;
+	thinktime new_missile : 0;
 
-	newmis.touch = famine_missile_touch;
+	new_missile.touch = famine_missile_touch;
 }
 
 void famine_missilespawner(void)

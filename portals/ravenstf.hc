@@ -427,31 +427,31 @@ Launch all ravens
 ----------------------*/
 void launch_superraven (void)
 {
-	entity newmis;
+	entity new_missile;
 
 	self.attack_finished = time + 0.5;
 
 	makevectors(self.v_angle);
 
-	newmis = spawn();
-	setmodel (newmis, "models/birdmsl2.mdl");
-	newmis.movetype = MOVETYPE_FLYMISSILE;
-	newmis.solid = SOLID_BBOX;
-	newmis.takedamage = DAMAGE_NO;
-	newmis.owner = self;
-	setsize (newmis, '0 0 0', '0 0 0');		
+	new_missile = spawn();
+	setmodel (new_missile, "models/birdmsl2.mdl");
+	new_missile.movetype = MOVETYPE_FLYMISSILE;
+	new_missile.solid = SOLID_BBOX;
+	new_missile.takedamage = DAMAGE_NO;
+	new_missile.owner = self;
+	setsize (new_missile, '0 0 0', '0 0 0');		
 
-	newmis.velocity = normalize (v_forward);
-	newmis.velocity = newmis.velocity * 800;
-	newmis.angles = vectoangles(newmis.velocity);
-	setorigin(newmis, self.origin + self.proj_ofs  + v_forward*10);
+	new_missile.velocity = normalize (v_forward);
+	new_missile.velocity = new_missile.velocity * 800;
+	new_missile.angles = vectoangles(new_missile.velocity);
+	setorigin(new_missile, self.origin + self.proj_ofs  + v_forward*10);
 
-	newmis.touch = ravenmissile_touch;
-	newmis.lifetime = time + 3;
-	newmis.avelocity_z = 1000; 
-	newmis.scale = .40;
-	thinktime newmis : HX_FRAME_TIME * 3;
-	newmis.think = ravenmissile_puff;
+	new_missile.touch = ravenmissile_touch;
+	new_missile.lifetime = time + 3;
+	new_missile.avelocity_z = 1000; 
+	new_missile.scale = .40;
+	thinktime new_missile : HX_FRAME_TIME * 3;
+	new_missile.think = ravenmissile_puff;
 
 	self.punchangle_x= random(-3);
 }

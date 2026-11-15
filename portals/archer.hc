@@ -379,7 +379,7 @@ void archerdrawdone () [-- $tranA7..$tranA1]
   -----------------------------------------*/
 void archermissile () [++ $fire1..$fire4]
 {
-float enemy_range,chance,ok,tspeed;
+float target_range,chance,ok,tspeed;
 vector spot1, spot2;
 
 	self.attack_state = AS_MISSILE;
@@ -422,14 +422,14 @@ vector spot1, spot2;
 
 		if(ok)
 		{	
-			enemy_range = range(self.enemy);
-			if (enemy_range < RANGE_MELEE)   // Which arrow to use?
+			target_range = range(self.enemy);
+			if (target_range < RANGE_MELEE)   // Which arrow to use?
 				chance = 0.80;
-			else if (enemy_range < RANGE_NEAR)
+			else if (target_range < RANGE_NEAR)
 				chance = 0.50;
-			else if (enemy_range < RANGE_MID)
+			else if (target_range < RANGE_MID)
 				chance = 0.30;
-			else if (enemy_range < RANGE_FAR)
+			else if (target_range < RANGE_FAR)
 				chance = 0.10;
 
 			if (self.netname=="monster_archer_ice")

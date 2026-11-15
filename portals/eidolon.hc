@@ -1235,22 +1235,22 @@ void eidolon_wait () [++ $wait1 .. $wait16]
 void multiplayer_health ()
 {
 entity lastent;
-float num_players;
+float player_count;
 	if(coop)
 	{
 		lastent=nextent(world);
-		num_players=0;
+		player_count=0;
 		while(lastent)
 		{
 			if(lastent.flags&FL_CLIENT)
-				num_players+=1;
+				player_count+=1;
 			lastent=find(lastent,classname,"player");
 		}
-		if(num_players>4)
-			num_players=4;
-		self.max_health+=1000*num_players;
+		if(player_count>4)
+			player_count=4;
+		self.max_health+=1000*player_count;
 		self.health=self.max_health;
-		self.torncount=num_players - 1;
+		self.torncount=player_count - 1;
 	}
 	if(self.th_save!=SUB_Null)
 		self.th_save();

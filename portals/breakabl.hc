@@ -126,7 +126,7 @@ void linkBreakables()
 //============================================================================
 void brush_use_hierarchy()
 {
-   local entity starte, oself, other;
+   local entity starte, oself;
 	local float headNum;
 
 	oself = starte = self;
@@ -169,19 +169,20 @@ void brush_use_ordered()
 
 void brush_use()
 {
-	local entity starte, other;
-	
+	local entity starte, next_brush;
+
 	starte = self;
-	
+
+	// [2026-11-15] jsH2+ the global other: whoever used the brush, as in Raven's build
 	activator = other;
 
 	if (starte.spawnflags & BREAK_KILLALL)
 	{
 		do
 		{
-			other = self.enemy;
-			self.th_die();	
-			self = other;
+			next_brush = self.enemy;
+			self.th_die();
+			self = next_brush;
 		} while ( (self != starte) && (self != world) );
 	}
 	else 
