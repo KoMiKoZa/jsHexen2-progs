@@ -1107,7 +1107,7 @@ float door_dist, num_axes;
 			door_dist = self.level - self.lip;
 		else
 		{
-			//was: door_dist=fabs(self.movedir*self.size) - self.lip;
+			//was: movedist=fabs(self.movedir*self.size) - self.lip;
 //			dprintv("Door movedir = %s\n",self.movedir);
 //			dprintv("Door size = %s\n",self.size);
 			num_axes=0;
@@ -1131,7 +1131,7 @@ float door_dist, num_axes;
 				num_axes+=1;
 			}
 			door_dist=door_dist/num_axes - self.lip;
-//			dprintf("Door door_dist = %s\n",door_dist);
+//			dprintf("Door movedist = %s\n",movedist);
 		}
 		self.pos2 = self.pos1 + self.movedir*door_dist;
 	}
