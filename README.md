@@ -10,18 +10,18 @@ The game code (`progs.dat`) of jsHexen2, a Hexen II source port: HexenC source b
 final released source for Portal of Praevus (v1.12a). The fixes work in any Hexen II engine; the
 optional redesigns need jsHexen2.
 
-The mission-pack program runs the original campaign as well as the expansion, so this one file
-is the game logic for both. It is changed one commit at a time. Most commits fix bugs in Raven's
-code: crashes, blocked progression, and things that do not do what they were written to do.
-Some fixes change how the game plays, such as each class's armor values. A few changes are
-optional redesigns, described below.
+Portal of Praevus's program runs the original Hexen II campaign as well as Portal of Praevus, so
+this one file is the game logic for both. It is changed one commit at a time. Most commits fix
+bugs in Raven's code: crashes, blocked progression, and things that do not do what they were
+written to do. Some fixes change how the game plays, such as each class's armor values. A few
+changes are optional redesigns, described below.
 
 ## Redesigns and jsHexen2
 
 In jsHexen2, a few mechanics have optional redesigns, marked **[JSH2 REDESIGN]** in the
 changelog. Each one is a switch, on by default. With a switch off, or on any other engine, that
 mechanic plays as in Raven's game apart from the bug fixes in the same code, which stay on either
-way. The changelog rows of each redesign say where a fix still makes it differ.
+way. Where a fix makes a redesign's off state differ from Raven's, its changelog row says so.
 
 | Switch | What it covers |
 |---|---|
@@ -35,8 +35,8 @@ way. The changelog rows of each redesign say where a fix still makes it differ.
 Each switch is a `jsp_*` console variable that the program reads with `cvar()`. It also defines a
 marker function of the same name so that jsHexen2 lists the switch in the jsHexen2 Progs category
 of its Options menu. The markers for `jsp_loosedrops`, `jsp_tempestcharge` and `jsp_torchblaze`
-are empty, and the engine supplies their label and tooltip; later ones, such as `jsp_baglist`,
-return their own.
+are empty, and the engine supplies their label and tooltip; `jsp_baglist`, `jsp_hammerreturn`
+and `jsp_swimstrokes` return their own.
 
 Other engines do not register these variables, so `cvar()` returns 0 there and the mechanic
 behaves as in Raven's code, the same as switching it off in jsHexen2.
@@ -86,10 +86,11 @@ behavior, the changelog row says so.
 
 ## For Devs & Modders
 
-If you take a fix from here into another source port or a mod, check it first. This code is developed with AI assistance, alongside the jsHexen2
-engine and tested on it. A row that names a bug as Raven's is our reading of the cause, and it
-can be wrong: a fix may depend on jsHexen2's behavior, or correct an earlier change of ours
-rather than the original code. Compare against Raven's source yourself.
+If you take a fix from here into another source port or a mod, check it first. This code is
+developed with AI assistance, alongside the jsHexen2 engine and tested on it. A row that names a
+bug as Raven's is our reading of the cause, and it can be wrong: a fix may depend on jsHexen2's
+behavior, or correct an earlier change of ours rather than the original code. Compare against
+Raven's source yourself.
 
 The first commit, `78436a8`, is Raven's source unmodified. Its title says v1.21; that is a
 mislabel, and the content is the v1.12a release. `git diff 78436a8 -- portals/<file>` shows
@@ -127,8 +128,9 @@ The places where this changes the game are marked **[RAVEN HCC BUG]** below. The
 fixed twice, on purpose:
 
 - **Here, in the source.** Each of these lines is rewritten so that every compiler reads it the
-  same way: Raven's HCC, NHCC, uHexen2's hcc, FTEQCC, or jsHexen2-hcc with `-noretfix` or
-  `-noifvecfix`. Code taken from here keeps the fix, whatever compiler builds it.
+  same way. Taken into another mod, it keeps the fix whichever compiler builds that mod: Raven's
+  HCC, NHCC, uHexen2's hcc, FTEQCC, or jsHexen2-hcc with `-noretfix` or `-noifvecfix`. This source
+  as a whole needs jsHexen2-hcc; see Building.
 - **In the compiler.** [jsHexen2-hcc](https://github.com/KoMiKoZa/jsHexen2-hcc) builds such lines
   correctly and warns where it finds one, so the same mistake can't creep into new code here or
   into other mods. On this source it finds none left.
@@ -145,11 +147,9 @@ One row per change. `git show <hash>` shows exactly what changed.
 
 | Commit | Date | Change | What it does |
 |---|---|---|---|
-| `3802965` | 2026-11-15 | Tempest Staff with the switch off | **[JSH2 REDESIGN]** Follow-up to the charged trigger (`03db4a6`): with `jsp_tempestcharge` off, the staff plays as in Raven's game apart from its bug fixes. Held fire waits out the refire with Raven's hold animation instead of the charged pose, the ball carries Raven's flight hum instead of a hum during the charge, and running out of mana mid-charge drops the staff to rest. One difference remains, from the fix to the windup (`03db4a6`): the first ball comes after a full windup, about half a second, where Raven's code ran the first windup once per server frame, 69 ms after the press at 72 frames a second. Quick presses therefore fire fewer balls than in Raven's game. Measured on demo1 against Raven's progs. |
-| `943d0a0` | 2026-11-15 | Torch refresh with the switch off | **[JSH2 REDESIGN]** Follow-up to the two-size torch light (`68cc25e`): refreshing only in the last 5 seconds of the gutter is now part of `jsp_torchblaze`. Off, or on another engine, a torch refreshes as in Raven's game: only in the last 5 seconds of its full burn, not while it catches or gutters. Two things stay fixed. In Raven's game each further use after a refresh restarted the torch, so one torch burned forever for free; now a refreshed torch waits for its next full burn, and it's paid for when lit (`f997888`). And Raven's check let a player with another effect active, such as invisibility, refresh in any phase; now only the torch's own phase counts. Measured on demo1 against Raven's progs. |
+| `03db4a6`, `cfc07ce`, `2081855`, `3802965` | 2026-11-15 | Tempest Staff charge | **[JSH2 REDESIGN]** Normal fire is a charge: hold fire and the ball leaves at full charge, about half a second after the press; let go earlier and the charge cancels at no cost. Held fire repeats at Raven's sustained rate, holding the charged pose between balls, and letting go at full charge closes the staff back to rest. The hum plays while the staff charges, and the ball flies silent. Tome mode is unchanged. Switch: `jsp_tempestcharge`; off, or on another engine, the staff plays as in Raven's game: every press fires after a full windup, held fire waits out the refire in Raven's hold animation, the ball carries Raven's flight hum, and running out of mana mid-charge drops the staff to rest. One difference stays either way: the first ball comes after the full windup, about half a second, where Raven's came 69 ms after the press at 72 frames a second, because Raven's first windup ran once per server frame (see Tempest Staff fixes). Quick presses therefore fire fewer balls than in Raven's game. |
+| `68cc25e`, `29e414e`, `e2e0748`, `943d0a0` | 2026-11-15 | Two-size torch light | **[JSH2 REDESIGN]** The torch is a large light at full burn and drops to the original size for its last 7 seconds, when the going-out sound plays. It can be refreshed only in the last 5 of those 7 seconds, so a burning torch can't be wasted. Engines without the matching render change show the original size throughout. Switch: `jsp_torchblaze`; off, or on another engine, the torch keeps one size for its whole burn and can be refreshed as in Raven's game, only in the last 5 seconds of its full burn. Two of Raven's faults stay fixed either way: each use after a refresh restarted the torch, so one torch burned forever for free (a refreshed torch now waits for its next full burn, and is paid for when lit, `f997888`), and another active effect, such as invisibility, let a player refresh at any point of the burn. |
 | `ddac294` | 2026-11-15 | Punch dagger stuck on one swing | **[RAVEN HCC BUG]** The Assassin's punch dagger is meant to take turns between its four swings. While a stone imp set to come to life when it sees you was watching you, the dagger used only its fourth swing. It now always takes turns. Raven's maps don't show this: Hexen II's 12 stone imps are all woken by a trigger or never wake, and Portal of Praevus has none. It happens with a stone imp (gargoyle flag set) that has no `targetname` and no `wait -1`. We reproduced it on egypt1 with an `.ent` file that removed its stone imps' `targetname`s. |
-| `2081855` | 2026-11-14 | Tempest Staff pacing | **[JSH2 REDESIGN]** Follow-up to the charge pacing added in `03db4a6`: it stepped the charge, and the spin after drawing the staff, every 0.1 s, half the game's animation pace, so both looked jerky. Both step with the game again: the spin takes about 0.8 s, as in Raven's code, and a full charge about half a second. This applies with `jsp_tempestcharge` off too. |
-| `2081855` | 2026-11-14 | Tempest Staff release at full charge | **[JSH2 REDESIGN]** With `jsp_tempestcharge` on, letting go of fire while the staff holds a full charge between balls closes it back to rest, playing the charge in reverse. |
 | `b6281c9` | 2026-11-14 | Tomed Meteor Staff fired too fast | With the Tome of Power, the Meteor Staff's tornado had no cooldown and its fire animation ran once per server frame, so on a fast machine it fired 7 tornadoes a second, 20 green mana each. It now fires one per fire animation, about two a second on any machine, and the tornado leaves as you press fire, like the normal shot. |
 | `163ec37` | 2026-11-14 | Ice Mace skipped shots | The Ice Mace plays one of five short firing animations at random and fires an ice shard as each one starts. When it picked the animation it had just played, it began that one partway through and fired nothing. Every animation fires now, so held fire shoots at an even pace. |
 | `c533f4a` | 2026-11-14 | Flame Orb cast | The Flame Orb's fire code ran every server frame on top of the weapon's own timing, so the hand cast played two frames at a time and was over in a tenth of a second, and a faster machine fired faster. The cast now plays out in full, and the Flame Orb fires once per cast: about one stream a second, or one swarm every 1.7 s with the Tome of Power. |
@@ -183,13 +183,10 @@ One row per change. `git show <hash>` shows exactly what changed.
 | `27e0dda`, `9662622` | 2026-11-11 | Armor used the wrong class's values | Armor values are stored as four pieces per class but were looked up one slot per class, so every class except the Paladin got other classes' pieces. With all four worn, the Crusader got 65%, the Necromancer 60% and the Assassin 45%, instead of 55%. Each class now uses its own values, which jsHexen2's HUD (an engine fix) already showed. |
 | `79aefbf` | 2026-11-11 | Patrollers walk to the player at the end of a path | A patrolling monster that reached a path corner with no next target walked to the player instead of stopping, without having seen them, and after a death paced over the body. Looking up an empty target name matched the first unnamed entity, the player. A corner with no target now ends the path. |
 | `7bd2a94` | 2026-11-11 | Monsters pace over your corpse | After you died, monsters dropped you as their enemy but kept walking to your body, through it and back. A monster that loses its enemy now returns to its patrol path, or stands where it is. One whose map target is not a patrol corner also stands instead of walking back to that target. |
-| `29e414e` | 2026-11-11 | Torch light switch | **[JSH2 REDESIGN]** The two-size torch light (`68cc25e`) has a switch, `jsp_torchblaze`. Off, or on another engine, the torch keeps one size for its whole burn, and since `943d0a0` it refreshes as in Raven's game. The pay-on-light rule (`f997888`) applies either way. |
-| `cfc07ce` | 2026-11-11 | Tempest Staff charge switch | **[JSH2 REDESIGN]** The charged trigger (`03db4a6`) has a switch, `jsp_tempestcharge`. Off, or on another engine, a tap fires a full windup as in the original, and since `3802965` the rest of the staff plays as in Raven's game too. The fixes of `03db4a6` apply either way. |
 | `f39ee64`, `220e4b5` | 2026-11-11 | Loose monster drops | **[JSH2 REDESIGN]** A killed monster throws each dropped item out separately, the way Quake throws its backpack, instead of leaving one bag on the corpse. Containers split their contents and pop them up. Player packs stay bags, and a drop of more than 8 items stays one bag. Switch: `jsp_loosedrops`; off, or on another engine, drops are as in the original. |
 | `28d692c` | 2026-11-11 | Dropped armor gave nothing | A piece of armor dropped by a monster or a coop/DM player printed its pickup message but gave nothing: the pickup reads the item's type name, which dropped pieces lacked. They are named now. A dropped piece already lying in an older save still gives nothing. |
 | `6419bcb` | 2026-11-11 | Lifted objects fly off sideways | Lifting an object (impulse 13) could carry it sideways, because objects at rest keep the sideways speed they landed with. The lift now clears that speed, so the object goes straight up and lands where it stood. |
 | `3582715` | 2026-10-15 | Pickup sound on every tomed hammer catch | With the Tome, every catch of the returning hammer played the weapon-pickup sound. Raven's note marks the sound as a placeholder for the select animation, which already plays. The catch is now silent apart from that animation. |
-| `e2e0748` | 2026-10-15 | White light left after the torch | **[JSH2 REDESIGN]** Follow-up to the two-size torch light (`68cc25e`) and the Tempest Staff's charge light (`03db4a6`): charging the Tempest Staff while the torch was guttering left a steady white light on the player after the torch went out. The staff deferred to any active torch, not only one in full blaze, which is the only one that owns that light. It now defers only to a blazing torch. This only arises with `jsp_torchblaze` on, as only then does the torch blaze. |
 | `e507ce9`, `e38568d` | 2026-10-15 | Deathmatch on maps without DM spawns | Starting deathmatch on a map with no `info_player_deathmatch` (`thomas`, for one) looped forever looking for a spawn spot until the engine aborted the game. It now falls back to the normal player start after three passes. Maps with DM spawns are unchanged. |
 | `a51d7e1` | 2026-10-15 | Explosions at the map origin | An explosion sometimes went off at the map origin (Raven's FIXME). An exploding grenade, arrow or mine stayed damageable during its own blast, so a second explosion could kill it mid-explosion and leave it reading a deleted entity's position. Explosives are now undamageable once they go off, as exploding barrels already were. |
 | `922564c` | 2026-10-15 | Chained explosions crash | Explosives destroyed by another explosion blew up inside the first one's damage loop. A chain of about eight overflowed the VM's call stack ("stack overflow", Raven's "crashes in a loop" FIXME), and shorter chains skipped part of the outer blast's victims. They now explode one frame later, as exploding barrels did. Damage and radius are unchanged. |
@@ -228,11 +225,9 @@ One row per change. `git show <hash>` shows exactly what changed.
 | `f49860e` | 2026-06-12 | Tibet1 pentacles heal from hits | A player-only damage bonus was read from monsters too, turning their damage negative, so the catapult pentacles healed. Players only now. (HoT/uHexen2) |
 | `09450d3` | 2026-06-12 | Mezzoman crash | The "assignment to world entity" crash: the mezzoman's reflection trigger kept running after removing itself when its owner died. It now stops. (HoT/uHexen2) |
 | `09450d3` | 2026-06-12 | Tibet7 yakman never spawns | Removing a mezzoman's shield left a stale reference, and a later removal deleted whatever entity reused the slot; on tibet7 that was the yakman's spawner. References are now cleared. (HoT/uHexen2) |
-| `03db4a6` | 2026-06-12 | Tempest Staff charged trigger | **[JSH2 REDESIGN]** Normal fire is a charge weapon: hold to charge (about half a second since `2081855`), the ball fires at full charge, and releasing early cancels it at no cost. Holding repeats at the original sustained rate, holding the charged pose between balls. The hum plays while the staff charges, and the ball flies silent. Tome mode is unchanged. Switch: `jsp_tempestcharge` (`cfc07ce`; off plays as Raven's since `3802965`). |
-| `03db4a6` | 2026-06-12 | Tempest Staff fixes | A dispatch bug re-ran the staff's fire code every server frame while firing, so the first windup played faster on faster machines. Fixed by letting only the weapon's own animation step the charge, at the game's animation pace since `2081855`. Also fixed: the shot sound played twice, each ball carried two looping hums, and switching weapons mid-fire left the staff's light on. The charge light is now white instead of the torch's dim light, so the staff and the torch no longer share, or put out, each other's light. |
+| `03db4a6`, `2081855` | 2026-06-12 | Tempest Staff fixes | A dispatch bug re-ran the staff's fire code every server frame while firing, so the first windup played faster on faster machines. Only the weapon's own animation steps the charge now, at the game's animation pace, so the windup takes the same time on any machine, and the spin after drawing the staff takes about 0.8 s, as in Raven's code. Also fixed: the shot sound played twice, each ball carried two looping hums, and switching weapons mid-fire left the staff's light on. The charge light is now white instead of the torch's dim light, so the staff and the torch no longer share, or put out, each other's light. |
 | `9bf5d28` | 2026-06-12 | Scorpion claw misses on slopes | The scorpion's claw traced straight from its floor-level origin, so on slopes and steps it hit terrain and never connected. A miss now retries aimed at the target's center with the same reach. Flat ground is unchanged. (Shanjaq/uhexen2-progs) |
 | `68cc25e` | 2026-06-12 | Water douses the torch | Raven wrote a water-douse function and never called it (`//Never called?!`). Restored: going fully under water puts out a lit torch, and a torch can't be lit with your head under water (no torch is used). Always on. |
-| `68cc25e` | 2026-06-12 | Two-size torch light | **[JSH2 REDESIGN]** The torch is a large light at full burn and drops to the original size for its last 7 seconds, when the going-out sound plays. Refreshing works only during the last 5 of those 7 seconds, so a burning torch can't be wasted. Engines without the matching render change show the original size throughout. Switch: `jsp_torchblaze` (`29e414e`), which covers the refresh rule too since `943d0a0`. |
 | `f997888` | 2026-06-12 | Infinite-torch exploit | A torch was used up only at burn-out, and refreshing it near the end postponed that forever. It is now used up when lit, like other artifacts. (Math; same fix as SoT) |
 | `660f17b` | 2026-06-12 | Torch light bug | `EF_TORCHLIGHT` was 6, two other effect flags combined, so firing the Tempest Staff or catching fire could turn the torch into a wide white light or put its light out. It is now its own flag, and other code no longer strips the torch's light. |
 | `e872eb7` | 2026-06-12 | Version print | The console prints `jsHexen2+ Progs 1.0.0 (based on Raven v1.12a)` on connect. |
