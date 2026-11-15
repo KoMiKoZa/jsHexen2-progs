@@ -537,12 +537,20 @@ TorchBurn
 void UseTorch()
 {
 // [2026-06-12] jsH2+ rewritten from the vanilla equality test ((self.effects!=EF_DIMLIGHT)&&
-// (self.effects!=EF_TORCHLIGHT)), which made dim-phase use a silent no-op. Rules now:
-// a burning-strong torch can't be relit (a second torch would be wasted - the caller window
-// torchtime<time+5 is also open during the 1s catch phase); refresh works exactly during
-// the gutter phase (torchthink==KillTorch), which is what the gutter sound warns about.
-	if ((self.artifact_flags & AFL_TORCH) && (self.torchthink != KillTorch))
-		return;
+// (self.effects!=EF_TORCHLIGHT)), which reads the torch's phase from the whole effects field.
+// [2026-11-15] jsH2+ The phase now comes from torchthink. Raven's test, measured: no use during the 1s catch or the
+// gutter (effects is exactly EF_DIMLIGHT there), a refresh in the full burn (the caller allows its last 5s), and once
+// refreshed, every further use restarted the catch, because EF_TORCHLIGHT 6 left MUZZLEFLASH|BRIGHTLIGHT behind.
+	if (self.artifact_flags & AFL_TORCH)
+	{
+		if (cvar("jsp_torchblaze"))	// [2026-11-15] jsH2+ [JSH2 REDESIGN] refresh only in the gutter, which its sound warns about
+		{
+			if (self.torchthink != KillTorch)
+				return;
+		}
+		else if (self.torchthink != DimTorch)	// [2026-11-15] jsH2+ switch off: Raven's rule, a refresh only in the full burn
+			return;
+	}
 
 	if (self.waterlevel > 2)
 	{	// [2026-06-12] jsH2+ head under water: the torch won't take - fizzle, nothing consumed
