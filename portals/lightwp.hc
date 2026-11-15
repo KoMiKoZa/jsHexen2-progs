@@ -144,10 +144,12 @@ entity lball;//,star1,star2;
 	lball.think=HomeThink;
 	lball.hoverz=TRUE;
 	thinktime lball : 0.2;
-	// [2026-06-12] jsH2+ flight loop removed (user decision): vanilla stacked TWO copies of
-	// the buzz2 loop on every ball - one here on CHAN_WEAPON at spawn, another from HomeThink
-	// on CHAN_BODY 0.02-0.5s later (via t_width, also removed). The ball flies silent;
-	// buzz2 is the charge sound now.
+	// [2026-06-12] jsH2+ vanilla stacked TWO copies of the buzz2 loop on every ball - one here
+	// on CHAN_WEAPON at spawn, another from HomeThink on CHAN_BODY 0.02-0.5s later (via t_width,
+	// removed there). This spawn copy is the one kept.
+	// [2026-11-15] jsH2+ [JSH2 REDESIGN] with jsp_tempestcharge on the ball flies silent and buzz2 is the charge hum; off keeps Raven's flight hum.
+	if(!cvar("jsp_tempestcharge"))
+		sound(lball,CHAN_WEAPON,"succubus/buzz2.wav",1,ATTN_LOOP);
 /*
 	star1=spawn();
 	lball.movechain = star1;
@@ -367,23 +369,28 @@ void lightning_fire_normal (void)
 // rate PLUS frame rate (~0.15s total, framerate-bound since retail: the first ball always
 // read as instant). Post-shot windups ran at honest 20Hz (the visible replay players saw).
 // Now: the Suc_Litn_Fire re-entry guard leaves the think chain as the only driver - one
-// frame per think, an even charge at any framerate; release before frame 12 cancels (the old
-// fidle hold loop is gone - every ball is charged through the full windup).
-// Fully charged + refire pending holds the pose at $normal12.
+// frame per think, an even charge at any framerate.
 // [2026-11-14] jsH2+ no slower gate on top of the think: a 0.07s gate checked on 0.05s thinks steps every 0.1s, and the lerp stalls between steps.
+// [2026-11-15] jsH2+ [JSH2 REDESIGN] jsp_tempestcharge on: release before frame 12 cancels, and fully charged + refire pending holds the pose at $normal12.
+// Off is Raven's: a release fires anyway, and a full charge waiting out attack_finished plays Raven's $fidle loop (weaponframe_cnt set), which the guard lets work.
+float charge;
+	charge = cvar("jsp_tempestcharge");
+	if(self.weaponframe_cnt)
+		self.wfs = advanceweaponframe($fidle1,$fidle16);
+	else if (self.weaponframe != $normal12)	// hold the fully-charged pose; the fire branch
+		self.wfs = advanceweaponframe($normal1,$normal16);	// below moves us to $normal13
 // [2026-06-12] jsH2+ measured frame semantics (prong-tip vertex separation, sucwp4.mdl):
 // normal1-5 = tips CLOSED at rest, normal6-11 = tips snap OPEN and the ball builds between
 // them, normal12-16 = the clap that looses the ball, landing back closed (frame 16 matches
 // frame 1 - the artist built a seamless cycle). Vanilla's own animation IS the charge
 // weapon; it just played at one frame per 72Hz tick and was never visible.
-	if (self.weaponframe != $normal12)	// hold the fully-charged pose; the fire branch
-		self.wfs = advanceweaponframe($normal1,$normal16);	// below moves us to $normal13
 	// [2026-06-12] jsH2+ full vanilla cycle 1..16 (the closed-rest experiment is retired -
 	// the model has no truly closed frame; a fully-shut rest would need model surgery,
 	// noted in PROGS_TRACKER as an optional future local-asset project).
 	if(self.weaponframe==$normal2)
 	{//FIXME:  WHY THE FUCK CAN'T I SET DRAWFLAGS?!!!!
-		sound(self,CHAN_WEAPON,"succubus/buzz2.wav",1,ATTN_NORM);	// [2026-06-12] jsH2+ charge hum
+		if(charge)	// [2026-11-15] jsH2+ [JSH2 REDESIGN] the charge hum is the switch's; off, the ball carries Raven's hum
+			sound(self,CHAN_WEAPON,"succubus/buzz2.wav",1,ATTN_NORM);	// [2026-06-12] jsH2+ charge hum
 									// (loop-marked sample: sustains through the charge, stopped at
 									// every exit; the ball's own firelbal.wav stays the only shot sound)
 		// [2026-06-12] jsH2+ the charge light is EF_BRIGHTLIGHT (white, like the tome
@@ -438,10 +445,12 @@ void lightning_fire_normal (void)
 	// wraps, and charges the next ball. Follow-through always plays to completion.
 	// [2026-11-11] jsH2+ [JSH2 REDESIGN] the release-cancel is the jsp_tempestcharge option (jsHexen2 Progs page).
 	// Off, or on another engine, a tap fires a full windup as in vanilla; the re-entry
-	// guard, sound and light fixes stay either way.
+	// guard, sound and light fixes stay either way. The stopSound calls stay on with the switch
+	// off, where the staff plays nothing on CHAN_WEAPON: they end a hum started before the switch
+	// was turned off.
 	else if(self.greenmana<6||
 			self.bluemana<6||
-			(!self.button0&&((cvar("jsp_tempestcharge")&&self.weaponframe<$normal13) || self.weaponframe==$normal16))
+			(!self.button0&&((charge&&self.weaponframe<$normal13) || self.weaponframe==$normal16))
 			)
 	{
 		if(self.effects&EF_BRIGHTLIGHT)
@@ -452,23 +461,27 @@ void lightning_fire_normal (void)
 				self.lefty=FALSE;
 		}
 		stopSound(self,CHAN_WEAPON);	// [2026-06-12] jsH2+ end the charge hum (buzz2 has a loop marker)
-		if (self.weaponframe > $normal1 && self.weaponframe <= $normal12)	// [2026-11-14] jsH2+ a release while held fully charged closes too, not snaps to rest
+		// [2026-11-15] jsH2+ [JSH2 REDESIGN] the close animation is the switch's; off, running out of mana mid-charge snaps to rest as in Raven's
+		if (charge && self.weaponframe > $normal1 && self.weaponframe <= $normal12)	// [2026-11-14] jsH2+ a release while held fully charged closes too, not snaps to rest
 			lightning_close_normal();	// [2026-06-12] jsH2+ canceled mid-charge: anim reverses back to rest
 		else
 			lightning_ready_normal();
 	}
-	else if(self.weaponframe==$normal12)
+	else if(self.weaponframe==$normal12 || (self.weaponframe>=$fidle1 && self.weaponframe<=$fidle16))
 	{
 		if(self.attack_finished<time)
 		{
+			self.weaponframe_cnt=FALSE;
 			stopSound(self,CHAN_WEAPON);	// [2026-06-12] jsH2+ end the charge hum (buzz2 has a loop marker)
 			FireLightningBall();	// [2026-06-12] jsH2+ plays its own firelbal.wav (vanilla doubled it
-						// here on CHAN_WEAPON; that copy now plays at charge start instead)
+						// here on CHAN_WEAPON)
 			self.bluemana-=6;
 			self.greenmana-=6;
 			self.attack_finished=time+1;
 			self.weaponframe=$normal13;
 		}
+		else if(!charge)
+			self.weaponframe_cnt=TRUE;
 	}
 }
 
