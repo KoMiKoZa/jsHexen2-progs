@@ -6,9 +6,9 @@
 ![Progs](https://img.shields.io/badge/progs-1.0.0--dev-orange.svg)
 ![Base](https://img.shields.io/badge/base-Raven_v1.12a-8B0000.svg)
 
-HexenC source for the Hexen II: Portal of Praevus game code (`progs.dat`), based on Raven's
-final released source (v1.12a) and maintained alongside the
-[jsHexen2](https://github.com/KoMiKoZa) engine.
+The game code (`progs.dat`) of jsHexen2, a Hexen II source port: HexenC source based on Raven's
+final released source for Portal of Praevus (v1.12a). The fixes work in any Hexen II engine; the
+optional redesigns need jsHexen2.
 
 The mission-pack program runs the original campaign as well as the expansion, so this one file
 is the game logic for both. It is changed one commit at a time. Most commits fix bugs in Raven's
@@ -90,7 +90,7 @@ everything that differs from the original, and `git show <hash>` shows a single 
 
 Current: **jsHexen2 Progs 1.0.0** (in development).
 
-The console prints the version on connect:
+The console prints the version on connect, in any engine:
 
 ```
 jsHexen2+ Progs 1.0.0 (based on Raven v1.12a)
@@ -117,12 +117,12 @@ correctly, but HCC builds something else:
 The places where this changes the game are marked **[RAVEN HCC BUG]** below. The first two are
 fixed twice, on purpose:
 
-- **Here, in the source.** Each of these lines is rewritten so that any compiler builds it
-  correctly: Raven's HCC, NHCC, uHexen2's hcc, FTEQCC, or jsHexen2-hcc with `-noretfix` or
-  `-noifvecfix`. Whoever builds this code gets the fixed game, whatever compiler they use.
+- **Here, in the source.** Each of these lines is rewritten so that every compiler reads it the
+  same way: Raven's HCC, NHCC, uHexen2's hcc, FTEQCC, or jsHexen2-hcc with `-noretfix` or
+  `-noifvecfix`. Code taken from here keeps the fix, whatever compiler builds it.
 - **In the compiler.** [jsHexen2-hcc](https://github.com/KoMiKoZa/jsHexen2-hcc) builds such lines
   correctly and warns where it finds one, so the same mistake can't creep into new code here or
-  into other mods. On this source it finds none, which also confirms these were all of them.
+  into other mods. On this source it finds none left.
 
 The third is fixed here, in the source, so every compiler builds the same game. FTEQCC lists any
 such local with its warning F306; on this source it lists none.
@@ -231,23 +231,26 @@ One row per change. `git show <hash>` shows exactly what changed.
 
 ## Building
 
-The source is in `portals/`. It builds with [jsHexen2-hcc](https://github.com/KoMiKoZa/jsHexen2-hcc), Raven's HCC with
-`-ot`, which reuses the globals that hold intermediate results. Raven's HCC and NHCC can't build
-it: they don't accept `\\` (a backslash) in a string, which the bag list uses for the `\1` lettering
-escape, and they would use 65,392 of the 65,536 globals a `progs.dat` can address. No compiler
-binary is included here.
+The source is in `portals/`. Build it with [jsHexen2-hcc](https://github.com/KoMiKoZa/jsHexen2-hcc)
+1.0.1 or later; a ready-built `hcc.exe` for Windows is on its
+[Releases](https://github.com/KoMiKoZa/jsHexen2-hcc/releases) page. Use `-ot`, which reuses the
+globals that hold intermediate results:
 
 ```
 cd portals
-hcc.exe -ot -name Progs.src
+hcc -ot -name Progs.src
 ```
 
-The output is `progs.dat`, plus `progs.lno` for debugging. In jsHexen2 it goes in `jsh2/`; in
-other engines, loose in `Portals/`.
+The program is written to `portals/progs.dat`, and the compiler writes `progdefs.h` and
+`files.dat` in the same folder.
+
+Older compilers can't build this source. Raven's HCC, NHCC and jsHexen2-hcc 1.0.0 don't accept
+`\\` (a backslash) in a string, which the bag list uses for the `\1` lettering escape, and Raven's
+HCC and NHCC would use 65,392 of the 65,536 globals a `progs.dat` can address.
 
 Keep the first 16 characters of the connect message in `Client.hc` (`ClientConnect`) exactly
-`jsHexen2+ Progs `. jsHexen2 looks for them to tell a build of these progs from another program
-in `jsh2/`; without them, every later build shows as "Unknown jsHexen2 progs".
+`jsHexen2+ Progs `. jsHexen2 looks for them to recognize a build of these progs; without them it
+treats your build as someone else's program.
 
 ## License
 
