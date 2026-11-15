@@ -132,12 +132,12 @@ such local with its warning F306; on this source it lists none.
 One row per change. `git show <hash>` shows exactly what changed.
 
 <details open>
-<summary><h3>1.0.0 (in development): 72 game fixes, 9 Raven HCC fixes, 9 optional redesigns</h3></summary>
+<summary><h3>1.0.0 (in development): 71 game fixes, 9 Raven HCC fixes, 10 optional redesigns</h3></summary>
 
 | Commit | Date | Change | What it does |
 |---|---|---|---|
 | `ddac294` | 2026-11-15 | Punch dagger stuck on one swing | **[RAVEN HCC BUG]** The Assassin's punch dagger is meant to take turns between its four swings. While a stone imp set to come to life when it sees you was watching you, the dagger used only its fourth swing. It now always takes turns. Raven's maps don't show this: Hexen II's 12 stone imps are all woken by a trigger or never wake, and Portal of Praevus has none. It happens with a stone imp (gargoyle flag set) that has no `targetname` and no `wait -1`. We reproduced it on egypt1 with an `.ent` file that removed its stone imps' `targetname`s. |
-| `2081855` | 2026-11-14 | Tempest Staff pacing | Follow-up to the charge pacing added in `03db4a6`: it stepped the charge, and the spin after drawing the staff, every 0.1 s, half the game's animation pace, so both looked jerky. Both step with the game again: the spin takes about 0.8 s, as in Raven's code, and a full charge about half a second. This applies with `jsp_tempestcharge` off too. |
+| `2081855` | 2026-11-14 | Tempest Staff pacing | **[JSH2 REDESIGN]** Follow-up to the charge pacing added in `03db4a6`: it stepped the charge, and the spin after drawing the staff, every 0.1 s, half the game's animation pace, so both looked jerky. Both step with the game again: the spin takes about 0.8 s, as in Raven's code, and a full charge about half a second. This applies with `jsp_tempestcharge` off too. |
 | `2081855` | 2026-11-14 | Tempest Staff release at full charge | **[JSH2 REDESIGN]** With `jsp_tempestcharge` on, letting go of fire while the staff is fully charged closes it back to rest, playing the charge in reverse, instead of snapping it there. |
 | `b6281c9` | 2026-11-14 | Tomed Meteor Staff fired too fast | With the Tome of Power, the Meteor Staff's tornado had no cooldown and its fire animation ran once per server frame, so on a fast machine it fired 7 tornadoes a second, 20 green mana each. It now fires one per fire animation, about two a second on any machine, and the tornado leaves as you press fire, like the normal shot. |
 | `163ec37` | 2026-11-14 | Ice Mace skipped shots | The Ice Mace plays one of five short firing animations at random and fires an ice shard as each one starts. When it picked the animation it had just played, it began that one partway through and fired nothing. Every animation fires now, so held fire shoots at an even pace. |
