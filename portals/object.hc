@@ -366,7 +366,9 @@ float ontop,pushed,inertia,force,walkforce;
 //FIXME- find current think and set transition to run
 						self.think=sheep_trot;
 				}
-				else if(self.thingtype==THINGTYPE_WOOD)
+// [2026-11-15] jsH2+ barrels are wood and metal, which no branch here matched, so pushing
+// one was silent. Raven's HexenWorld code gives them the wood sound, as here.
+				else if(self.thingtype==THINGTYPE_WOOD||self.thingtype==THINGTYPE_WOOD_METAL)
 				{
 					sound(self,CHAN_VOICE,"misc/pushwood.wav",1,ATTN_NORM);		
 					self.pain_finished=time + 1.041;
