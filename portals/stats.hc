@@ -233,6 +233,105 @@ void player_experience_cheat(void)
 	AwardExperience(self,self,350);
 }
 
+// [2026-11-16] jsH2+ [JSH2 REDESIGN] never called: the engine lists the option only when the loaded progs defines this
+string jsp_levelup (void)
+{
+	return "Level-Up Message|Gaining a level shows one message with your class, your new level, the health and mana you gained and any new ability, and the console keeps it. Off: Raven's 'gained a level' message, with the stats in lines at the top of the screen.";
+}
+
+string LevelUpClassName (float pc)
+{
+	if (pc == CLASS_PALADIN)
+		return "Paladin";
+	if (pc == CLASS_CRUSADER)
+		return "Crusader";
+	if (pc == CLASS_NECROMANCER)
+		return "Necromancer";
+	if (pc == CLASS_ASSASSIN)
+		return "Assassin";
+	return "Demoness";
+}
+
+// What a class gains on reaching level 3 (FL_SPECIAL_ABILITY1 and the level >= 3 checks) or level 6
+// (FL_SPECIAL_ABILITY2 and the level >= 6 checks); "" when it gains nothing new there.
+string LevelUpAbility (float pc, float lev)
+{
+	if (lev == 3)
+	{
+		if (pc == CLASS_PALADIN)
+			return "You can no longer drown";				// Client.hc, the drowning check
+		if ((pc == CLASS_CRUSADER) || (pc == CLASS_NECROMANCER))
+			return "Kills can leave soul spheres";			// damage.hc, crusader_sphere / necromancer_sphere
+		if (pc == CLASS_ASSASSIN)
+			return "Stand still in the dark to hide";		// specials.hc, CheckAbilities
+		return "Hold jump in the air to glide";				// Client.hc, the Demoness's glide
+	}
+	if (pc == CLASS_PALADIN)
+		return "A chance to survive a killing blow";		// damage.hc, Pal_DivineIntervention
+	if (pc == CLASS_NECROMANCER)
+		return "The sickle drains life";					// sickle.hc
+	if (pc == CLASS_ASSASSIN)
+		return "Punch dagger backstabs hit hard";			// punchdgr.hc
+	if (pc == CLASS_SUCCUBUS)
+		return "Damage taken restores mana";				// allplay.hc, player_pain
+	return "";
+}
+
+// One line of the level-up for each thing gained, as the centered message (msg TRUE: \3 for the first line in
+// the message letters, \1 for the rest in the console letters, '@' between) or as one console line.
+// Sent with stuffcmd, one piece at a time, since ftos has a single buffer.
+void LevelUpText (float StartLevel, float HealthGain, float ManaGain, float msg)
+{
+	string	s;
+	float	lev;
+
+	if (msg)
+		stuffcmd (self, "centerprint \\3");
+	else
+		stuffcmd (self, "logprint ");
+	stuffcmd (self, LevelUpClassName (self.playerclass));
+	stuffcmd (self, " is now level ");
+	stuffcmd (self, ftos (self.level));
+	if (msg)
+		stuffcmd (self, "@\\1");
+	else
+		stuffcmd (self, ": ");
+	if (HealthGain > 0)
+	{
+		stuffcmd (self, "+");
+		stuffcmd (self, ftos (HealthGain));
+		stuffcmd (self, " health, ");
+	}
+	stuffcmd (self, "+");
+	stuffcmd (self, ftos (ManaGain));
+	stuffcmd (self, " mana");
+	if ((self.playerclass == CLASS_CRUSADER) && !self.newclass)
+	{
+		if (msg)
+			stuffcmd (self, "@\\1Mana refilled");
+		else
+			stuffcmd (self, ", mana refilled");
+	}
+	lev = 3;
+	while (lev <= 6)
+	{
+		if ((StartLevel < lev) && (self.level >= lev))
+		{
+			s = LevelUpAbility (self.playerclass, lev);
+			if (s != "")
+			{
+				if (msg)
+					stuffcmd (self, "@\\1");
+				else
+					stuffcmd (self, ". ");
+				stuffcmd (self, s);
+			}
+		}
+		lev += 3;
+	}
+	stuffcmd (self, "\n");
+}
+
 /*
 ================
 PlayerAdvanceLevel
@@ -246,6 +345,7 @@ void PlayerAdvanceLevel(float NewLevel)
 	string s2;
 	float OldLevel,Diff;
 	float index,HealthInc,ManaInc;
+	float msg,StartLevel,StartHealth,StartMana;
 
 	sound (self, CHAN_VOICE, "misc/comm.wav", 1, ATTN_NONE);
 
@@ -253,31 +353,49 @@ void PlayerAdvanceLevel(float NewLevel)
 	self.level = NewLevel;
 	Diff = self.level - OldLevel;
 
-	sprint(self,"You are now level ");
-	s2 = ftos(self.level);
-	sprint(self,s2);
-	sprint(self,"!\n");
+	// [2026-11-16] jsH2+ [JSH2 REDESIGN] jsp_levelup: LevelUpMessage replaces Raven's prints below. It is
+	// built from jsHexen2 client commands, so it needs protocol 2026, where every client is jsHexen2.
+	msg = cvar ("jsp_levelup");
+	if ((cvar ("sv_protocol") != 2026) || !(self.flags & FL_CLIENT) ||
+		(self.playerclass < CLASS_PALADIN) || (self.playerclass > CLASS_SUCCUBUS))
+		msg = FALSE;
+	StartLevel = OldLevel;
+	StartHealth = self.max_health;
+	StartMana = self.max_mana;
+
+	if (!msg)
+	{
+		sprint(self,"You are now level ");
+		s2 = ftos(self.level);
+		sprint(self,s2);
+		sprint(self,"!\n");
+	}
 
 	if(!self.newclass)
 	{
 		switch (self.playerclass)
 		{
 		case CLASS_PALADIN:
-		   centerprint(self, "Paladin gained a level\n");
+			if (!msg)
+				centerprint(self, "Paladin gained a level\n");
 		break;
 		case CLASS_CRUSADER:
-			centerprint(self,"Crusader gained a level\n");
+			if (!msg)
+				centerprint(self,"Crusader gained a level\n");
 			// Special ability #1, full mana at level advancement
 			self.bluemana = self.greenmana = self.max_mana;
 		break;
 		case CLASS_NECROMANCER:
-		   centerprint(self,"Necromancer gained a level\n");
+			if (!msg)
+				centerprint(self,"Necromancer gained a level\n");
 		break;
 		case CLASS_ASSASSIN:
-		   centerprint(self,"Assassin gained a level\n");
+			if (!msg)
+				centerprint(self,"Assassin gained a level\n");
 		break;
 		case CLASS_SUCCUBUS:
-		   centerprint(self,"Demoness gained a level\n");
+			if (!msg)
+				centerprint(self,"Demoness gained a level\n");
 		break;
 		}
 	}
@@ -318,15 +436,18 @@ void PlayerAdvanceLevel(float NewLevel)
 		self.greenmana += ManaInc;
 		self.bluemana += ManaInc;
 		self.max_mana += ManaInc;
-		
-		sprint(self, "Stats: MP +");
-		s2 = ftos(ManaInc);
-		sprint(self, s2);
 
-		sprint(self, "  HP +");
-		s2 = ftos(HealthInc);
-		sprint(self, s2);
-		sprint(self, "\n");
+		if (!msg)
+		{
+			sprint(self, "Stats: MP +");
+			s2 = ftos(ManaInc);
+			sprint(self, s2);
+
+			sprint(self, "  HP +");
+			s2 = ftos(HealthInc);
+			sprint(self, s2);
+			sprint(self, "\n");
+		}
 	}
 
 	if (self.level > 2)
@@ -335,6 +456,16 @@ void PlayerAdvanceLevel(float NewLevel)
 	if (self.level >5)
 		self.flags(+)FL_SPECIAL_ABILITY2;
 
+	if (msg)
+	{
+		// a class change (newclass) re-counts its levels: Raven shows no message for it, so only the console gets one
+		if (!self.newclass)
+		{
+			LevelUpText (StartLevel, self.max_health - StartHealth, self.max_mana - StartMana, TRUE);
+			self.walkframe = time + 3;	// holds the bag list off, as centerprint() does
+		}
+		LevelUpText (StartLevel, self.max_health - StartHealth, self.max_mana - StartMana, FALSE);
+	}
 }
 
 
