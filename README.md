@@ -241,21 +241,21 @@ One row per change. `git show <hash>` shows exactly what changed.
 ## Building
 
 The source is in `portals/`. Build it with [jsHexen2-hcc](https://github.com/KoMiKoZa/jsHexen2-hcc)
-1.0.1 or later; a ready-built `hcc.exe` for Windows is on its
-[Releases](https://github.com/KoMiKoZa/jsHexen2-hcc/releases) page. Use `-ot`, which reuses the
-globals that hold intermediate results:
+1.0.2 or later; a ready-built `hcc.exe` for Windows is on its
+[Releases](https://github.com/KoMiKoZa/jsHexen2-hcc/releases) page:
 
 ```
 cd portals
-hcc -ot -name Progs.src
+hcc
 ```
 
-The program is written to `portals/progs.dat`, and the compiler writes `progdefs.h` and
-`files.dat` in the same folder.
+The program is written to `portals/progs.dat`, and the compiler writes `files.dat` in the same
+folder. jsHexen2-hcc 1.0.1 builds it too, with `hcc -ot -name Progs.src`.
 
 Older compilers can't build this source. Raven's HCC, NHCC and jsHexen2-hcc 1.0.0 don't accept
 `\\` (a backslash) in a string, which the bag list uses for the `\1` lettering escape. Without
-`-ot` this source also uses 65,500 of the 65,536 globals a `progs.dat` can address.
+shared globals for intermediate results (`-noot` in 1.0.2, or 1.0.1 without `-ot`), this source
+also uses 65,518 of the 65,536 globals a `progs.dat` can address.
 
 Keep the first 16 characters of the connect message in `Client.hc` (`ClientConnect`) exactly
 `jsHexen2+ Progs `. jsHexen2 looks for them to recognize a build of these progs; without them it
