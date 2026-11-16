@@ -260,8 +260,10 @@ string LevelUpAbility (float pc, float lev)
 	{
 		if (pc == CLASS_PALADIN)
 			return "You can no longer drown";				// Client.hc, the drowning check
-		if ((pc == CLASS_CRUSADER) || (pc == CLASS_NECROMANCER))
-			return "Kills can leave soul spheres";			// damage.hc, crusader_sphere / necromancer_sphere
+		if (pc == CLASS_CRUSADER)
+			return "Kills can leave Holy Strength";			// damage.hc, crusader_sphere (soul.hc: 30 s of super damage)
+		if (pc == CLASS_NECROMANCER)
+			return "Kills can leave soul spheres";			// damage.hc, necromancer_sphere
 		if (pc == CLASS_ASSASSIN)
 			return "Stand still in the dark to hide";		// specials.hc, CheckAbilities
 		return "Hold jump in the air to glide";				// Client.hc, the Demoness's glide
@@ -269,9 +271,9 @@ string LevelUpAbility (float pc, float lev)
 	if (pc == CLASS_PALADIN)
 		return "A chance to survive a killing blow";		// damage.hc, Pal_DivineIntervention
 	if (pc == CLASS_NECROMANCER)
-		return "The sickle drains life";					// sickle.hc
+		return "The sickle can drain life";					// sickle.hc
 	if (pc == CLASS_ASSASSIN)
-		return "Punch dagger backstabs hit hard";			// punchdgr.hc
+		return "Dagger backstabs can hit hard";				// punchdgr.hc
 	if (pc == CLASS_SUCCUBUS)
 		return "Damage taken restores mana";				// allplay.hc, player_pain
 	return "";
@@ -353,8 +355,9 @@ void PlayerAdvanceLevel(float NewLevel)
 	self.level = NewLevel;
 	Diff = self.level - OldLevel;
 
-	// [2026-11-16] jsH2+ [JSH2 REDESIGN] jsp_levelup: LevelUpMessage replaces Raven's prints below. It is
-	// built from jsHexen2 client commands, so it needs protocol 2026, where every client is jsHexen2.
+	// [2026-11-16] jsH2+ [JSH2 REDESIGN] jsp_levelup: LevelUpText replaces Raven's prints below. It is
+	// built from jsHexen2 client commands, so it needs protocol 2026, where every client is jsHexen2 (the
+	// cvar, while the engine fixes the protocol when a map starts: change sv_protocol before the map).
 	msg = cvar ("jsp_levelup");
 	if ((cvar ("sv_protocol") != 2026) || !(self.flags & FL_CLIENT) ||
 		(self.playerclass < CLASS_PALADIN) || (self.playerclass > CLASS_SUCCUBUS))
@@ -458,7 +461,7 @@ void PlayerAdvanceLevel(float NewLevel)
 
 	if (msg)
 	{
-		// a class change (newclass) re-counts its levels: Raven shows no message for it, so only the console gets one
+		// a class change (newclass) re-counts its levels: Raven shows no center message for it, so only the console gets one
 		if (!self.newclass)
 		{
 			LevelUpText (StartLevel, self.max_health - StartHealth, self.max_mana - StartMana, TRUE);
