@@ -1030,6 +1030,11 @@ void() CycleWeaponReverseCommand =
 {
 	local	float	it, am;
 	
+	// [2026-11-17] jsH2+ wait out an attack or a draw, as CycleWeaponCommand does: W_SetCurrentWeapon
+	// refuses the switch then, and the weapon picked below stayed set while the old one stayed in hand
+	if(self.attack_finished>time)
+		return;
+
 	it = self.items;
 	self.impulse = 0;
 
