@@ -325,7 +325,7 @@ void MedusaGaze (vector org, vector destiny, entity loser) [++ $medusa1 .. $medu
 	ai_face();
 	WriteByte (MSG_BROADCAST, SVC_TEMPENTITY);
 	WriteByte (MSG_BROADCAST, TE_STREAM_GAZE);
-	// [2026-11-18] jsH2+ entity first, as every engine reads a stream: Raven wrote it after the flags and duration, so the beam lived 0 s
+	// [2026-11-18] jsH2+ entity first, as every engine reads a stream: Raven wrote it after the flags and duration, so the beam only flickered
 	WriteEntity (MSG_BROADCAST, self);
 	WriteByte (MSG_BROADCAST, 1+STREAM_ATTACHED);
 	WriteByte (MSG_BROADCAST, 4);
