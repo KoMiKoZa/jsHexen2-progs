@@ -1024,7 +1024,7 @@ entity spot;
 	self.absorb_time+= TimeDiff;
 	self.last_impact+= TimeDiff;
 	self.sheep_sound_time+= TimeDiff;
-	self.still_time+= TimeDiff;
+	self.still_time=-1;	// [2026-11-22] jsH2+ arriving starts the hiding wait over: shifting -1 by the time difference left a deadline already past on a level whose clock was ahead
 	self.last_onground+= TimeDiff;
 	self.invincible_time+= TimeDiff;
 	self.show_hostile+= TimeDiff;
