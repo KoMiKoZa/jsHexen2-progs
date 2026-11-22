@@ -10,7 +10,7 @@ void CheckAbilities ()
 			trans_limit=1;
 		if(self.velocity=='0 0 0'&&self.last_attack<time - 2&&self.light_level<100)
 		{
-			if(self.still_time==-1)
+			if(self.still_time<=0)	// [2026-11-22] jsH2+ 0 or less: a new player starts with 0, and a level change shifts -1 below it
 				self.still_time=time + 10 - self.level;
 			if(self.still_time<time)
 			{
@@ -24,20 +24,25 @@ void CheckAbilities ()
 				self.drawflags(+)DRF_TRANSLUCENT|MLS_ABSLIGHT;
 			}
 		}
-		else if(self.drawflags&(DRF_TRANSLUCENT|MLS_ABSLIGHT))	// [2026-06-12] jsH2+ precedence:
-						// "&a|b" parsed as "(x&a)|b" - always true, so the fade-back
-						// branch ran constantly. (HoT/uhexen2)
+		else
 		{
+			// [2026-11-22] jsH2+ moving, attacking or light restarts the wait every time, hidden or
+			// not, so a wait cut short never carries over; only the fade-back is for a hidden player.
 			self.still_time=-1;
-			if(self.abslight<1)
-				self.abslight+=0.02*trans_limit;
-			else
+			if(self.drawflags&(DRF_TRANSLUCENT|MLS_ABSLIGHT))	// [2026-06-12] jsH2+ precedence:
+							// "&a|b" parsed as "(x&a)|b" - always true, so the fade-back
+							// branch ran constantly. (HoT/uhexen2)
 			{
-				self.drawflags(-)MLS_ABSLIGHT|DRF_TRANSLUCENT;
-				self.abslight=0;
-				msg_entity=self;
-				WriteByte(MSG_ONE, SVC_CLEAR_VIEW_FLAGS);
-				WriteByte(MSG_ONE,DRF_TRANSLUCENT);
+				if(self.abslight<1)
+					self.abslight+=0.02*trans_limit;
+				else
+				{
+					self.drawflags(-)MLS_ABSLIGHT|DRF_TRANSLUCENT;
+					self.abslight=0;
+					msg_entity=self;
+					WriteByte(MSG_ONE, SVC_CLEAR_VIEW_FLAGS);
+					WriteByte(MSG_ONE,DRF_TRANSLUCENT);
+				}
 			}
 		}
 	}
