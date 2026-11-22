@@ -302,9 +302,9 @@ float inertia, lift;
 			trace_ent.flags-=FL_ONGROUND;
 
 		if(self.playerclass==CLASS_ASSASSIN||self.playerclass==CLASS_SUCCUBUS)
-			sound (self, CHAN_BODY,"player/assjmp.wav", 1, ATTN_NORM);
+			sound (self, CHAN_JUMP,"player/assjmp.wav", 1, ATTN_NORM);	// [2026-11-22] jsH2+ was CHAN_BODY, as the jump grunt
 		else
-			sound (self, CHAN_BODY,"player/paljmp.wav", 1, ATTN_NORM);
+			sound (self, CHAN_JUMP,"player/paljmp.wav", 1, ATTN_NORM);	// [2026-11-22] jsH2+ was CHAN_BODY
 		self.attack_finished=time+1;
 	}
 }

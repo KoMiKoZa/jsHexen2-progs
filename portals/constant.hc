@@ -508,6 +508,10 @@ float	CHAN_WEAPON					= 1;
 float	CHAN_VOICE					= 2;
 float	CHAN_ITEM					= 3;
 float	CHAN_BODY					= 4;
+// [2026-11-22] jsH2+ the player's grunt and glide share one channel and splashes have another:
+// on CHAN_BODY a splash or a glide cut off the grunt and the other body sounds
+float	CHAN_JUMP					= 5;
+float	CHAN_SPLASH					= 6;
 
 float	ATTN_NONE					= 0;
 float	ATTN_NORM					= 1;

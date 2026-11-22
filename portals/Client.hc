@@ -1389,9 +1389,9 @@ float wall_jump;
 	if(self.model=="models/sheep.mdl")//self.modelindex==modelindex_sheep)
 		sheep_sound(1);
 	else if(self.playerclass==CLASS_ASSASSIN||self.playerclass==CLASS_SUCCUBUS)
-		sound (self, CHAN_BODY,"player/assjmp.wav", 1, ATTN_NORM);
+		sound (self, CHAN_JUMP,"player/assjmp.wav", 1, ATTN_NORM);	// [2026-11-22] jsH2+ was CHAN_BODY
 	else
-		sound (self, CHAN_BODY,"player/paljmp.wav", 1, ATTN_NORM);
+		sound (self, CHAN_JUMP,"player/paljmp.wav", 1, ATTN_NORM);	// [2026-11-22] jsH2+ was CHAN_BODY
 
 //Unless can do a flip of angles, this looks weird
 	if(wall_jump)
@@ -1502,7 +1502,7 @@ void() WaterMove =
 	{  // Getting out of the water
 		if (self.flags & FL_INWATER)	
 		{	// play leave water sound
-			sound (self, CHAN_BODY, "raven/outwater.wav", 1, ATTN_NORM);
+			sound (self, CHAN_SPLASH, "raven/outwater.wav", 1, ATTN_NORM);	// [2026-11-22] jsH2+ was CHAN_BODY
 			self.flags(-)FL_INWATER;
 			self.lefty = 0;
 		}
@@ -1537,15 +1537,15 @@ void() WaterMove =
 	{
 		self.splash_time = time + .05;
 
-		// player enter water sound
+		// player enter water sound ([2026-11-22] jsH2+ on CHAN_SPLASH, was CHAN_BODY)
 		if (self.watertype == CONTENT_LAVA)
-			sound (self, CHAN_BODY, "raven/inlava.wav", 1, ATTN_NORM);
+			sound (self, CHAN_SPLASH, "raven/inlava.wav", 1, ATTN_NORM);
 		else if (self.watertype == CONTENT_WATER)
 		{
-			sound (self, CHAN_BODY, "raven/inh2o.wav", 1, ATTN_NORM);
+			sound (self, CHAN_SPLASH, "raven/inh2o.wav", 1, ATTN_NORM);
 		}
 		else if (self.watertype == CONTENT_SLIME)
-			sound (self, CHAN_BODY, "player/slimbrn1.wav", 1, ATTN_NORM);
+			sound (self, CHAN_SPLASH, "player/slimbrn1.wav", 1, ATTN_NORM);
 
 		self.flags(+)FL_INWATER;
 		self.dmgtime = 0;
@@ -2352,7 +2352,7 @@ void() PlayerPostThink =
 		if(self.absorb_time>=time)
 			self.jump_flag/=2;
 		if (self.watertype == CONTENT_WATER)
-			sound (self, CHAN_BODY, "player/h2ojmp.wav", 1, ATTN_NORM);
+			sound (self, CHAN_SPLASH, "player/h2ojmp.wav", 1, ATTN_NORM);	// [2026-11-22] jsH2+ was CHAN_BODY
 		else if (self.jump_flag*(self.mass/10) < -500)//was -650
 		{
 //			T_Damage (self, world, world, 5); 
@@ -2376,7 +2376,7 @@ void() PlayerPostThink =
 				if(self.button2&&self.velocity_z<=0&&!self.waterlevel)
 				{
 					if(self.gravity==self.standard_grav&&self.standard_grav>0.2)
-						sound (self, CHAN_BODY, "succubus/fwoomp.wav", 1, ATTN_NORM);
+						sound (self, CHAN_JUMP, "succubus/fwoomp.wav", 1, ATTN_NORM);	// [2026-11-22] jsH2+ was CHAN_BODY
 					self.gravity=0.2;
 					self.flags(-)FL_JUMPRELEASED;
 				}
