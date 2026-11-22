@@ -10,7 +10,7 @@ void CheckAbilities ()
 			trans_limit=1;
 		if(self.velocity=='0 0 0'&&self.last_attack<time - 2&&self.light_level<100)
 		{
-			if(self.still_time<=0)	// [2026-11-22] jsH2+ 0 too: a new player starts with 0, which skipped the wait
+			if(self.still_time<=0)	// [2026-11-22] jsH2+ 0 or less: a new player starts with 0, and a level change shifts -1 below it
 				self.still_time=time + 10 - self.level;
 			if(self.still_time<time)
 			{
@@ -26,9 +26,8 @@ void CheckAbilities ()
 		}
 		else
 		{
-			// [2026-11-22] jsH2+ moving, attacking or light restarts the wait every time, hidden
-			// or not; Raven's always-true test below did this by accident, and the 2026-06-12 fix
-			// to that test left the restart inside it, so only a hidden player's wait restarted.
+			// [2026-11-22] jsH2+ moving, attacking or light restarts the wait every time, hidden or
+			// not, so a wait cut short never carries over; only the fade-back is for a hidden player.
 			self.still_time=-1;
 			if(self.drawflags&(DRF_TRANSLUCENT|MLS_ABSLIGHT))	// [2026-06-12] jsH2+ precedence:
 							// "&a|b" parsed as "(x&a)|b" - always true, so the fade-back
