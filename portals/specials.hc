@@ -10,7 +10,7 @@ void CheckAbilities ()
 			trans_limit=1;
 		if(self.velocity=='0 0 0'&&self.last_attack<time - 2&&self.light_level<100)
 		{
-			if(self.still_time<=0)	// [2026-11-22] jsH2+ 0 or less: a new player starts with 0, and a level change shifts -1 below it
+			if(self.still_time<=0)	// [2026-11-22] jsH2+ 0 or less: a new player starts with 0
 				self.still_time=time + 10 - self.level;
 			if(self.still_time<time)
 			{
